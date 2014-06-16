@@ -46,6 +46,7 @@
 #define clear_line() printf(ANSI_CLEAR_LINE)
 #define hide_cursor() printf(ANSI_HIDE_CURSOR)
 #define show_cursor() printf(ANSI_SHOW_CURSOR)
+#define clear_all() printf(ANSI_CLEAR_SCRN)
 
 #define BOARD_ROW 1
 #define BOARD_COL 1
@@ -77,6 +78,7 @@ int main(){
     //printf("%s", ANSI_WHITE); 
     //init_board
     //hide_cursor();
+    clear_all();
     init_board(BOARD_ROW, BOARD_COL);
     init_board(ANALYSIS_ROW, ANALYSIS_COL);
     move_cursor(20, 0);
