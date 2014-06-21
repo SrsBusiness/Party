@@ -168,7 +168,8 @@ def main():
     usr_white = int(raw_input("Choose color: white(0), black(1): ")) == 0
     usr_piece = 'X' if usr_white else 'O'
     ai_piece = 'X' if not usr_white else 'O'
-    while not game_over:
+    move_count = 0
+    while not game_over and move_count < dim * dim:
         check_board()
         if usr_white == white_move:
             move_cursor(30, 0)
@@ -179,14 +180,13 @@ def main():
             #update_board(analysis_row, analysis_col, index, usr_piece)
         else:
             index = best_move()
-            if index == -1:
-                break
             move(index, ai_piece)
             update_board(board_row, board_col, index, ai_piece)
             #update_board(analysis_row, analysis_col, index, ai_piece)
         if check_win('O') or check_win('X'):
             game_over = True
-    print(table)
+        move_count += 1
+    #print(table)
     print(len(table))
 
 if __name__ == "__main__":
