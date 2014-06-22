@@ -49,19 +49,21 @@ def best_move():
     #    table[tuple(board)] = 1
     #    return -1
     piece = 'X' if white_move else 'O'
-    best = -2
+    #best = -2
+    alpha = -2
+    beta = 2
     next_move = -1
     for i in range(dim * dim):
         if board[i] != '_':
             continue
-        if best == 1:
+        if alpha == 1:
             return next_move
         move(i, piece)
         #update_board(analysis_row, analysis_col, i, piece)
-        score = -1 * negamax()
+        score = -1 * negamax(alpha, beta)
         #print(score)
-        if score > best:
-            best = score
+        if score > alpha:
+            alpha = score
             next_move = i
         unmove(i)
         #update_board(analysis_row, analysis_col, i, '_')
@@ -102,20 +104,23 @@ def best_move():
 #and vice versa
 #
 #the condition on whether to abandon the current subtree was whether
-#the current score <= alpha (from white's point of view). With the negation this becomes
-#score >= beta. Let's say white was first to move. When evaluating black's
-#responses, the evaluations for black are the negation of those for white.
-#therefore -score(black) = score(white). Also beta(black) = -alpha(white).
-#the relation score(white) <= alpha(white) must fail. therefore the equivalent
-#relation from black's point of view is -score(black) <= -beta(black), which is
-#equivalent to score(black) >= beta(black). Therefore the comparison to be made in
-#negamax is score >= beta. Luckiy this is symmetric because of the negation used
-#in negamax
+#the current score <= alpha (from white's point of view). With the negation i
+#this becomes score >= beta. Let's say white was first to move. When 
+#evaluating black's responses, the evaluations for black are the negation of 
+#those for white. Therefore -score(black) = score(white). 
+#Also beta(black) = -alpha(white). The relation score(white) <= alpha(white) 
+#must fail. therefore the equivalent relation from black's point of view is 
+#-score(black) <= -beta(black), which is equivalent to 
+#score(black) >= beta(black). Therefore the comparison to be made in
+#negamax is score >= beta. Luckiy this is symmetric because of the negation 
+#used in negamax
 #
-#now what about the beta score (white's pov), or beta(white)? We need to update what
-#black is willing to tolerate. This is the same as -alpha(black). This is simply 
-#
-#
+#Now what about the beta score (white's pov), or beta(white)? We need to 
+#update what black is willing to tolerate. This is the same as -alpha(black).
+#This is simply let's assume that we are analysing white's responses to 
+#black's previous move. Then alpha(black) is simply the best score for black
+#so far, which, negated, becomes beta for white. Symmetrically, this applies
+#to beta for black as well.
 #
 #
 #
@@ -139,29 +144,31 @@ def negamax(alpha, beta):
     #best = -2
     piece = 'X' if white_move else 'O'
     for i in range(dim * dim):
-        if board[i] != '_':
+        if board[i] != '_': # checking move legality
             continue
-        #if best == 1:
-        #    return best
+        if alpha == 1: # if a win was found, look no further!
+            return alpha
         move(i, piece)
         #update_board(analysis_row, analysis_col, i, piece)
-        if tuple(board) not in table:
+        if tuple(board) not in table: #unvisited node
             #move_cursor(20, 20)
             #clear_line()
             #print("miss")
-            score = -1 * negamax()
+            score = -1 * negamax(-beta, -alpha)
         else:
             #move_cursor(20, 20)
             #clear_line()
             #print("hit")
             score = -1 * table[tuple(board)]
-        if score > best:
-            best = score
+        if score >= beta:
+            return beta
+        if score > alpha:
+            alpha = score
         unmove(i);
         #update_board(analysis_row, analysis_col, i, '_')
-    if best != -2:
+    if alpha != -2:
         table[tuple(board)] = 0
-        return best
+        return alpha
     else:
         return 0
 
@@ -189,7 +196,7 @@ def update_board(row, col, index, piece):
     print(piece)
 
 def move_cursor(row, col):
-    print("\033[{:d};{:d}H".format(row, col)),
+    print("\033[{:f};{:f}H".format(row, col)),
 
 def clear_line():
     print("\x1B[2K")
@@ -224,7 +231,7 @@ def main():
     init_board(analysis_row, analysis_col)
     game_over = False
     move_cursor(30, 0)
-    usr_white = int(raw_input("Choose color: white(0), black(1): ")) == 0
+    usr_white = int(input("Choose color: white(0), black(1): ")) == 0
     usr_piece = 'X' if usr_white else 'O'
     ai_piece = 'X' if not usr_white else 'O'
     move_count = 0
@@ -233,7 +240,7 @@ def main():
         if usr_white == white_move:
             move_cursor(30, 0)
             clear_line()
-            index = int(raw_input("Choose index to place piece: "))
+            index = int(input("Choose index to place piece: "))
             move(index, usr_piece)
             update_board(board_row, board_col, index, usr_piece)
             #update_board(analysis_row, analysis_col, index, usr_piece)
