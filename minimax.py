@@ -64,6 +64,7 @@ def best_move():
             score = -1 * table[tuple(board)]
         else:
             score = -1 * negamax(-1 * beta, -1 * alpha)
+            table[tuple(board)] = -1 * score
         #print(score)
         if score > alpha:
             alpha = score
@@ -143,10 +144,10 @@ def negamax(alpha, beta):
     #    return table[tuple(board)]
     total_nodes += 1
     if white_move and check_win('O'):
-        #table[tuple(board)] = -1;
+        #table[tuple(board)] = 1
         return -1
     elif (not white_move) and check_win('X'):
-        #table[tuple(board)] = -1;
+        #table[tuple(board)] = 1
         return -1
     #best = -2
     tie = True
@@ -157,7 +158,6 @@ def negamax(alpha, beta):
         else:
             tie = False
         if alpha == 1: # if a win was found, look no further!
-            #table[tuple(board)] = alpha
             return alpha
         move(i, piece)
         #update_board(analysis_row, analysis_col, i, piece)
@@ -174,11 +174,11 @@ def negamax(alpha, beta):
         unmove(i);
         #update_board(analysis_row, analysis_col, i, '_')
     if not tie:
-        #table[tuple(board)] = alpha
+        #table[tuple(board)] = 1
         return alpha
     else:
+        #table[tuple(board)] = 1
         #print("tie")
-        #table[tuple(board)] = 0
         return 0
 
 
