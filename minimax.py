@@ -68,7 +68,66 @@ def best_move():
     show_cursor()
     return next_move
 
-def negamax():
+#alpha-beta
+#evaluate all moves for white
+#make move for white (move1)
+#   now evaluate position
+#   try all black's responses
+#   we find all of them result in even game
+#   now eval of 0 is lower bound
+#
+#try next move for white (move2)
+#   now evaluate position
+#   try all black's responses
+#   response #1 results in black with significant advantage
+#   therefore we can discard this subtree and return
+#
+#try next move for white (move3)
+#   try all black's reponses
+#   move1 results in slight advantage for white
+#   try move2
+#       move1 -> even game
+#       move2 -> winning advantage for white
+#       we can therefore discard this subtree 
+#       since the subtree of black's move1 led to 
+#       only a slight advantage
+#
+#alpha will represent lower bound (lowest white will settle for)
+#beta will represent upper bound (highest black will settle for)
+#
+#because of negamax, the lowest white will settle for becomes
+#the negative of the highest black will settle for, and vice versa
+#
+#therefore what was now alpha becomes -beta for the next negamax call
+#and vice versa
+#
+#the condition on whether to abandon the current subtree was whether
+#the current score <= alpha (from white's point of view). With the negation this becomes
+#score >= beta. Let's say white was first to move. When evaluating black's
+#responses, the evaluations for black are the negation of those for white.
+#therefore -score(black) = score(white). Also beta(black) = -alpha(white).
+#the relation score(white) <= alpha(white) must fail. therefore the equivalent
+#relation from black's point of view is -score(black) <= -beta(black), which is
+#equivalent to score(black) >= beta(black). Therefore the comparison to be made in
+#negamax is score >= beta. Luckiy this is symmetric because of the negation used
+#in negamax
+#
+#now what about the beta score (white's pov), or beta(white)? We need to update what
+#black is willing to tolerate. This is the same as -alpha(black). This is simply 
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+def negamax(alpha, beta):
+    #alpha is the current lower bound
+    #if score is lower than alpha, then we need to leave    
     global white_move
     global table
     if white_move and check_win('O'):
@@ -77,13 +136,13 @@ def negamax():
     elif (not white_move) and check_win('X'):
         table[tuple(board)] = -1;
         return -1
-    best = -2
+    #best = -2
     piece = 'X' if white_move else 'O'
     for i in range(dim * dim):
         if board[i] != '_':
             continue
-        if best == 1:
-            return best
+        #if best == 1:
+        #    return best
         move(i, piece)
         #update_board(analysis_row, analysis_col, i, piece)
         if tuple(board) not in table:
