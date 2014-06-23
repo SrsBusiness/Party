@@ -1,6 +1,6 @@
 #white_win = [['X', 'X', 'X', '_', '_', '_', '_', '_', '_'],['_', '_', '_', 'X', 'X', 'X', '_', '_', '_'], ['_', '_', '_', '_', '_', '_', 'X', 'X', 'X'], ['X', '_', '_', 'X', '_', '_', 'X', '_', '_'], ['_', 'X', '_', '_', 'X', '_' ,'_', 'X', '_'], ['_', '_', 'X', '_', '_', 'X', '_', '_', 'X'], ['X', '_', '_', '_', 'X', '_', '_', '_', 'X'], ['_', '_', 'X', '_', 'X', '_', 'X', '_', '_']]
 #black_win = [['O', 'O', 'O', '_', '_', '_', '_', '_', '_'],['_', '_', '_', 'O', 'O', 'O', '_', '_', '_'], ['_', '_', '_', '_', '_', '_', 'O', 'O', 'O'], ['O', '_', '_', 'O', '_', '_', 'O', '_', '_'], ['_', 'O', '_', '_', 'O', '_' ,'_', 'O', '_'], ['_', '_', 'O', '_', '_', 'O', '_', '_', 'O'], ['O', '_', '_', '_', 'O', '_', '_', '_', 'O'], ['_', '_', 'O', '_', 'O', '_', 'O', '_', '_']]
-win = [[0, 1, 2, 4], [4, 5, 6, 7], [8, 9, 10, 11], [12, 13, 14, 15], [0, 4, 8, 12], [1, 5, 9, 13], [2, 6, 10, 14], [3, 7, 11, 15], [0, 5, 10, 15], [3, 6, 9, 12]]
+win = [[0, 1, 2, 3], [4, 5, 6, 7], [8, 9, 10, 11], [12, 13, 14, 15], [0, 4, 8, 12], [1, 5, 9, 13], [2, 6, 10, 14], [3, 7, 11, 15], [0, 5, 10, 15], [3, 6, 9, 12]]
 board = ['_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_']
 
 #win = [[0, 1, 2], [3, 4, 5], [6, 7, 8], [0, 3, 6], [1, 4, 7], [2, 5, 8], [0, 4, 8], [2, 4, 6]]
@@ -12,7 +12,7 @@ board_col = 1
 analysis_row = 12
 analysis_col = 1
 dim = 4
-
+total_nodes = 0
 table = {}
 
 def check_win(piece):
@@ -60,7 +60,10 @@ def best_move():
             return next_move
         move(i, piece)
         #update_board(analysis_row, analysis_col, i, piece)
-        score = -1 * negamax(alpha, beta)
+        if tuple(board) in table:
+            score = -1 * table[tuple(board)]
+        else:
+            score = -1 * negamax(-1 * beta, -1 * alpha)
         #print(score)
         if score > alpha:
             alpha = score
@@ -135,41 +138,47 @@ def negamax(alpha, beta):
     #if score is lower than alpha, then we need to leave    
     global white_move
     global table
+    global total_nodes
+    #if tuple(board) in table:
+    #    return table[tuple(board)]
+    total_nodes += 1
     if white_move and check_win('O'):
-        table[tuple(board)] = -1;
+        #table[tuple(board)] = -1;
         return -1
     elif (not white_move) and check_win('X'):
-        table[tuple(board)] = -1;
+        #table[tuple(board)] = -1;
         return -1
     #best = -2
+    tie = True
     piece = 'X' if white_move else 'O'
     for i in range(dim * dim):
         if board[i] != '_': # checking move legality
             continue
+        else:
+            tie = False
         if alpha == 1: # if a win was found, look no further!
+            #table[tuple(board)] = alpha
             return alpha
         move(i, piece)
         #update_board(analysis_row, analysis_col, i, piece)
-        if tuple(board) not in table: #unvisited node
-            #move_cursor(20, 20)
-            #clear_line()
-            #print("miss")
-            score = -1 * negamax(-beta, -alpha)
-        else:
-            #move_cursor(20, 20)
-            #clear_line()
-            #print("hit")
+        if tuple(board) in table:
             score = -1 * table[tuple(board)]
+        else:
+            score = -1 * negamax(-1 * beta, -1 * alpha)
+            table[tuple(board)] = -1 * score
         if score >= beta:
+            unmove(i)
             return beta
         if score > alpha:
             alpha = score
         unmove(i);
         #update_board(analysis_row, analysis_col, i, '_')
-    if alpha != -2:
-        table[tuple(board)] = 0
+    if not tie:
+        #table[tuple(board)] = alpha
         return alpha
     else:
+        #print("tie")
+        #table[tuple(board)] = 0
         return 0
 
 
@@ -192,11 +201,11 @@ def init_board(row, col):
 def update_board(row, col, index, piece):
     #move(index, piece);
     #print("row: " + ((index / 3) + row) + " col: " + (2 * (index % 3) + col))
-    move_cursor((dim - 1) - (index / dim) + row, 2 * (index % dim) + col)
+    move_cursor((dim - 1) - int(index / dim) + row, 2 * (index % dim) + col)
     print(piece)
 
 def move_cursor(row, col):
-    print("\033[{:f};{:f}H".format(row, col)),
+    print("\033[{:d};{:d}H".format(row, col), end="")
 
 def clear_line():
     print("\x1B[2K")
@@ -216,7 +225,7 @@ def test():
 
 def check_board():
     move_cursor(0, 20)
-    print("board: "),
+    print("board: ", end="")
     print(board)
 
 def main():
@@ -252,8 +261,10 @@ def main():
         if check_win('O') or check_win('X'):
             game_over = True
         move_count += 1
+    print(move_count, " moves")
     #print(table)
-    print(len(table))
+    print("positions: ", str(len(table)))
+    print("nodes: ", str(total_nodes))
 
 if __name__ == "__main__":
     main()
