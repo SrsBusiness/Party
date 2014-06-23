@@ -126,11 +126,11 @@ def init_board(row, col):
 def update_board(row, col, index, piece):
     #move(index, piece);
     #print("row: " + ((index / 3) + row) + " col: " + (2 * (index % 3) + col))
-    move_cursor((dim - 1) - (index / dim) + row, 2 * (index % dim) + col)
+    move_cursor((dim - 1) - int(index / dim) + row, 2 * (index % dim) + col)
     print(piece)
 
 def move_cursor(row, col):
-    print("\033[{:d};{:d}H".format(row, col)),
+    print("\x1B[{:d};{:d}H".format(row, col), end="")
 
 def clear_line():
     print("\x1B[2K")
@@ -165,16 +165,16 @@ def main():
     init_board(analysis_row, analysis_col)
     game_over = False
     move_cursor(30, 0)
-    usr_white = int(raw_input("Choose color: white(0), black(1): ")) == 0
+    usr_white = int(input("Choose color: white(0), black(1): ")) == 0
     usr_piece = 'X' if usr_white else 'O'
     ai_piece = 'X' if not usr_white else 'O'
     move_count = 0
     while not game_over and move_count < dim * dim:
-        check_board()
+        #check_board()
         if usr_white == white_move:
             move_cursor(30, 0)
             clear_line()
-            index = int(raw_input("Choose index to place piece: "))
+            index = int(input("Choose index to place piece: "))
             move(index, usr_piece)
             update_board(board_row, board_col, index, usr_piece)
             #update_board(analysis_row, analysis_col, index, usr_piece)
