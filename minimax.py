@@ -205,11 +205,7 @@ def update_board(row, col, index, piece):
     print(piece)
 
 def move_cursor(row, col):
-<<<<<<< HEAD
     print("\x1B[{:d};{:d}H".format(row, col), end="")
-=======
-    print("\033[{:d};{:d}H".format(row, col), end="")
->>>>>>> alpha_beta
 
 def clear_line():
     print("\x1B[2K")
