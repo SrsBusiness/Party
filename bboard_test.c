@@ -59,6 +59,7 @@ void display_bboard(bboard);
 
 int main(){
     clear_all();
+    hide_cursor();
     int i = 0;
     while(1){
         move_cursor(3, 0);
