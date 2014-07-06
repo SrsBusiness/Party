@@ -59,7 +59,7 @@ def best_move():
         if alpha == 1:
             return next_move
         move(i, piece)
-        #update_board(analysis_row, analysis_col, i, piece)
+        update_board(analysis_row, analysis_col, i, piece)
         if tuple(board) in table:
             score = -1 * table[tuple(board)]
         else:
@@ -70,7 +70,7 @@ def best_move():
             alpha = score
             next_move = i
         unmove(i)
-        #update_board(analysis_row, analysis_col, i, '_')
+        update_board(analysis_row, analysis_col, i, '_')
     show_cursor()
     return next_move
 
@@ -160,7 +160,7 @@ def negamax(alpha, beta):
         if alpha == 1: # if a win was found, look no further!
             return alpha
         move(i, piece)
-        #update_board(analysis_row, analysis_col, i, piece)
+        update_board(analysis_row, analysis_col, i, piece)
         if tuple(board) in table:
             score = -1 * table[tuple(board)]
         else:
@@ -168,11 +168,12 @@ def negamax(alpha, beta):
             table[tuple(board)] = -1 * score
         if score >= beta:
             unmove(i)
+            update_board(analysis_row, analysis_col, i, '_')
             return beta
         if score > alpha:
             alpha = score
         unmove(i);
-        #update_board(analysis_row, analysis_col, i, '_')
+        update_board(analysis_row, analysis_col, i, '_')
     if not tie:
         #table[tuple(board)] = 1
         return alpha
@@ -252,12 +253,12 @@ def main():
             index = int(input("Choose index to place piece: "))
             move(index, usr_piece)
             update_board(board_row, board_col, index, usr_piece)
-            #update_board(analysis_row, analysis_col, index, usr_piece)
+            update_board(analysis_row, analysis_col, index, usr_piece)
         else:
             index = best_move()
             move(index, ai_piece)
             update_board(board_row, board_col, index, ai_piece)
-            #update_board(analysis_row, analysis_col, index, ai_piece)
+            update_board(analysis_row, analysis_col, index, ai_piece)
         if check_win('O') or check_win('X'):
             game_over = True
         move_count += 1
