@@ -61,30 +61,43 @@ void display_bboard(bboard);
 int main(){
     clear_all();
     hide_cursor();
-    //int i = 0;
-    //while(1){
-    //    move_cursor(3, 0);
-    //    clear_line();
-    //    printf("%s\n", bboard_names[i]);
-    //    display_bboard(0);
-    //    display_bboard(bboards[i]);
-    //    char j = getchar();
-    //    if (j == '-')
-    //        i = (i + 51) % 52;
-    //    else
-    //        i = (i + 1) % 52;
-    //}
-    for(int i = 7; i >= 0; i++){
-        for(int j = 7; j >= 0; j++){
+    int i = 0;
+    while(1){
+        move_cursor(3, 0);
+        clear_line();
+        printf("%s\n", bboard_names[i]);
+        display_bboard(0);
+        display_bboard(bboards[i]);
+        char j = getchar();
+        if (j == '-')
+            i = (i + 51) % 52;
+        else
+            i = (i + 1) % 52;
+    }
+    for(int i = 7; i >= 0; i--){
+        for(int j = 7; j >= 0; j--){
             display_bboard(0);
             display_bboard(1 | (1ul << (i * 8 + j)));
             move_cursor(3, 0);
             clear_line();
-            printf("Manhattan distance: %d\n", dist_man[diff88(0, (16 * i + j) )]);
-            printf("%d", (16 * i + j));
+            printf("Manhattan distance: %d\n", dist_man[diff88(0, 16 * i + j)]);
+            printf("%X", diff88(0, 16 * i + j));
             getchar();
         }
     }
+    for(int i = 0; i < 8; i++){
+        for(int j = 0; j < 8; j++){
+            display_bboard(0);
+            display_bboard(1 | (1ul << (i * 8 + j)));
+            move_cursor(3, 0);
+            clear_line();
+            printf("Manhattan distance: %d\n", dist_man[diff88(16 * i + j, 0)]);
+            printf("%X", diff88(16 * i + j, 0));
+            getchar();
+        }
+    }
+
+    show_cursor();
 }
 
 void display_bboard(bboard b) {

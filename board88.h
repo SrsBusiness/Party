@@ -1,7 +1,10 @@
-#define invalid_square_88(a) (a & 0x88)
-#define diff88(a, b) (a - b + 0x77)
+#define invalid_square_88(a) ((a) & 0x88)
+#define diff88(a, b) ((a) - (b) + 0x77)
 
 extern unsigned char board_88[128];
+
+// table of Manhattan distances. To index into the table, use
+// the diff88 macro.
 const unsigned char dist_man[240] = {14, 13, 12, 11, 10, 9, 8, 7,
                             -1, -1, -1, -1, -1, -1, -1, -1,
                             13, 12, 11, 10, 9, 8, 7, 6,
@@ -33,6 +36,9 @@ const unsigned char dist_man[240] = {14, 13, 12, 11, 10, 9, 8, 7,
                             -1, -1, -1, -1, -1, -1, -1, -1,
                             7, 8, 9, 10, 11, 12, 13, 14, -1
                             };
+
+// Table of actual square distances. The indexing scheme
+// is the same as above
 const unsigned char dist[240] = {7, 7, 7, 7, 7, 7, 7, 7,
                             -1, -1, -1, -1, -1, -1, -1, -1,
                             7, 6, 6, 6, 6, 6, 6, 6,
@@ -64,3 +70,10 @@ const unsigned char dist[240] = {7, 7, 7, 7, 7, 7, 7, 7,
                             -1, -1, -1, -1, -1, -1, -1, -1,
                             7, 7, 7, 7, 7, 7, 7, 7, -1
                             };
+
+// 0x01 - diag (Bishop, Queen)
+// 0x02 - horiz/vertic (Rook, Queen)
+// 0x04 - knight
+// 0x08 - king
+// 0x10 - pawn
+

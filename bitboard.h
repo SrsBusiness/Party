@@ -63,3 +63,12 @@
 #define BLACK       0xFFFF000000000000
 
 typedef unsigned long long bboard;
+
+// iterate through all pieces in a bboard
+// bboard b;
+// while(b){
+//     int index = __builtin_ffsll(b & -b);
+//     ...
+//     b &= b - 1;
+//
+// }
