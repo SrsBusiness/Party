@@ -1,3 +1,5 @@
+#include <stdint.h>
+
 // File Masks
 #define AFILE       0x0101010101010101
 #define BFILE       0x0202020202020202
@@ -62,12 +64,42 @@
 #define WHITE       0x000000000000FFFF
 #define BLACK       0xFFFF000000000000
 
-typedef unsigned long long bboard;
+
+// macro functions on bitboards
+
+// returns the rotated word
+#define flipv(board)    (__builtin_bswap64(board))
+
+// returns the word rotated, hopefully compiler optimized
+#define rolll(x, y) ((x << y) | ((uint64_t)x >> (8 * sizeof(uint64_t) - y)))
+#define rorll(x, y) (((uint64_t)x >> y) | (x << (8 * sizeof(uint64_t) - y)))
+
+// directional shifts
+#define north_one(x)    (x << 8)
+#define south_one(x)    (x >> 8)
+#define east_one(x) ((x << 1) & (~AFILE))
+#define west_one(x) ((x >> 1) & (~HFILE))
+#define ne_one(x)   ((x << 9) & (~AFILE))
+#define nw_one(x)   ((x << 7) & (~HFILE))
+#define se_one(x)   ((x >> 7) & (~AFILE))
+#define sw_one(x)   ((x >> 9) & (~HFILE))
+
+
+typedef uint64_t bboard;
+
+bboard (*fliph)(bboard);
+bboard flipld(bboard); 
+bboard flipdd(bboard); 
+bboard rotate_pi(bboard);
+bboard rotate_c(bboard);
+bboard rotate_a(bboard);
+
+
 
 // iterate through all pieces in a bboard
 // bboard b;
 // while(b){
-//     int index = __builtin_ffsll(b & -b);
+//     int index = __builtin_ctz(b);
 //     ...
 //     b &= b - 1;
 //

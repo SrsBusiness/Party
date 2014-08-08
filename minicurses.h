@@ -10,8 +10,10 @@
 #define ANSI_CYAN "\x1B[36m"
 #define ANSI_WHITE "\x1B[37m"
 #define ANSI_CLEAR_SCRN "\x1B[2J"
-#define ANSI_MOVE_UP_ONE "\x1B[1A"
-#define ANSI_MOVE_DOWN_ONE "\x1B[1B"
+#define ANSI_MOVE_UP "\x1B[%dA"
+#define ANSI_MOVE_DOWN "\x1B[%dB"
+#define ANSI_MOVE_FORWARD "\x1B[%dC"
+#define ANSI_MOVE_BACK "\x1B[%dD"
 #define ANSI_CLEAR_LINE "\x1B[2K"
 #define ANSI_BG_BLACK "\x1B[40m"
 #define ANSI_SAVE_CURSOR "\x1B[s"
@@ -25,8 +27,10 @@
 // Only the side-effect of these functions are significant.
 
 #define move_cursor(a, b) printf("\x1B[%d;%dH", a, b)
-#define move_up() printf(ANSI_MOVE_UP_ONE)
-#define move_down() printf(ANSI_MOVE_DOWN_ONE)
+#define move_up(a) printf(ANSI_MOVE_UP, a)
+#define move_down(a) printf(ANSI_MOVE_DOWN, a)
+#define move_forward(a) printf(ANSI_MOVE_FORWARD, a)
+#define move_back(a) printf(ANSI_MOVE_BACK, a)
 #define clear_line() printf(ANSI_CLEAR_LINE)
 #define hide_cursor() printf(ANSI_HIDE_CURSOR)
 #define show_cursor() printf(ANSI_SHOW_CURSOR)

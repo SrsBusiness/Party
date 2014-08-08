@@ -1,9 +1,12 @@
 #include "bitboard.h"
 #include "minicurses.h"
 #include "board88.h"
+#include <signal.h>
+#include <stdlib.h>
 
 #define BOARD_ROW 5
 #define BOARD_COL 8
+#define smiley 0x2828282882443800
 
 bboard bboards[52] = {WHITE, BLACK, KING, QUEEN, BISHOP, KNIGHT, ROOK, PAWN,
     AFILE, BFILE, CFILE, DFILE, EFILE, FFILE, GFILE, HFILE,
@@ -36,14 +39,13 @@ bboard bboards[52] = {WHITE, BLACK, KING, QUEEN, BISHOP, KNIGHT, ROOK, PAWN,
     G8H7,
     LIGHT,
     DARK
-    };
+};
 
 // 0x88 board
 char board088[128];
 
 // 10 x 12 board
 char board120[120];
-
 
 
 char * bboard_names[52] = {"White", "Black", "King", "Queen", "Bishop",
@@ -58,51 +60,144 @@ char * bboard_names[52] = {"White", "Black", "King", "Queen", "Bishop",
 
 void display_bboard(bboard);
 
+void cleanup(){
+    show_cursor();
+}
+
+void display_text(char *string, int row){
+    move_cursor(row, 0);
+    clear_line();
+    printf("%s\n", string);
+}
+
 int main(){
+    atexit(cleanup);
     clear_all();
     hide_cursor();
     int i = 0;
+    bboard current;
+    //*(int *)&current = rand();
+    //*((int *)&current + 1) = rand();
     while(1){
-        move_cursor(3, 0);
-        clear_line();
-        printf("%s\n", bboard_names[i]);
-        display_bboard(0);
-        display_bboard(bboards[i]);
-        char j = getchar();
-        if (j == '-')
-            i = (i + 51) % 52;
-        else
-            i = (i + 1) % 52;
-    }
-    for(int i = 7; i >= 0; i--){
-        for(int j = 7; j >= 0; j--){
-            display_bboard(0);
-            display_bboard(1 | (1ul << (i * 8 + j)));
-            move_cursor(3, 0);
-            clear_line();
-            printf("Manhattan distance: %d\n", dist_man[diff88(0, 16 * i + j)]);
-            printf("%X", diff88(0, 16 * i + j));
-            getchar();
-        }
-    }
-    for(int i = 0; i < 8; i++){
-        for(int j = 0; j < 8; j++){
-            display_bboard(0);
-            display_bboard(1 | (1ul << (i * 8 + j)));
-            move_cursor(3, 0);
-            clear_line();
-            printf("Manhattan distance: %d\n", dist_man[diff88(16 * i + j, 0)]);
-            printf("%X", diff88(16 * i + j, 0));
-            getchar();
-        }
-    }
+        //display_text(bboard_names[i],3);
+        //display_bboard(0);
+        display_text("Hey, buddy", 4);
+        current = smiley;
+        display_bboard(current);
 
-    show_cursor();
+        getchar();
+        current = flipv(current);
+        display_text("Vertical Flip", 4);
+        display_bboard(current);
+        
+        getchar();
+        current = fliph(current);
+        display_text("Horizontal Flip", 4);
+        display_bboard(current);
+
+        getchar();
+        current = flipld(current);
+        display_text("Flip about light square diag", 4);
+        display_bboard(current);
+
+        getchar();
+        current = flipdd(current);
+        display_text("Flip about dark square diag", 4);
+        display_bboard(current);
+
+        getchar();
+        current = rotate_pi(current);
+        display_text("Rotate pi radians", 4);
+        display_bboard(current);
+
+        getchar();
+        current = rotate_c(current);
+        display_text("Rotate pi/2 radians clockwise", 4);
+        display_bboard(current);
+
+        getchar();
+        current = rotate_a(current);
+        display_text("Rotate pi/2 radians anticlockwise", 4);
+        display_bboard(current);
+        
+        getchar();
+        current = north_one(current);
+        display_text("Shift North", 4);
+        display_bboard(current);
+
+        getchar();
+        current = south_one(current);
+        display_text("Shift South", 4);
+        display_bboard(current);
+        
+        getchar();
+        current = east_one(current);
+        display_text("Shift East", 4);
+        display_bboard(current);
+        
+        getchar();
+        current = west_one(current);
+        display_text("Shift West", 4);
+        display_bboard(current);
+        
+        getchar();
+        current = ne_one(current);
+        display_text("Shift NE", 4);
+        display_bboard(current);
+        
+        getchar();
+        current = sw_one(current);
+        display_text("Shift SW", 4);
+        display_bboard(current);
+        
+        getchar();
+        current = nw_one(current);
+        display_text("Shift NW", 4);
+        display_bboard(current);
+        
+        getchar();
+        current = se_one(current);
+        display_text("Shift SE", 4);
+        display_bboard(current);
+        
+
+        
+        getchar();
+        //i = (i + 1) % 52;
+        //if (j == '-')
+        //    i = (i + 51) % 52;
+        //else
+        //    i = (i + 1) % 52;
+    }
+    //for(int i = 7; i >= 0; i--){
+    //    for(int j = 7; j >= 0; j--){
+    //        display_bboard(0);
+    //        display_bboard(1 | (1ul << (i * 8 + j)));
+    //        move_cursor(3, 0);
+    //        clear_line();
+    //        printf("Distance: %d\n", dist[diff88(0, 16 * i + j)]);
+    //        printf("%X", diff88(0, 16 * i + j));
+    //        getchar();
+    //    }
+    //}
+    //for(int i = 0; i < 8; i++){
+    //    for(int j = 0; j < 8; j++){
+    //        display_bboard(0);
+    //        display_bboard(1 | (1ul << (i * 8 + j)));
+    //        move_cursor(3, 0);
+    //        clear_line();
+    //        printf("Distance: %d\n", dist[diff88(16 * i + j, 0)]);
+    //        printf("%X", diff88(16 * i + j, 0));
+    //        getchar();
+    //    }
+    //}
+
+    //show_cursor();
 }
 
 void display_bboard(bboard b) {
     for(int i  = 0; i < 64; i++) {
-        move_cursor(7 - (i / 8) + BOARD_ROW, (i & 7) + BOARD_COL);
+        move_cursor(7 - (i / 8) + BOARD_ROW, ((i & 7) << 1) + BOARD_COL);
         if((1lu << i) & b)
             putchar('#');
         else
