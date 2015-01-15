@@ -33,8 +33,6 @@ bboard fliph2 (bboard x) {
     return rorll(x, 7);
 }
 
-bboard (*fliph)(bboard) = fliph0;
-
 bboard flipdd(bboard x) { // light square diagonal
     bboard t;
     const bboard k1 = 0x5500550055005500;
@@ -78,13 +76,13 @@ bboard rotate_pi(bboard x){
 }
 
 // 90 clockwise
-bboard rotate_c(bboard x){
+bboard rotate_clockwise(bboard x){
     // to be optimized with inlining...
     return flipld(flipv(x));
 }
 
 // 90 anticlockwise
-bboard rotate_a(bboard x){
+bboard rotate_anticlockwise(bboard x){
     // to be optimized with inlining...
     return flipdd(flipv(x));
 }
@@ -103,18 +101,145 @@ bboard south_span(bboard x){
     return x;
 }
 
+bboard north_fill(bboard gen) {
+   gen |= (gen <<  8);
+   gen |= (gen << 16);
+   gen |= (gen << 32);
+   return gen;
+}
+ 
+bboard south_fill(bboard gen) {
+   gen |= (gen >>  8);
+   gen |= (gen >> 16);
+   gen |= (gen >> 32);
+   return gen;
+}
+
 // file fill = north_span(x) | south_span(x) | x, shows open/closed files
 
 // front span = north_span(white), south_span(black) (rear spans are vice versa)
 
 // Inter span = north_span(white) & south_span(black), occurs on closed files
 
-// Attack front Span = east and west front spans
-// Attack rear span = east and west rear spans
+// Pawn Attack front Span = east and west front spans
+// Pawn Attack rear span = east and west rear spans
 //
-//Occlusive fill - fill until it is blocked
+//
+// Occlusive fill - fill until it is blocked
+// Useful for sliding pieces 
+//
+
+bboard knight_attacks0(bboard b){
+    return ((b << 17) & ~AFILE) |
+        ((b << 10) & ~AFILE & ~BFILE) |
+        ((b >>  6) & ~AFILE & ~BFILE) |
+        ((b >> 15) & ~AFILE) |
+        ((b << 15) & ~HFILE) |
+        ((b <<  6) & ~GFILE & ~HFILE) |
+        ((b >> 10) & ~GFILE & ~HFILE) |
+        ((b >> 17) & ~HFILE);
+}
+
+bboard knight_attacks1(bboard knights){
+    bboard west, east, attacks;
+    east     = east_one (knights);
+    west     = west_one (knights);
+    attacks  = (east|west) << 16;
+    attacks |= (east|west) >> 16;
+    east     = east_one (east);
+    west     = west_one (west);
+    attacks |= (east|west) <<  8;
+    attacks |= (east|west) >>  8;
+    return attacks; 
+}
+
+bboard knight_attacks2(bboard knights) {
+    bboard l1 = (knights >> 1) & ~HFILE;
+    bboard l2 = (knights >> 2) & ~GFILE & ~HFILE;
+    bboard r1 = (knights << 1) & ~AFILE;
+    bboard r2 = (knights << 2) & ~AFILE & ~BFILE;
+    bboard h1 = l1 | r1;
+    bboard h2 = l2 | r2;
+    return (h1<<16) | (h1>>16) | (h2<<8) | (h2>>8);
+}
+
+bboard knight_fork(bboard targets) {
+    bboard west, east, attak, forks;
+    east = east_one(targets);
+    west = west_one(targets);
+    attak = east << 16;
+    forks = (west << 16) & attak;
+    attak |= west << 16;
+    forks |= (east >> 16) & attak;
+    attak |= east >> 16;
+    forks |= (west >> 16) & attak;
+    attak |= west >> 16;
+    east = east_one(east);
+    west = west_one(west);
+    forks |= (east << 8) & attak;
+    attak |= east << 8;
+    forks |= (west << 8) & attak;
+    attak |= west << 8;
+    forks |= (east >> 8) & attak;
+    attak |= east >> 8;
+    forks |= (west >> 8) & attak;
+    return forks;
+}
+
+// no set should be empty -> assert (b1 != 0 && b2 != 0 )
+// b1 != b2
+int knight_distance(bboard b1, bboard b2) {
+    int d = 0;
+    while ((b1 & b2) == 0) {
+        b1 = knight_attacks(b1); // as long as sets are disjoint
+        d++; // increment distance
+    }
+    return d;
+}
+
+bboard kingAttacks(bboard kingSet) {
+    bboard attacks = east_one(kingSet) | west_one(kingSet);
+    kingSet |= attacks;
+    attacks |= north_one(kingSet) | south_one(kingSet);
+    return attacks;
+}
+
+// algorithm based on the square of the passed pawn
+// returns a bitboard set containing all squares which,
+// if occupied, can be caught by a king, whose position
+// is represented by an input bitboard
+//
+
+bboard catchable_passers_white(bboard king){
+    return 0;
+}
+
+bboard catchable_passers_black(bboard king){
+    return 0;
+}
+
+
+
+//int knight_distance_occl(bboard b1, bboard b2, bboard occupied){
+//    int d = 0;
+//    while ((b1 & b2) == 0) {
+//        b1 = knight_attacks(b1) & ~occupied; // as long as sets are disjoint
+//        d++; // increment distance
+//    }
+//    return d;
+//}
+
+//int knightDistance(bboard source, bboard dest) {
+//    return calcKnightDistance(source, dest);
+//}
+
+/*
+ * gen refers to the generation set i.e. set of pieces generating the fill
+ * pro refers to the propgation set i.e. set of empty squares on the board 
+ */
+
 bboard soutOccl(bboard gen, bboard pro) {
-    gen |= pro & (gen >>  8);
+    gen |= pro & (gen >> 8);
     pro &= (pro >>  8);
     gen |= pro & (gen >> 16);
     pro &= (pro >> 16);
@@ -123,7 +248,7 @@ bboard soutOccl(bboard gen, bboard pro) {
 }
 
 bboard nortOccl(bboard gen, bboard pro) {
-    gen |= pro & (gen <<  8);
+    gen |= pro & (gen << 8);
     pro &= (pro <<  8);
     gen |= pro & (gen << 16);
     pro &= (pro << 16);
@@ -143,7 +268,7 @@ bboard eastOccl(bboard gen, bboard pro) {
 
 bboard noEaOccl(bboard gen, bboard pro) {
     pro &= ~AFILE;
-    gen |= pro & (gen <<  9);
+    gen |= pro & (gen << 9);
     pro &= (pro <<  9);
     gen |= pro & (gen << 18);
     pro &= (pro << 18);
@@ -153,7 +278,7 @@ bboard noEaOccl(bboard gen, bboard pro) {
 
 bboard soEaOccl(bboard gen, bboard pro) {
     pro &= ~AFILE;
-    gen |= pro & (gen >>  7);
+    gen |= pro & (gen >> 7);
     pro &= (pro >>  7);
     gen |= pro & (gen >> 14);
     pro &= (pro >> 14);
@@ -173,7 +298,7 @@ bboard westOccl(bboard gen, bboard pro) {
 
 bboard soWeOccl(bboard gen, bboard pro) {
     pro &= ~HFILE;
-    gen |= pro & (gen >>  9);
+    gen |= pro & (gen >> 9);
     pro &= (pro >>  9);
     gen |= pro & (gen >> 18);
     pro &= (pro >> 18);
@@ -183,10 +308,12 @@ bboard soWeOccl(bboard gen, bboard pro) {
 
 bboard noWeOccl(bboard gen, bboard pro) {
     pro &= ~HFILE;
-    gen |= pro & (gen <<  7);
+    gen |= pro & (gen << 7);
     pro &= (pro <<  7);
     gen |= pro & (gen << 14);
     pro &= (pro << 14);
     gen |= pro & (gen << 28);
     return gen;
 }
+
+

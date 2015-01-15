@@ -59,7 +59,7 @@
 #define QUEEN       0x0800000000000008
 #define BISHOP      0x2400000000000024
 #define KNIGHT      0x4200000000000042
-#define ROOK        0x8100000000000081 
+#define ROOK        0x8100000000000081
 #define PAWN        0x00FF00000000FF00
 #define WHITE       0x000000000000FFFF
 #define BLACK       0xFFFF000000000000
@@ -67,34 +67,81 @@
 
 // macro functions on bitboards
 
-// returns the rotated word
+// bitscan
+#define bit_scan(board) (__builtin_ctzll(board))
+//#define bit_scan(board) (__builtin_ffsll(board))
+
+// flips the bytes of the word
 #define flipv(board)    (__builtin_bswap64(board))
 
 // returns the word rotated, hopefully compiler optimized
-#define rolll(x, y) ((x << y) | ((uint64_t)x >> (8 * sizeof(uint64_t) - y)))
-#define rorll(x, y) (((uint64_t)x >> y) | (x << (8 * sizeof(uint64_t) - y)))
+#define rolll(x, y) (((x) << (y)) | ((uint64_t)(x) >> (8 * sizeof(uint64_t) - (y))))
+#define rorll(x, y) (((uint64_t)(x) >> (y)) | ((x) << (8 * sizeof(uint64_t) - (y))))
 
-// directional shifts
-#define north_one(x)    (x << 8)
-#define south_one(x)    (x >> 8)
-#define east_one(x) ((x << 1) & (~AFILE))
-#define west_one(x) ((x >> 1) & (~HFILE))
-#define ne_one(x)   ((x << 9) & (~AFILE))
-#define nw_one(x)   ((x << 7) & (~HFILE))
-#define se_one(x)   ((x >> 7) & (~AFILE))
-#define sw_one(x)   ((x >> 9) & (~HFILE))
+// directional shifts by one square
+// kings/pawns
+#define north_one(x)    ((x) << 8)
+#define south_one(x)    ((x) >> 8)
+#define east_one(x) (((x) << 1) & ~AFILE)
+#define west_one(x) (((x) >> 1) & ~HFILE)
+#define ne_one(x)   (((x) << 9) & ~AFILE)
+#define nw_one(x)   (((x) << 7) & ~HFILE)
+#define se_one(x)   (((x) >> 7) & ~AFILE)
+#define sw_one(x)   (((x) >> 9) & ~HFILE)
+
+#define w_pawn_east_attacks(x)  ne_one(x)
+#define w_pawn_west_attacks(x)  nw_one(x)
+
+
+
+#define b_pawn_east_attacks(x)  se_one(x)
+#define b_pawn_west_attacks(x)  sw_one(x)
+
+
+#define w_pawn_any_attacks(x)   (w_pawn_east_attacks(x) | w_pawn_west_attacks(x))
+#define w_pawn_dbl_attacks(x)   (w_pawn_east_attacks(x) & w_pawn_west_attacks(x))
+#define w_pawn_single_attacks(x)    (w_pawn_east_attacks(x) ^ w_pawn_west_attacks(x))
+#define b_pawn_any_attacks(x)   (b_pawn_east_attacks(x) | b_pawn_west_attacks(x))
+#define b_pawn_dbl_attacks(x)   (b_pawn_east_attacks(x) & b_pawn_west_attacks(x))
+#define b_pawn_single_attacks(x)    (b_pawn_east_attacks(x) ^ b_pawn_west_attacks(x))
+
+// knights
+
+
+#define bishop_attacks(x) (noEaOccl(x) | soEaOccl(x) | noWeOccl(x) | soWeOccl(x))
+#define rook_attacks(x) (nortOccl(x) | eastOccl(x) | soutOccl(x) | westOccl(x))
+#define queen_attacks(x) (bishop_attacks(x) | rook_attacks(x))
+
 
 
 typedef uint64_t bboard;
+// square of passed pawns
 
-bboard (*fliph)(bboard);
-bboard flipld(bboard); 
-bboard flipdd(bboard); 
+extern const bboard square_pp[64];
+
+// for black's pov, just vertical flip the index, index into the table, then
+// vertical flip the bitboard.
+
+
+#define fliph(x)        fliph0(x)
+bboard flipld(bboard);
+bboard flipdd(bboard);
 bboard rotate_pi(bboard);
-bboard rotate_c(bboard);
-bboard rotate_a(bboard);
-
-
+bboard rotate_clockwise(bboard);
+bboard rotate_anticlockwise(bboard);
+bboard north_span(bboard);
+bboard south_span(bboard);
+#define knight_attacks(x)       knight_attacks2(x)
+int knight_distance(bboard, bboard);
+bboard knight_fork(bboard);
+bboard soutOccl(bboard, bboard);
+bboard nortOccl(bboard, bboard);
+bboard eastOccl(bboard, bboard);
+bboard noEaOccl(bboard, bboard);
+bboard soEaOccl(bboard, bboard);
+bboard westOccl(bboard, bboard);
+bboard soWeOccl(bboard, bboard);
+bboard noWeOccl(bboard, bboard);
 
 // iterate through all pieces in a bboard
 // bboard b;
