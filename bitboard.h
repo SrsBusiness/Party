@@ -129,8 +129,24 @@ bboard flipdd(bboard);
 bboard rotate_pi(bboard);
 bboard rotate_clockwise(bboard);
 bboard rotate_anticlockwise(bboard);
+
 bboard north_span(bboard);
 bboard south_span(bboard);
+
+#define w_front_span(x) (north_span(x))
+#define w_rear_span(x)  (south_span(x))
+#define b_front_span(x) (south_span(x))
+#define b_rear_span(x)  (north_span(x))
+
+bboard north_fill(bboard);
+bboard south_fill(bboard);
+
+#define w_front_fill(x) (north_fill(x))
+#define w_rear_fill(x)  (south_fill(x))
+#define b_front_fill(x) (south_fill(x))
+#define b_rear_fill(x)  (north_fill(x))
+
+#define file_fill(x)    (north_fill(x) | south_fill(x))
 #define knight_attacks(x)       knight_attacks2(x)
 int knight_distance(bboard, bboard);
 bboard knight_fork(bboard);

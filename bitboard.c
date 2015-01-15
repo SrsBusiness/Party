@@ -115,6 +115,8 @@ bboard south_fill(bboard gen) {
    return gen;
 }
 
+
+
 // file fill = north_span(x) | south_span(x) | x, shows open/closed files
 
 // front span = north_span(white), south_span(black) (rear spans are vice versa)

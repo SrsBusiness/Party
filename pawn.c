@@ -230,3 +230,42 @@ bboard pawns_with_east_neighbors(bboard pawns) {
 bboard pawns_with_west_neighbors(bboard pawns) {
     return pawns & east_one (pawns);
 }
+
+/*
+ *  returns closed files
+ */
+
+bboard closed_files(bboard wpawns, bboard bpawns) {
+    return file_fill(wpawns) & file_fill(bpawns);
+}
+
+/*
+ *  returns open files
+ */
+
+bboard open_files(bboard wpawns, bboard bpawns) {
+    return ~file_fill(wpawns | bpawns);
+}
+
+
+/*
+ *  returns half-open files
+ */
+
+bboard w_half_open_files(bboard wpawns, bboard bpawns) {
+    return ~file_fill(wpawns) ^ open_files(wpawns, bpawns);
+}
+
+bboard b_half_open_files(bboard wpawns, bboard bpawns) {
+    return ~file_fill(bpawns) ^ open_files(wpawns, bpawns);
+}
+
+/*
+ *  TODO: half-closed files
+ */
+
+/*
+ *  For doubled/tripled pawns, or with file and popcount
+ */
+
+
