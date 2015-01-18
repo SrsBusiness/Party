@@ -213,13 +213,4 @@ int main(){
     }
 }
 
-void display_bboard(bboard b, int row, int col) {
-    for(int i  = 0; i < 64; i++) {
-        move_cursor(7 - (i / 8) + row, ((i & 7) << 1) + col);
-        if((1lu << i) & b)
-            putchar('#');
-        else
-            putchar('_');
-    }
-    fflush(stdin);
-}
+
