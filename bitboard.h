@@ -89,21 +89,6 @@
 #define se_one(x)   (((x) >> 7) & ~AFILE)
 #define sw_one(x)   (((x) >> 9) & ~HFILE)
 
-#define w_pawn_east_attacks(x)  ne_one(x)
-#define w_pawn_west_attacks(x)  nw_one(x)
-
-
-
-#define b_pawn_east_attacks(x)  se_one(x)
-#define b_pawn_west_attacks(x)  sw_one(x)
-
-
-#define w_pawn_any_attacks(x)   (w_pawn_east_attacks(x) | w_pawn_west_attacks(x))
-#define w_pawn_dbl_attacks(x)   (w_pawn_east_attacks(x) & w_pawn_west_attacks(x))
-#define w_pawn_single_attacks(x)    (w_pawn_east_attacks(x) ^ w_pawn_west_attacks(x))
-#define b_pawn_any_attacks(x)   (b_pawn_east_attacks(x) | b_pawn_west_attacks(x))
-#define b_pawn_dbl_attacks(x)   (b_pawn_east_attacks(x) & b_pawn_west_attacks(x))
-#define b_pawn_single_attacks(x)    (b_pawn_east_attacks(x) ^ b_pawn_west_attacks(x))
 
 // knights
 

@@ -265,7 +265,124 @@ bboard b_half_open_files(bboard wpawns, bboard bpawns) {
  */
 
 /*
+ *  Filesets 
+ */
+
+fset bboard_2_fset(bboard pawns) {
+    return (fset)south_fill(pawns);
+}
+
+bboard fset_2_file_fill(fset f) {
+    bboard fill = f;
+    return fill * AFILE;
+}
+
+/*
  *  For doubled/tripled pawns, or with file and popcount
  */
+
+
+/*
+ *  Pawn Islands
+ *  To count pawn islands, do popcnt(islands_east_files(pawns))
+ */
+    
+fset islands_east_files(fset pawns) { 
+    return pawns & ~(pawns >> 1);
+}
+
+fset islands_west_files(fset pawns) {
+    return pawns & ~(pawns << 1);
+}
+
+/*
+ *  Pawn Isolanis and Hanging Pawns
+ */
+
+bboard no_east_neighbors(bboard pawns) {
+    return pawns & ~west_attack_file_fill(pawns);
+}
+
+bboard no_west_neighbors(bboard pawns) {
+    return pawns & ~east_attack_file_fill(pawns);
+}
+
+bboard isolanis(bboard pawns) {
+    return no_east_neighbors(pawns) & no_west_neighbors(pawns);
+}
+
+bboard half_isolanis(bboard pawns) {
+    return no_east_neighbors(pawns) ^ no_west_neighbors(pawns);
+}
+
+/* TODO: hanging pawns */
+bboard hanging_pawns() {
+
+}
+
+/*
+ *  Unfree pawns
+ */
+
+bboard w_unfree_pawns(bboard wpawns, bboard bpawns) {
+    return wpawns & b_front_span(bpawns);
+}
+
+bboard b_unfree_pawns(bboard wpawns, bboard bpawns) {
+    return bpawns & w_front_span(wpawns);
+}
+
+/*
+ *  Open pawns (opposite of unfree pawns)
+ */
+
+bboard w_open_pawns(bboard wpawns, bboard bpawns) {
+    return wpawns & ~b_front_span(bpawns);
+}
+
+bboard b_open_pawns(bboard wpawns, bboard bpawns) {
+    return bpawns & ~w_front_span(wpawns);
+}
+
+/*
+ *  Passed Pawns
+ */
+
+bboard w_passed_pawns(bboard wpawns, bboard bpawns) {
+    bboard all_front_spans = b_front_span(bpawns);
+    all_front_spans |= east_one(all_front_spans) | west_one(all_front_spans);
+    return wpawns & ~all_front_spans;
+}
+
+bboard b_passed_pawns(bboard wpawns, bboard bpawns) {
+    bboard all_front_spans = w_front_span(wpawns);
+    all_front_spans |= east_one(all_front_spans) | west_one(all_front_spans);
+    return bpawns & ~all_front_spans;
+}
+
+/*
+ *  TODO: Candidate Pawns
+ */
+
+
+/*
+ *   Backward Pawns
+ */
+
+bboard w_backward(bboard wpawns, bboard bpawns) {
+    bboard w_attack_spans = w_east_attack_front_span(wpawns) | 
+        w_west_attack_front_span(wpawns);
+    bboard b_attacks = b_pawn_east_attacks(bpawns) |
+        b_pawn_west_attacks(bpawns);
+    return south_fill(b_attacks & ~w_attack_spans) & wpawns;
+}
+
+bboard b_backward(bboard wpawns, bboard bpawns) {
+    bboard b_attack_spans = b_east_attack_front_span(bpawns) | 
+        b_west_attack_front_span(bpawns);
+    bboard w_attacks = w_pawn_east_attacks(wpawns) |
+        w_pawn_west_attacks(wpawns);
+    return north_fill(w_attacks & ~b_attack_spans) & bpawns;
+}
 
 
