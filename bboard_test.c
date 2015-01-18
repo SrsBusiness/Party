@@ -63,11 +63,7 @@ void cleanup(){
     show_cursor();
 }
 
-void display_text(char *string, int row){
-    move_cursor(row, 0);
-    clear_line();
-    printf("%s\n", string);
-}
+
 
 void trans_test() {
     bboard current;

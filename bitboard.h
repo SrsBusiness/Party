@@ -153,4 +153,7 @@ bboard noWeOccl(bboard, bboard);
 //
 // }
 
+void display_bboard(bboard, int, int);
+void display_text(char *, int, int);
+
 #endif

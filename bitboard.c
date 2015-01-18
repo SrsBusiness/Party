@@ -265,3 +265,9 @@ void display_bboard(bboard b, int row, int col) {
     }
     fflush(stdin);
 }
+
+void display_text(char *string, int row, int col){
+    move_cursor(row, col);
+    clear_line();
+    printf("%s\n", string);
+}

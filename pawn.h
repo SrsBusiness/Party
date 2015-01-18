@@ -97,8 +97,8 @@ bboard b_pawn_defenders_from_east(bboard);
  *  returns pawns with neighbors
  */
 
-bboard pawns_with_east_neighbors(bboard);
-bboard pawns_with_west_neighbors(bboard);
+bboard pawns_with_east_adj_neighbors(bboard);
+bboard pawns_with_west_adj_neighbors(bboard);
 
 /*
  *  returns closed files
@@ -140,7 +140,7 @@ bboard fset_2_file_fill(fset f);
  *  To count pawn islands, do popcnt(islands_east_files(pawns))
  */
     
-fset islands_east_files(fset pawns) { 
+fset islands_east_files(fset pawns);
 fset islands_west_files(fset pawns);
 
 /*
@@ -154,9 +154,6 @@ bboard half_isolanis(bboard);
 
 /* TODO: hanging pawns */
 bboard hanging_pawns();
-
-}
-
 /*
  *  Unfree pawns
  */

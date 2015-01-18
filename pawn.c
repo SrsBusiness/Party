@@ -223,11 +223,11 @@ bboard b_pawn_defenders_from_east(bboard bpawns) {
  *  returns pawns with neighbors
  */
 
-bboard pawns_with_east_neighbors(bboard pawns) {
+bboard pawns_with_east_adj_neighbors(bboard pawns) {
     return pawns & west_one (pawns);
 }
 
-bboard pawns_with_west_neighbors(bboard pawns) {
+bboard pawns_with_west_adj_neighbors(bboard pawns) {
     return pawns & east_one (pawns);
 }
 
