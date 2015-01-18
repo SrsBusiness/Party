@@ -1,3 +1,6 @@
+#ifndef BITBOARD_H
+#define BITBOARD_H
+
 #include <stdint.h>
 
 // File Masks
@@ -132,9 +135,6 @@ bboard south_fill(bboard);
 #define b_rear_fill(x)  (north_fill(x))
 
 #define file_fill(x)    (north_fill(x) | south_fill(x))
-#define knight_attacks(x)       knight_attacks2(x)
-int knight_distance(bboard, bboard);
-bboard knight_fork(bboard);
 bboard soutOccl(bboard, bboard);
 bboard nortOccl(bboard, bboard);
 bboard eastOccl(bboard, bboard);
@@ -152,3 +152,5 @@ bboard noWeOccl(bboard, bboard);
 //     b &= b - 1;
 //
 // }
+
+#endif

@@ -1,3 +1,6 @@
+#ifndef MINICURSES_H
+#define MINICURSES_H
+
 #include <stdio.h>
 
 #define ANSI_RESET "\x1B[0m"
@@ -47,3 +50,4 @@
 #define restore_cursor() printf(ANSI_RESTORE_CURSOR)
 #define clear_below() printf(ANSI_CLEAR_BELOW)
 
+#endif

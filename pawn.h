@@ -1,3 +1,6 @@
+#ifndef PAWN_H
+#define PAWN_H
+
 #include <stdint.h>
 #include "bitboard.h"
 
@@ -32,3 +35,5 @@
 #define west_attack_file_fill(x)    (west_one(file_fill(x)))
 
 typedef uint8_t fset;
+
+#endif

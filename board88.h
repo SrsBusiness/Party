@@ -1,3 +1,7 @@
+#ifndef BOARD88_H
+#define BOARD88_H
+
+
 #define invalid_square_88(a) ((a) & 0x88)
 #define diff88(a, b) ((a) - (b) + 0x77)
 
@@ -113,4 +117,4 @@ const unsigned char dist_knight[240] = { 6, 5, 4, 5, 4, 5, 4, 5,
 // 0x04 - knight
 // 0x08 - king
 // 0x10 - pawn
-
+#endif
