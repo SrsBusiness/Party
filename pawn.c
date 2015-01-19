@@ -101,7 +101,7 @@ bboard b_pawns_able_2_push(bboard bpawns, bboard empty) {
 
 bboard b_pawns_able_2_dbl_push(bboard bpawns, bboard empty) {
     bboard emptyRank6 = north_one(empty & RANK5) & empty;
-    return w_pawns_able_2_push(bpawns, emptyRank6);
+    return b_pawns_able_2_push(bpawns, emptyRank6);
 }
 
 /*
@@ -117,8 +117,8 @@ bboard w_west_lever(bboard wpawns, bboard bpawns) {
 }
 
 bboard w_any_lever(bboard wpawns, bboard bpawns) {
-    return w_east_lever(wpawns, bpawns)
-        | w_west_lever(wpawns, bpawns);
+    return w_east_lever(wpawns, bpawns) | 
+        w_west_lever(wpawns, bpawns);
 }
 
 
@@ -132,8 +132,8 @@ bboard b_west_lever(bboard wpawns, bboard bpawns) {
 }
 
 bboard b_any_lever(bboard wpawns, bboard bpawns) {
-    return b_east_lever(bpawns, wpawns)
-        | b_west_lever(bpawns, wpawns);
+    return b_east_lever(wpawns, bpawns) | 
+        b_west_lever(wpawns, bpawns);
 }
 
 /*

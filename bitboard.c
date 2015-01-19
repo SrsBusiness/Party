@@ -90,6 +90,7 @@ bboard rotate_anticlockwise(bboard x){
 
 bboard north_span(bboard x){
     x <<= 8;
+    x |= (x << 8);
     x |= (x << 16);
     x |= (x << 32);
     return x;
@@ -97,6 +98,7 @@ bboard north_span(bboard x){
 
 bboard south_span(bboard x){
     x >>= 8;
+    x |= (x >> 8);
     x |= (x >> 16);
     x |= (x >> 32);
     return x;
@@ -268,6 +270,5 @@ void display_bboard(bboard b, int row, int col) {
 
 void display_text(char *string, int row, int col){
     move_cursor(row, col);
-    clear_line();
     printf("%s\n", string);
 }
