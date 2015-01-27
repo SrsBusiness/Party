@@ -104,6 +104,22 @@ bboard south_span(bboard x){
     return x;
 }
 
+bboard east_span(bboard x) {
+    x = x << 1 & ~AFILE;
+    x |= (x << 1) & ~AFILE;
+    x |= (x << 2) & ~AFILE & ~BFILE;
+    x |= (x << 3) & ~AFILE & ~BFILE & ~CFILE;
+    return x;
+}
+
+bboard west_span(bboard x) {
+    x = x >> 1 & ~HFILE;
+    x |= (x >> 1) & ~HFILE;
+    x |= (x >> 2) & ~HFILE & ~GFILE;
+    x |= (x >> 3) & ~HFILE & ~GFILE & ~FFILE;
+    return x;
+}
+
 bboard north_fill(bboard gen) {
    gen |= (gen <<  8);
    gen |= (gen << 16);
@@ -136,12 +152,7 @@ bboard south_fill(bboard gen) {
 
 
 
-bboard kingAttacks(bboard kingSet) {
-    bboard attacks = east_one(kingSet) | west_one(kingSet);
-    kingSet |= attacks;
-    attacks |= north_one(kingSet) | south_one(kingSet);
-    return attacks;
-}
+
 
 // algorithm based on the square of the passed pawn
 // returns a bitboard set containing all squares which,

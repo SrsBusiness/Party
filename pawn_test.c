@@ -29,10 +29,14 @@ bboard double_args_empty[] = {
 
 bboard double_args_white[] = {
     0x0000000008502000,
+    0x0000004005800200,
+    0x0000000004100A00
 };
 
 bboard double_args_black[] = {
-    0x0020409800000000
+    0x0020409800000000,
+    0x0020400500000000,
+    0x0000020011080000
 };
 
 void single_arg_test(bboard (*f)(bboard), char *desc) {
@@ -234,8 +238,8 @@ void double_args_tests() {
 int main() {
     //single_arg_tests();
     clear_all();
-    display_bboard(south_span(double_args_black[0]), 2, 2);
-    getchar();
+    //display_bboard(south_span(double_args_black[0]), 2, 2);
+    //getchar();
     double_args_tests();
 }
 

@@ -374,7 +374,8 @@ bboard w_backward(bboard wpawns, bboard bpawns) {
         w_west_attack_front_span(wpawns);
     bboard b_attacks = b_pawn_east_attacks(bpawns) |
         b_pawn_west_attacks(bpawns);
-    return south_fill(b_attacks & ~w_attack_spans) & wpawns;
+    return south_fill(b_attacks & ~w_attack_spans) &
+        w_open_pawns(wpawns, bpawns);
 }
 
 bboard b_backward(bboard wpawns, bboard bpawns) {
@@ -382,7 +383,8 @@ bboard b_backward(bboard wpawns, bboard bpawns) {
         b_west_attack_front_span(bpawns);
     bboard w_attacks = w_pawn_east_attacks(wpawns) |
         w_pawn_west_attacks(wpawns);
-    return north_fill(w_attacks & ~b_attack_spans) & bpawns;
+    return north_fill(w_attacks & ~b_attack_spans) &
+        b_open_pawns(wpawns, bpawns);
 }
 
 

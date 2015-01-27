@@ -96,9 +96,9 @@
 // knights
 
 
-#define bishop_attacks(x) (noEaOccl(x) | soEaOccl(x) | noWeOccl(x) | soWeOccl(x))
-#define rook_attacks(x) (nortOccl(x) | eastOccl(x) | soutOccl(x) | westOccl(x))
-#define queen_attacks(x) (bishop_attacks(x) | rook_attacks(x))
+//#define bishop_attacks(x) (noEaOccl(x) | soEaOccl(x) | noWeOccl(x) | soWeOccl(x))
+//#define rook_attacks(x) (nortOccl(x) | eastOccl(x) | soutOccl(x) | westOccl(x))
+//#define queen_attacks(x) (bishop_attacks(x) | rook_attacks(x))
 
 
 
@@ -120,6 +120,8 @@ bboard rotate_anticlockwise(bboard);
 
 bboard north_span(bboard);
 bboard south_span(bboard);
+bboard east_span(bboard);
+bboard west_span(bboard);
 
 #define w_front_span(x) (north_span(x))
 #define w_rear_span(x)  (south_span(x))
