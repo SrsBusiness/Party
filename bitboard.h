@@ -122,6 +122,10 @@ bboard north_span(bboard);
 bboard south_span(bboard);
 bboard east_span(bboard);
 bboard west_span(bboard);
+bboard ne_span(bboard);
+bboard nw_span(bboard);
+bboard se_span(bboard);
+bboard sw_span(bboard);
 
 #define w_front_span(x) (north_span(x))
 #define w_rear_span(x)  (south_span(x))
@@ -130,6 +134,12 @@ bboard west_span(bboard);
 
 bboard north_fill(bboard);
 bboard south_fill(bboard);
+bboard east_fill(bboard);
+bboard west_fill(bboard);
+bboard ne_fill(bboard);
+bboard nw_fill(bboard);
+bboard se_fill(bboard);
+bboard sw_fill(bboard);
 
 #define w_front_fill(x) (north_fill(x))
 #define w_rear_fill(x)  (south_fill(x))

@@ -105,18 +105,68 @@ bboard south_span(bboard x){
 }
 
 bboard east_span(bboard x) {
-    x = x << 1 & ~AFILE;
-    x |= (x << 1) & ~AFILE;
-    x |= (x << 2) & ~AFILE & ~BFILE;
-    x |= (x << 3) & ~AFILE & ~BFILE & ~CFILE;
+    bboard k1 = ~AFILE;
+    bboard k2 = k1 & (k1 << 1);
+    bboard k3 = k2 & (k2 << 2);
+    x = (x << 1) & k1;
+    x |= (x << 1) & k1;
+    x |= (x << 2) & k2;
+    x |= (x << 4) & k3;
     return x;
 }
 
 bboard west_span(bboard x) {
-    x = x >> 1 & ~HFILE;
-    x |= (x >> 1) & ~HFILE;
-    x |= (x >> 2) & ~HFILE & ~GFILE;
-    x |= (x >> 3) & ~HFILE & ~GFILE & ~FFILE;
+    bboard k1 = ~HFILE;
+    bboard k2 = k1 & (k1 >> 1);
+    bboard k3 = k2 & (k2 >> 2);
+    x = (x >> 1) & k1;
+    x |= (x >> 1) & k1;
+    x |= (x >> 2) & k2;
+    x |= (x >> 4) & k3;
+    return x;
+}
+
+bboard ne_span(bboard x) {
+    bboard k1 = ~AFILE;
+    bboard k2 = k1 & (k1 << 9);
+    bboard k3 = k2 & (k2 << 18);
+    x = (x << 9) & k1;
+    x |= (x << 9) & k1;
+    x |= (x << 18) & k2;
+    x |= (x << 36) & k3;
+    return x;
+}
+
+bboard nw_span(bboard x) {
+    bboard k1 = ~HFILE;
+    bboard k2 = k1 & (k1 << 7);
+    bboard k3 = k2 & (k2 << 14);
+    x = (x << 7) & k1;
+    x |= (x << 7) & k1;
+    x |= (x << 14) & k2;
+    x |= (x << 28) & k3;
+    return x;
+}
+
+bboard se_span(bboard x) {
+    bboard k1 = ~AFILE;
+    bboard k2 = k1 & (k1 >> 7);
+    bboard k3 = k2 & (k2 >> 14);
+    x = (x >> 7) & k1;
+    x |= (x >> 7) & k1;
+    x |= (x >> 14) & k2;
+    x |= (x >> 28) & k3;
+    return x;
+}
+
+bboard sw_span(bboard x) {
+    bboard k1 = ~HFILE;
+    bboard k2 = k1 & (k1 >> 9);
+    bboard k3 = k2 & (k2 >> 18);
+    x = (x >> 9) & k1;
+    x |= (x >> 9) & k1;
+    x |= (x >> 18) & k2; 
+    x |= (x >> 36) & k3;
     return x;
 }
 
@@ -134,6 +184,71 @@ bboard south_fill(bboard gen) {
    return gen;
 }
 
+bboard east_fill(bboard x) {
+    bboard k1 = ~AFILE;
+    bboard k2 = k1 & (k1 << 1);
+    bboard k3 = k2 & (k2 << 2);
+    x = (x << 1) & k1;
+    x |= (x << 1) & k1;
+    x |= (x << 2) & k2;
+    x |= (x << 4) & k3;
+    return x;
+}
+
+bboard west_fill(bboard x) {
+    bboard k1 = ~HFILE;
+    bboard k2 = k1 & (k1 >> 1);
+    bboard k3 = k2 & (k2 >> 2);
+    x = (x >> 1) & k1;
+    x |= (x >> 1) & k1;
+    x |= (x >> 2) & k2;
+    x |= (x >> 4) & k3;
+    return x;
+}
+
+bboard ne_fill(bboard x) {
+    bboard k1 = ~AFILE;
+    bboard k2 = k1 & (k1 << 9);
+    bboard k3 = k2 & (k2 << 18);
+    x = (x << 9) & k1;
+    x |= (x << 9) & k1;
+    x |= (x << 18) & k2;
+    x |= (x << 36) & k3;
+    return x;
+}
+
+bboard nw_fill(bboard x) {
+    bboard k1 = ~HFILE;
+    bboard k2 = k1 & (k1 << 7);
+    bboard k3 = k2 & (k2 << 14);
+    x = (x << 7) & k1;
+    x |= (x << 7) & k1;
+    x |= (x << 14) & k2;
+    x |= (x << 28) & k3;
+    return x;
+}
+
+bboard se_fill(bboard x) {
+    bboard k1 = ~AFILE;
+    bboard k2 = k1 & (k1 >> 7);
+    bboard k3 = k2 & (k2 >> 14);
+    x = (x >> 7) & k1;
+    x |= (x >> 7) & k1;
+    x |= (x >> 14) & k2;
+    x |= (x >> 28) & k3;
+    return x;
+}
+
+bboard sw_fill(bboard x) {
+    bboard k1 = ~HFILE;
+    bboard k2 = k1 & (k1 >> 9);
+    bboard k3 = k2 & (k2 >> 18);
+    x = (x >> 9) & k1;
+    x |= (x >> 9) & k1;
+    x |= (x >> 18) & k2; 
+    x |= (x >> 36) & k3;
+    return x;
+}
 
 
 // file fill = north_span(x) | south_span(x) | x, shows open/closed files
@@ -269,7 +384,8 @@ bboard nw_occluded_fill(bboard gen, bboard pro) {
 /* for debugging purposes */
 
 void display_bboard(bboard b, int row, int col) {
-    for(int i  = 0; i < 64; i++) {
+    int i;
+    for(i = 0; i < 64; i++) {
         move_cursor(7 - (i / 8) + row, ((i & 7) << 1) + col);
         if((1lu << i) & b)
             putchar('#');
