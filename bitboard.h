@@ -147,14 +147,14 @@ bboard sw_fill(bboard);
 #define b_rear_fill(x)  (north_fill(x))
 
 #define file_fill(x)    (north_fill(x) | south_fill(x))
-bboard soutOccl(bboard, bboard);
-bboard nortOccl(bboard, bboard);
-bboard eastOccl(bboard, bboard);
-bboard noEaOccl(bboard, bboard);
-bboard soEaOccl(bboard, bboard);
-bboard westOccl(bboard, bboard);
-bboard soWeOccl(bboard, bboard);
-bboard noWeOccl(bboard, bboard);
+bboard south_occluded_fill(bboard, bboard);
+bboard north_occluded_fill(bboard, bboard);
+bboard east_occluded_fill(bboard, bboard);
+bboard ne_occluded_fill(bboard, bboard);
+bboard se_occluded_fill(bboard, bboard);
+bboard west_occluded_fill(bboard, bboard);
+bboard sw_occluded_fill(bboard, bboard);
+bboard nw_occluded_fill(bboard, bboard);
 
 // iterate through all pieces in a bboard
 // bboard b;
