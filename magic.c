@@ -10,18 +10,28 @@
 #include <signal.h>
 #include <fcntl.h>
 #include <sys/stat.h>
+#include "rook.h"
+#include "bishop.h"
 
-bboard rook_occupancy_masks[64];
-bboard bishop_occupancy_masks[64];
-char rook_magic_shifts[64];
-char bishop_magic_shifts[64];
+//bboard rook_occupancy_masks[64];
+//bboard bishop_occupancy_masks[64];
+//char rook_magic_shifts[64];
+//char bishop_magic_shifts[64];
+
+//uint64_t rook_magic_numbers[64];
+//uint64_t bishop_magic_numbers[64];
 
 void generate_rook_occupancy_masks(bboard *, char *);
 void generate_bishop_occupancy_masks(bboard *, char *);
 
 bboard number_to_occupancy(int, bboard);
 bboard generate_attack_set_rook(bboard, bboard);
-bboard generate_magic_rook(int, int);
+bboard generate_attack_set_bishop(bboard, bboard);
+void generate_magic_rook(bboard *);
+void generate_magic_bishop(bboard *);
+
+void generate_rook_attack_table(int, bboard);
+
 void handler(int);
  
 bboard current, magic;
@@ -42,29 +52,30 @@ sighandler_t Signal(int signum, sighandler_t handler) {
 }
 
 
-int main() {
-    //bboard occupancy = 0x000101010101017E;
-    //bboard index = 0xFFF0000000000000;
-    //bboard magic = index / occupancy;
-    //bboard test = 0x000101010101017E;
-    //bboard test_index = (test * magic) & index;
-    //printf("%llX\n", magic);
-    //printf("%llX\n", index);
-    //printf("%llX\n", test_index);
+int main(int argc, char **argv) {
+    
+    if(argc < 2) {
+        fprintf(stderr, "Mukund is a faggot\n");
+        exit(1);
+    }
+    
+    int index;
+    sscanf(argv[1], "%d", &index);
     int urand = open("/dev/urandom", O_RDONLY);
     int seed;
     read(urand, &seed, sizeof(seed));
     srand(seed);
-    Signal(SIGINT, handler);
-    printf("Registered signal handler\n");
-    generate_rook_occupancy_masks(rook_occupancy_masks, rook_magic_shifts);
-    generate_bishop_occupancy_masks(bishop_occupancy_masks, bishop_magic_shifts);
+    //Signal(SIGINT, handler);
+    //printf("Registered signal handler\n");
+    //generate_rook_occupancy_masks(rook_occupancy_masks, rook_magic_shifts);
+    //generate_bishop_occupancy_masks(bishop_occupancy_masks, bishop_magic_shifts);
     int i;
-    clear_all();
-    hide_cursor();
     bboard magic[64];
-    generate_magic_rook(27, 10);
-    show_cursor();
+    //generate_magic_rook(magic);
+    generate_rook_attack_table(index, rook_magic_numbers[index]);
+    //for (i = 0; i < 64; i++) {
+    //    printf("0x%llX,\n", magic[i]);
+    //}
 }
 
 void generate_rook_occupancy_masks(bboard *occupancy, char *shifts) {
@@ -115,46 +126,93 @@ bboard generate_attack_set_rook(bboard gen, bboard occupancy) {
         west_occluded_fill(gen, ~west_one(occupancy))) ^ gen;
 }
 
-bboard generate_magic_rook(int index, int attack_bits) {
-    magic = 0xFFFFFFFFFFFFFFFF;
-    least = 0xFFFFFFFF;
-    bboard *used = malloc(sizeof(bboard) << attack_bits);
-    bboard occupancy_mask = rook_occupancy_masks[index];
+bboard generate_attack_set_bishop(bboard gen, bboard occupancy) {
+    return (ne_occluded_fill(gen, ~ne_one(occupancy)) |
+        nw_occluded_fill(gen, ~nw_one(occupancy)) |
+        se_occluded_fill(gen, ~se_one(occupancy)) |
+        sw_occluded_fill(gen, ~sw_one(occupancy))) ^ gen;
+}
+
+void generate_magic_rook(bboard *magics) {
     int fail;
-    int unique;
-    int num_occupancy_bits = 
+    int i;
+    for (i = 0; i < 64; i++) {
+        bboard occupancy_mask = rook_occupancy_masks[i];
+        int num_occupancy_bits = 
             __builtin_popcountll(occupancy_mask);
-    int max_occupancies = (bboard)1 << num_occupancy_bits;
-    //move_cursor(29, 1);
-    //printf("Max occupancies: %d\n", max_occupancies);
-    while(1) {
-        current = rand64() & rand64() & rand64();
-        fail = unique = 0;
-        memset(used, 0xFF, sizeof(bboard) << attack_bits);
-                int j;
-        for (j = 0; j < max_occupancies && !fail; j++) {
-            bboard occupancy = number_to_occupancy(j, occupancy_mask);
-            //move_cursor(1, 1);
-            //clear_line();
-            //printf("current: %llX occupancy: %d\n", current, j);
-            //display_bboard(occupancy, 2, 1);
-            bboard attack = generate_attack_set_rook((bboard)1 << index, 
-                    occupancy);
-            //display_bboard(attack, 12, 1);
-            uint32_t hash = (occupancy * current) >> (64 - attack_bits);
-            if (used[hash] == 0xFFFFFFFFFFFFFFFF) {
-                unique++;
-                used[hash] = attack;
-            } else if (used[hash] != attack) {
-                fail = 1;
+        int max_occupancies = (bboard)1 << num_occupancy_bits;
+
+        bboard *used = malloc(sizeof(bboard) << num_occupancy_bits);
+        do{
+            current = rand64() & rand64() & rand64();
+            fail = 0;
+            memset(used, 0xFF, sizeof(bboard) << num_occupancy_bits);
+            int j;
+            for (j = 0; j < max_occupancies && !fail; j++) {
+                bboard occupancy = number_to_occupancy(j, occupancy_mask);
+                bboard attack = generate_attack_set_rook((bboard)1 << i, 
+                        occupancy);
+                uint32_t hash = (occupancy * current) >> (64 - num_occupancy_bits);
+                if (used[hash] == 0xFFFFFFFFFFFFFFFF) {
+                    used[hash] = attack;
+                } else if (used[hash] != attack) {
+                    fail = 1;
+                }
             }
-        }
-        if (!fail && unique < least) {
-            magic = current;
-            least = unique;
-        }
+            if (!fail)
+                magics[i] = current;
+        } while (fail);
     }
-    return magic;
+}
+
+void generate_magic_bishop(bboard *magics) {
+    int fail;
+    int i;
+    for (i = 0; i < 64; i++) {
+        bboard occupancy_mask = bishop_occupancy_masks[i];
+        int num_occupancy_bits = 
+            __builtin_popcountll(occupancy_mask);
+        int max_occupancies = (bboard)1 << num_occupancy_bits;
+
+        bboard *used = malloc(sizeof(bboard) << num_occupancy_bits);
+        do{
+            current = rand64() & rand64() & rand64();
+            fail = 0;
+            memset(used, 0xFF, sizeof(bboard) << num_occupancy_bits);
+            int j;
+            for (j = 0; j < max_occupancies && !fail; j++) {
+                bboard occupancy = number_to_occupancy(j, occupancy_mask);
+                bboard attack = generate_attack_set_bishop((bboard)1 << i, 
+                        occupancy);
+                uint64_t hash = (occupancy * current) >> (64 - num_occupancy_bits);
+                if (used[hash] == 0xFFFFFFFFFFFFFFFF) {
+                    used[hash] = attack;
+                } else if (used[hash] != attack) {
+                    fail = 1;
+                }
+            }
+            if (!fail)
+                magics[i] = current;
+        } while (fail);
+    }
+}
+
+void generate_rook_attack_table(int index, bboard magic) {
+    bboard occupancy_mask = rook_occupancy_masks[index];    
+    int num_occupancy_bits = __builtin_popcountll(occupancy_mask);
+    printf("const bboard rook_%d[%d] = {\n", index, 1 << num_occupancy_bits);
+    int max_occupancies = 1 << num_occupancy_bits;
+    bboard *attack_table = malloc(sizeof(bboard) << num_occupancy_bits);
+    int i;
+    for (i = 0; i < max_occupancies; i++) {
+        bboard occupancy = number_to_occupancy(i, occupancy_mask);
+        attack_table[(occupancy * magic) >> (64 - num_occupancy_bits)] =
+            generate_attack_set_rook((bboard)1 << index, occupancy);
+    }
+    for(i = 0; i < max_occupancies; i++) {
+        printf("    0x%llX,\n", attack_table[i]);
+    }
+    printf("};\n");
 }
 
 void handler(int sig) {
