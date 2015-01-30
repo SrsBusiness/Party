@@ -168,4 +168,10 @@ bboard nw_occluded_fill(bboard, bboard);
 void display_bboard(bboard, int, int);
 void display_text(char *, int, int);
 
+typedef struct _magic_entry {
+    bboard *attack_table;
+    bboard mask;
+    bboard magic;
+} magic_entry;
+
 #endif

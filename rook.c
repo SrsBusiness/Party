@@ -1,5 +1,10 @@
 #include "rook.h"
 #include "minicurses.h"
+
+const magic_entry rook_magic_table[64] = {
+    {0, 0, 0}
+};
+
 const bboard rook_occupancy_masks[64] = {0x101010101017E,
     0x202020202027C,
     0x404040404047A,

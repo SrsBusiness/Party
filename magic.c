@@ -33,6 +33,8 @@ void generate_magic_bishop(bboard *);
 void generate_rook_attack_table(int);
 void generate_bishop_attack_table(int);
 
+void rook_magic_table();
+
 void handler(int);
  
 bboard current, magic;
@@ -73,7 +75,9 @@ int main(int argc, char **argv) {
     int i;
     bboard magic[64];
     //generate_magic_rook(magic);
-    generate_bishop_attack_table(index);
+    //generate_bishop_attack_table(index);
+    //
+    rook_magic_table();
     //for (i = 0; i < 64; i++) {
     //    printf("0x%llX,\n", magic[i]);
     //}
@@ -243,6 +247,16 @@ void generate_bishop_attack_table(int index) {
         //display_bboard(attack, 3, 39);
         //getchar();
         printf("    0x%llX,\n", attack_table[i]);
+    }
+    printf("};\n");
+}
+
+void rook_magic_table() {
+    printf("const magic_entry rook_magic_table[64] = {\n");
+    int i;
+    for (i = 0; i < 64; i++) {
+        printf("    {rook_%d, 0x%llx, 0x%llx},n", i, rook_occupancy_masks[i], 
+                rook_magic_numbers[i]);
     }
     printf("};\n");
 }
