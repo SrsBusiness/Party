@@ -169,9 +169,10 @@ void display_bboard(bboard, int, int);
 void display_text(char *, int, int);
 
 typedef struct _magic_entry {
-    bboard *attack_table;
+    const bboard *attack_table;
     bboard mask;
     bboard magic;
+    int shift;
 } magic_entry;
 
 #endif

@@ -33,7 +33,8 @@ void generate_magic_bishop(bboard *);
 void generate_rook_attack_table(int);
 void generate_bishop_attack_table(int);
 
-void rook_magic_table();
+void generate_rook_magic_table();
+void generate_bishop_magic_table();
 
 void handler(int);
  
@@ -57,13 +58,13 @@ sighandler_t Signal(int signum, sighandler_t handler) {
 
 int main(int argc, char **argv) {
     
-    if(argc < 2) {
-        fprintf(stderr, "Mukund is a faggot\n");
-        exit(1);
-    }
+    //if(argc < 2) {
+    //    fprintf(stderr, "Mukund is a faggot\n");
+    //    exit(1);
+    //}
     
-    int index;
-    sscanf(argv[1], "%d", &index);
+    //int index;
+    //sscanf(argv[1], "%d", &index);
     int urand = open("/dev/urandom", O_RDONLY);
     int seed;
     read(urand, &seed, sizeof(seed));
@@ -77,7 +78,8 @@ int main(int argc, char **argv) {
     //generate_magic_rook(magic);
     //generate_bishop_attack_table(index);
     //
-    rook_magic_table();
+    generate_rook_magic_table();
+    //generate_bishop_magic_table();
     //for (i = 0; i < 64; i++) {
     //    printf("0x%llX,\n", magic[i]);
     //}
@@ -251,12 +253,24 @@ void generate_bishop_attack_table(int index) {
     printf("};\n");
 }
 
-void rook_magic_table() {
+void generate_rook_magic_table() {
     printf("const magic_entry rook_magic_table[64] = {\n");
     int i;
     for (i = 0; i < 64; i++) {
-        printf("    {rook_%d, 0x%llx, 0x%llx},n", i, rook_occupancy_masks[i], 
-                rook_magic_numbers[i]);
+        printf("    {rook_%d, 0x%llx, 0x%llx, %d},\n", i, 
+                rook_occupancy_masks[i], rook_magic_numbers[i], 
+                rook_magic_shifts[i]);
+    }
+    printf("};\n");
+}
+
+void generate_bishop_magic_table() {
+    printf("const magic_entry bishop_magic_table[64] = {\n");
+    int i;
+    for (i = 0; i < 64; i++) {
+        printf("    {bishop_%d, 0x%llx, 0x%llx, %d},\n", i, 
+                bishop_occupancy_masks[i], bishop_magic_numbers[i],
+                bishop_magic_shifts[i]);
     }
     printf("};\n");
 }
