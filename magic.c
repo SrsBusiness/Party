@@ -30,7 +30,8 @@ bboard generate_attack_set_bishop(bboard, bboard);
 void generate_magic_rook(bboard *);
 void generate_magic_bishop(bboard *);
 
-void generate_rook_attack_table(int, bboard);
+void generate_rook_attack_table(int);
+void generate_bishop_attack_table(int);
 
 void handler(int);
  
@@ -72,7 +73,7 @@ int main(int argc, char **argv) {
     int i;
     bboard magic[64];
     //generate_magic_rook(magic);
-    generate_rook_attack_table(index, rook_magic_numbers[index]);
+    generate_bishop_attack_table(index);
     //for (i = 0; i < 64; i++) {
     //    printf("0x%llX,\n", magic[i]);
     //}
@@ -197,7 +198,8 @@ void generate_magic_bishop(bboard *magics) {
     }
 }
 
-void generate_rook_attack_table(int index, bboard magic) {
+void generate_rook_attack_table(int index) {
+    uint64_t magic = rook_magic_numbers[index];
     bboard occupancy_mask = rook_occupancy_masks[index];    
     int num_occupancy_bits = __builtin_popcountll(occupancy_mask);
     printf("const bboard rook_%d[%d] = {\n", index, 1 << num_occupancy_bits);
@@ -210,6 +212,36 @@ void generate_rook_attack_table(int index, bboard magic) {
             generate_attack_set_rook((bboard)1 << index, occupancy);
     }
     for(i = 0; i < max_occupancies; i++) {
+        printf("    0x%llX,\n", attack_table[i]);
+    }
+    printf("};\n");
+}
+
+void generate_bishop_attack_table(int index) {
+    uint64_t magic = bishop_magic_numbers[index];
+    bboard occupancy_mask = bishop_occupancy_masks[index];    
+    int num_occupancy_bits = __builtin_popcountll(occupancy_mask);
+    printf("const bboard bishop_%d[%d] = {\n", index, 1 << num_occupancy_bits);
+    int max_occupancies = 1 << num_occupancy_bits;
+    bboard *attack_table = malloc(sizeof(bboard) << num_occupancy_bits);
+    int i;
+    for (i = 0; i < max_occupancies; i++) {
+        bboard occupancy = number_to_occupancy(i, occupancy_mask);
+        attack_table[(occupancy * magic) >> (64 - num_occupancy_bits)] =
+            generate_attack_set_bishop((bboard)1 << index, occupancy);
+    }
+    //clear_all();
+    for(i = 0; i < max_occupancies; i++) {
+        //display_text("Bishop position", 1, 1);
+        //display_text("Occupancy", 1, 20);
+        //display_text("Attack set", 1, 39);
+        //bboard occupancy = number_to_occupancy(i, occupancy_mask);
+        //bboard attack = 
+        //    attack_table[(occupancy * magic) >> (64 - num_occupancy_bits)];
+        //display_bboard((bboard)1 << index, 3, 1);
+        //display_bboard(occupancy, 3, 20);
+        //display_bboard(attack, 3, 39);
+        //getchar();
         printf("    0x%llX,\n", attack_table[i]);
     }
     printf("};\n");
