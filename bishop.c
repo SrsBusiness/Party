@@ -68,3 +68,9 @@ const magic_entry bishop_magic_table[64] = {
     {bishop_62, 0x20100804020000, 0x4020a21802080140, 59},
     {bishop_63, 0x40201008040200, 0x2062089200820200, 58},
 };
+
+bboard bishop_attacks(bboard rook, bboard occupancy) {
+    int index = bit_scan(rook);       
+    magic_entry *m = &bishop_magic_table[index];
+    return m->attack_table[(occupancy * m->magic) >> m->shift];
+}

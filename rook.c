@@ -68,3 +68,9 @@ const magic_entry rook_magic_table[64] = {
     {rook_62, 0x3e40404040404000, 0x21000400a20001, 53},
     {rook_63, 0x7e80808080808000, 0x200022d00840246, 52},
 };
+
+bboard rook_attacks(bboard rook, bboard occupancy) {
+    int index = bit_scan(rook);       
+    magic_entry *m = &rook_magic_table[index];
+    return m->attack_table[(occupancy * m->magic) >> m->shift];
+}
