@@ -169,10 +169,24 @@ void display_bboard(bboard, int, int);
 void display_text(char *, int, int);
 
 typedef struct _magic_entry {
-    const bboard *attack_table;
-    bboard mask;
-    bboard magic;
-    int shift;
+    const bboard *attack_table; /* lookup table of attack sets */
+    bboard mask;    /* occupancy mask */
+    bboard magic;   /* magic number */
+    int shift;  /* how much to shift by */
 } magic_entry;
+
+typedef struct _board_state {
+    uint8_t turn;   /* 0 if white, 1 if black */
+    uint8_t castle_q[2];    /* 0 if either king or queen rook has moved, 1 otherwise */
+    uint8_t castle_k[2];    /* 0 if either king or king rook has moved, 1 otherwise */
+    uint8_t en_passant[2];  /* file field of pawns that have just double pushed */
+    /* bitboards */
+    bboard kings[2];    
+    bboard queens[2];
+    bboard bishops[2];
+    bboard knights[2];
+    bboard rooks[2];
+    bboard pawns[2];
+} board_state;
 
 #endif
