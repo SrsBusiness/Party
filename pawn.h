@@ -10,6 +10,7 @@
 #define b_pawn_east_attacks(x)  se_one(x)
 #define b_pawn_west_attacks(x)  sw_one(x)
 
+/* return squares attack by 1 or 2 pawns */
 #define w_pawn_any_attacks(x)   (w_pawn_east_attacks(x) | w_pawn_west_attacks(x))
 #define w_pawn_dbl_attacks(x)   (w_pawn_east_attacks(x) & w_pawn_west_attacks(x))
 #define w_pawn_single_attacks(x)    (w_pawn_east_attacks(x) ^ w_pawn_west_attacks(x))
@@ -35,8 +36,9 @@ typedef uint8_t fset;
 bboard w_single_push_targets(bboard, bboard);
 bboard w_dbl_push_targets(bboard, bboard);
 bboard b_single_push_targets(bboard, bboard);
-bboard b_double_push_targets(bboard, bboard);
-
+bboard b_dbl_push_targets(bboard, bboard);
+bboard single_push_targets(bboard, bboard, int);
+bboard double_push_targets(bboard, bboard, int);
 /*
  *  returns source squares of pawns able to be pushed
  */
@@ -45,7 +47,8 @@ bboard w_pawns_able_2_push(bboard, bboard);
 bboard w_pawns_able_2_dbl_push(bboard, bboard);
 bboard b_pawns_able_2_push(bboard, bboard);
 bboard b_pawns_able_2_dbl_push(bboard, bboard);
-
+bboard pawns_able_2_push(bboard, bboard, int);
+bboard pawns_able_2_dbl_push(bboard, bboard, int);
 /*
  *  Pawn lever functions
  */
@@ -74,6 +77,9 @@ bboard w_pawns_able_2_capture_any(bboard, bboard);
 bboard b_pawns_able_2_capture_east(bboard, bboard);
 bboard b_pawns_able_2_capture_west(bboard, bboard);
 bboard b_pawns_able_2_capture_any(bboard, bboard);
+bboard pawns_able_2_capture_east(bboard, bboard, int);
+bboard pawns_able_2_capture_west(bboard, bboard, int);
+bboard pawns_able_2_capture_any(bboard, bboard, int);
 
 /*
  *  returns defended pawns

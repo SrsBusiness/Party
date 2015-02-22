@@ -2,6 +2,18 @@
 #define BITBOARD_H
 
 #include <stdint.h>
+ 
+#define WHITE 0
+#define BLACK 1
+
+#define NO_PIECE    0xFF
+#define KING    0
+#define QUEEN   1
+#define BISHOP  2
+#define KNIGHT  3
+#define ROOK    4
+#define PAWN    5
+
 
 // File Masks
 #define AFILE       0x0101010101010101
@@ -58,20 +70,24 @@
 #define DARK        0xAA55AA55AA55AA55
 
 // Starting Squares of pieces
-#define KING        0x1000000000000010
-#define QUEEN       0x0800000000000008
-#define BISHOP      0x2400000000000024
-#define KNIGHT      0x4200000000000042
-#define ROOK        0x8100000000000081
-#define PAWN        0x00FF00000000FF00
-#define WHITE       0x000000000000FFFF
-#define BLACK       0xFFFF000000000000
+#define BB_KING        0x1000000000000010
+#define BB_QUEEN       0x0800000000000008
+#define BB_BISHOP      0x2400000000000024
+#define BB_KNIGHT      0x4200000000000042
+#define BB_ROOK        0x8100000000000081
+#define BB_PAWN        0x00FF00000000FF00
+#define BB_WHITE       0x000000000000FFFF
+#define BB_BLACK       0xFFFF000000000000
 
 
 // macro functions on bitboards
 
-// bitscan
-#define bit_scan(board) (__builtin_ctzll(board))
+/* bitscan: 
+ * lsb returns index of least significant bit 
+ * msb returns index of most significant bit
+ **/
+#define lsb(board) (__builtin_ctzll(board))
+#define msb(board) (63 - __builtin_clzll(board))
 //#define bit_scan(board) (__builtin_ffsll(board))
 
 // flips the bytes of the word
@@ -177,16 +193,41 @@ typedef struct _magic_entry {
 
 typedef struct _board_state {
     uint8_t turn;   /* 0 if white, 1 if black */
-    uint8_t castle_q[2];    /* 0 if either king or queen rook has moved, 1 otherwise */
-    uint8_t castle_k[2];    /* 0 if either king or king rook has moved, 1 otherwise */
     uint8_t en_passant[2];  /* file field of pawns that have just double pushed */
+    int castle_q[2];    /* 0 if either king or queen rook has moved, 1 otherwise */
+    int castle_k[2];    /* 0 if either king or king rook has moved, 1 otherwise */
     /* bitboards */
-    bboard kings[2];    
-    bboard queens[2];
-    bboard bishops[2];
-    bboard knights[2];
-    bboard rooks[2];
-    bboard pawns[2];
+    bboard bb[2][7];
+    //bboard kings[2];    
+    //bboard queens[2];
+    //bboard bishops[2];
+    //bboard knights[2];
+    //bboard rooks[2];
+    //bboard pawns[2];
+    char board88[64];
 } board_state;
+
+/* 
+ *  Mailbox works as follows.
+ *  Most significant bit refers to color
+ *  Other bits determine piece
+ **/
+
+typedef struct _move {
+    uint8_t en_passant[2];
+    int castle_q[2];
+    int castle_k[2];
+    int mover, captive, src, dest;
+    bboard target;
+    bboard capture;
+} move;
+
+#define all_pieces(x) ((x)->bb[WHITE][KING] | (x)->bb[BLACK][KING] | (x)->bb[WHITE][QUEEN] |\
+        (x)->bb[BLACK][QUEEN] | (x)->bb[WHITE][BISHOP] | (x)->bb[BLACK][BISHOP] | (x)->bb[WHITE][KNIGHT] |\
+        (x)->bb[BLACK][KNIGHT] | (x)->bb[WHITE][ROOK] | (x)->bb[BLACK][ROOK] | (x)->bb[WHITE][PAWN] |\
+        (x)->bb[BLACK][PAWN])
+
+#define pieces(x, y) ((x).kings[y] | (x).queens[y] | (x).bishops[y] |\
+        (x).knights[y] | (x).rooks[y] | (x).pawns[y] |)
 
 #endif

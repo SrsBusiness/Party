@@ -70,7 +70,7 @@ const magic_entry bishop_magic_table[64] = {
 };
 
 bboard bishop_attacks(bboard rook, bboard occupancy) {
-    int index = bit_scan(rook);       
+    int index = lsb(rook);       
     magic_entry *m = &bishop_magic_table[index];
     return m->attack_table[(occupancy * m->magic) >> m->shift];
 }

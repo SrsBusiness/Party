@@ -1,5 +1,7 @@
 #include "bitboard.h"
 #include "pawn.h"
+#include <stdio.h>
+#include <stdlib.h>
 
 const bboard square_pp[64] = {0, 0, 0, 0, 0, 0, 0, 0,
     0x7F7F7F7F7F7F7F00, //A2
@@ -77,9 +79,33 @@ bboard b_single_push_targets(bboard bpawns, bboard empty) {
     return south_one(bpawns) & empty;
 }
 
-bboard b_double_push_targets(bboard bpawns, bboard empty) {
+bboard b_dbl_push_targets(bboard bpawns, bboard empty) {
     bboard single_pushs = b_single_push_targets(bpawns, empty);
     return south_one(single_pushs) & empty & RANK5;
+}
+
+bboard single_push_targets(bboard pawns, bboard empty, int color) {
+    switch(color) {
+        case WHITE:
+            return w_single_push_targets(pawns, empty);
+        case BLACK:
+            return b_single_push_targets(pawns, empty);
+        default:
+            fprintf(stderr, "Invalid color\n");
+            exit(1);
+    }
+}
+
+bboard double_push_targets(bboard pawns, bboard empty, int color) {
+    switch(color) {
+        case WHITE:
+            return w_dbl_push_targets(pawns, empty);
+        case BLACK:
+            return b_dbl_push_targets(pawns, empty);
+        default:
+            fprintf(stderr, "Invalid color\n");
+            exit(1);
+    }
 }
 
 /*
@@ -102,6 +128,30 @@ bboard b_pawns_able_2_push(bboard bpawns, bboard empty) {
 bboard b_pawns_able_2_dbl_push(bboard bpawns, bboard empty) {
     bboard emptyRank6 = north_one(empty & RANK5) & empty;
     return b_pawns_able_2_push(bpawns, emptyRank6);
+}
+
+bboard pawns_able_2_push(bboard pawns, bboard empty, int color) {
+    switch(color) {
+        case WHITE:
+            return w_pawns_able_2_push(pawns, empty);
+        case BLACK:
+            return b_pawns_able_2_push(pawns, empty);
+        default:
+            fprintf(stderr, "Invalid color\n");
+            exit(1);
+    }
+}
+
+bboard pawns_able_2_dbl_push(bboard pawns, bboard empty, int color) {
+    switch(color) {
+        case WHITE:
+            return w_pawns_able_2_dbl_push(pawns, empty);
+        case BLACK:
+            return b_pawns_able_2_dbl_push(pawns, empty);
+        default:
+            fprintf(stderr, "Invalid color\n");
+            exit(1);
+    }
 }
 
 /*
@@ -177,6 +227,42 @@ bboard b_pawns_able_2_capture_west(bboard bpawns, bboard wpieces) {
 
 bboard b_pawns_able_2_capture_any(bboard bpawns, bboard wpieces) {
     return bpawns & w_pawn_any_attacks(wpieces);
+}
+
+bboard pawns_able_2_capture_east(bboard pawns, bboard pieces, int color) {
+    switch(color) {
+        case WHITE:
+            return w_pawns_able_2_capture_east(pawns, pieces);
+        case BLACK:
+            return b_pawns_able_2_capture_east(pawns, pieces);
+        default:
+            fprintf(stderr, "Invalid color\n");
+            exit(1);
+    }
+}
+
+bboard pawns_able_2_capture_west(bboard pawns, bboard pieces, int color) {
+    switch(color) {
+        case WHITE:
+            return w_pawns_able_2_capture_west(pawns, pieces);
+        case BLACK:
+            return b_pawns_able_2_capture_west(pawns, pieces);
+        default:
+            fprintf(stderr, "Invalid color\n");
+            exit(1);
+    }
+}
+
+bboard pawns_able_2_capture_anyt(bboard pawns, bboard pieces, int color) {
+    switch(color) {
+        case WHITE:
+            return w_pawns_able_2_capture_any(pawns, pieces);
+        case BLACK:
+            return b_pawns_able_2_capture_any(pawns, pieces);
+        default:
+            fprintf(stderr, "Invalid color\n");
+            exit(1);
+    }
 }
 
 /*

@@ -4,14 +4,25 @@
 #include <stdio.h>
 
 #define ANSI_RESET "\x1B[0m"
-#define ANSI_BLACK "\x1B[30m"
-#define ANSI_RED "\x1B[31m"
-#define ANSI_GREEN "\x1B[32m"
-#define ANSI_YELLOW "\x1B[33m"
-#define ANSI_BLUE "\x1B[34m"
-#define ANSI_PURPLE "\x1B[35m"
-#define ANSI_CYAN "\x1B[36m"
-#define ANSI_WHITE "\x1B[37m"
+#define ANSI_FG_BLACK "\x1B[30m"
+#define ANSI_FG_RED "\x1B[31m"
+#define ANSI_FG_GREEN "\x1B[32m"
+#define ANSI_FG_YELLOW "\x1B[33m"
+#define ANSI_FG_BLUE "\x1B[34m"
+#define ANSI_FG_PURPLE "\x1B[35m"
+#define ANSI_FG_CYAN "\x1B[36m"
+#define ANSI_FG_WHITE "\x1B[37m"
+
+#define ANSI_BG_BLACK "\x1B[40m"
+#define ANSI_BG_RED "\x1B[41m"
+#define ANSI_BG_GREEN "\x1B[42m"
+#define ANSI_BG_YELLOW "\x1B[43m"
+#define ANSI_BG_BLUE "\x1B[44m"
+#define ANSI_BG_PURPLE "\x1B[45m"
+#define ANSI_BG_CYAN "\x1B[46m"
+#define ANSI_BG_WHITE "\x1B[47m"
+
+
 #define ANSI_CLEAR_SCRN "\x1B[2J"
 #define ANSI_MOVE_UP "\x1B[%dA"
 #define ANSI_MOVE_DOWN "\x1B[%dB"
@@ -38,16 +49,30 @@
 #define hide_cursor() printf(ANSI_HIDE_CURSOR)
 #define show_cursor() printf(ANSI_SHOW_CURSOR)
 #define clear_all() printf(ANSI_CLEAR_SCRN)
-#define black_font() printf(ANSI_RED)
-#define red_font() printf(ANSI_RED)
-#define green_font() printf(ANSI_RED)
-#define yellow_font() printf(ANSI_RED)
-#define blue_font() printf(ANSI_RED)
-#define purple_font() printf(ANSI_RED)
-#define cyan_font() printf(ANSI_RED)
-#define white_font() printf(ANSI_RED)
+
+#define black_font() printf(ANSI_FG_BLACK)
+#define red_font() printf(ANSI_FG_RED)
+#define green_font() printf(ANSI_FG_GREEN)
+#define yellow_font() printf(ANSI_FG_YELLOW)
+#define blue_font() printf(ANSI_FG_BLUE)
+#define purple_font() printf(ANSI_FG_PURPLE)
+#define cyan_font() printf(ANSI_FG_CYAN)
+#define white_font() printf(ANSI_FG_WHITE)
+
+#define black_bg() printf(ANSI_BG_BLACK)
+#define red_bg() printf(ANSI_BG_RED)
+#define green_bg() printf(ANSI_BG_GREEN)
+#define yellow_bg() printf(ANSI_BG_YELLOW)
+#define blue_bg() printf(ANSI_BG_BLUE)
+#define purple_bg() printf(ANSI_BG_PURPLE)
+#define cyan_bg() printf(ANSI_BG_CYAN)
+#define white_bg() printf(ANSI_BG_WHITE)
+
+
 #define save_cursor() printf(ANSI_SAVE_CURSOR)
 #define restore_cursor() printf(ANSI_RESTORE_CURSOR)
 #define clear_below() printf(ANSI_CLEAR_BELOW)
+
+#define reset_attr() printf(ANSI_RESET)
 
 #endif
