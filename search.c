@@ -123,6 +123,7 @@ int dumb_search(board_state *board, int alpha, int beta, int depth) {
         getchar();
         
         score = -dumb_search(board, -beta, -alpha, depth - 1);
+        /*
         if(score >= beta) {
             unmake(board, &candidates[i]);
             print_board(board, 1, 1);
@@ -137,6 +138,7 @@ int dumb_search(board_state *board, int alpha, int beta, int depth) {
 
             return beta;
         }
+        */
         if(score > alpha)
             alpha = score;
 
