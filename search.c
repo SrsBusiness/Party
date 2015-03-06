@@ -6,9 +6,56 @@
 #include "minicurses.h"
 #include "debug.h"
 #include <string.h>
+#include <assert.h>
 
 void generate_pawn_moves(board_state *, move *, int *);
+void generate_single_pushes(board_state *, move *, int *);
+void generate_double_pushes(board_state *, move *, int *);
 
+
+static board_flags initial_flags = {{0, 0}, {1, 1}, {1, 1}};
+static bboard initial_bb[2][8] = {{
+    BB_KING & BB_WHITE,
+    BB_QUEEN & BB_WHITE,
+    BB_BISHOP & BB_WHITE,
+    BB_KNIGHT & BB_WHITE,
+    BB_ROOK & BB_WHITE,
+    BB_PAWN & BB_WHITE,
+    BB_WHITE,
+    SENTINAL,
+}, {
+    BB_KING & BB_BLACK,
+    BB_QUEEN & BB_BLACK,
+    BB_BISHOP & BB_BLACK,
+    BB_KNIGHT & BB_BLACK,
+    BB_ROOK & BB_BLACK,
+    BB_PAWN & BB_BLACK,
+    BB_BLACK,
+    SENTINAL,
+}};
+
+static board_state initial_state = {
+    0,
+    {{
+        BB_KING & BB_WHITE,
+        BB_QUEEN & BB_WHITE,
+        BB_BISHOP & BB_WHITE,
+        BB_KNIGHT & BB_WHITE,
+        BB_ROOK & BB_WHITE,
+        BB_PAWN & BB_WHITE,
+        BB_WHITE
+    }, {
+        BB_KING & BB_BLACK,
+        BB_QUEEN & BB_BLACK,
+        BB_BISHOP & BB_BLACK,
+        BB_KNIGHT & BB_BLACK,
+        BB_ROOK & BB_BLACK,
+        BB_PAWN & BB_BLACK,
+        BB_BLACK
+    }},
+    {{0, 0}, {1, 1}, {1, 1}}
+
+};
 
 static const uint8_t start_pos[64] = {
     ROOK, KNIGHT, BISHOP, QUEEN, KING, BISHOP, KNIGHT, ROOK,
@@ -24,57 +71,37 @@ static const uint8_t start_pos[64] = {
 
 
 void board_init(board_state *board) {
-    board->turn = 0; 
-    board->castle_q[0] = board->castle_q[1] = 
-        board->castle_k[0] = board->castle_k[1] = 1;
-    board->en_passant[0] = board->en_passant[1] = 0;
-    board->bb[WHITE][KING] = BB_KING & BB_WHITE;
-    board->bb[WHITE][QUEEN] = BB_QUEEN & BB_WHITE;
-    board->bb[WHITE][BISHOP] = BB_BISHOP & BB_WHITE;
-    board->bb[WHITE][KNIGHT] = BB_KNIGHT & BB_WHITE;
-    board->bb[WHITE][ROOK] = BB_ROOK & BB_WHITE;
-    board->bb[WHITE][PAWN] = BB_PAWN & BB_WHITE;
-    board->bb[BLACK][KING] = BB_KING & BB_BLACK;
-    board->bb[BLACK][QUEEN] = BB_QUEEN & BB_BLACK;
-    board->bb[BLACK][BISHOP] = BB_BISHOP & BB_BLACK;
-    board->bb[BLACK][KNIGHT] = BB_KNIGHT & BB_BLACK;
-    board->bb[BLACK][ROOK] = BB_ROOK & BB_BLACK;
-    board->bb[BLACK][PAWN] = BB_PAWN & BB_BLACK;
-    board->bb[WHITE][6] = BB_WHITE;
-    board->bb[BLACK][6] = BB_BLACK;
-    memcpy(board->board88, start_pos, sizeof(start_pos));
+    *board = initial_state;
 }
 
 void bb_make(board_state *board, move *m, int turn) {
-    board->bb[board->turn][m->mover] ^= m->target;
-    board->bb[board->turn][6] ^= m->target;
-    /* switch better than if-else? */
-    switch (m->captive) {
-        case NO_PIECE: /* if captive is -1, then there is no capture */
-            break;
-        default:
-            board->bb[!board->turn][m->captive] ^= m->capture;
-            board->bb[!board->turn][m->captive] ^= m->capture;
-            break;
-    }
+    /* capture */
+    int i;
+    for(i = QUEEN; i <= PAWN; i++)
+        board->bb[!board->turn][i] &= m-> capture;
+    
+    /* primary move */
+    board->bb[board->turn][m->p_mover] ^= m->primary;
+    board->bb[board->turn][6] ^= m->primary;
+    
+    /* Pawn promotion and castling */
+    board->bb[board->turn][m->s_mover] ^= m->secondary;
+    board->bb[board->turn][6] ^= m->secondary;
+    
 }
 
 void make(board_state *board, move *m) {
-    /* modify mailbox */
-    board->board88[m->dest] = board->board88[m->src];
-    board->board88[m->src] = NO_PIECE;
     /* modify bitboards */
     bb_make(board, m, board->turn);
     board->turn = !board->turn;
+    board->flags = m->flags;
 }
 
+/* unused */
 void unmake(board_state *board, move *m) {
     board->turn = !board->turn;
-    /* modify mailbox */
-    board->board88[m->src] = board->board88[m->dest];
-    board->board88[m->dest] = m->captive | (board->turn << 7);
-    /* modify bitboards */
     bb_make(board, m, board->turn);
+    board->flags = m->flags;
 }
 
 /* dumb because it considers every possible branch */
@@ -100,29 +127,31 @@ int dumb_search(board_state *board, int alpha, int beta, int depth) {
     
     generate_pawn_moves(board, candidates, &move_index);
 
-    uint8_t en_passant[2];
-    int castle_q[2];
-    int castle_k[2];
-
+    board_state altered;
     
     /* iterate through each move */
     int i;
     for(i = 0; i < move_index; i++) {
-        make(board, &candidates[i]);
-        print_board(board, 1, 1);
+        altered = *board;
+        make(&altered, &candidates[i]);
+        
+        #ifdef  DEBUG
+        print_board(&altered, 1, 1);
         move_cursor(28, 1);
         clear_line();
         display_text("Make", 28, 1);
         move_cursor(30, 1);
-        printf("i: %d, depth: %d, src: %d, dest: %d\n", i, depth, candidates[i].src, candidates[i].dest);
+        clear_line();
+        printf("i: %d, depth: %d", i, depth);
         display_text("Pawns", 31, 1);
-        display_bboard(board->bb[WHITE][PAWN], 32, 1);
-        display_bboard(board->bb[BLACK][PAWN], 32, 20);
-        display_text("Target", 31, 39);
-        display_bboard(candidates[i].target, 32, 39);
+        display_bboard(altered.bb[WHITE][PAWN], 32, 1);
+        display_bboard(altered.bb[BLACK][PAWN], 32, 20);
+        display_text("Primary", 31, 39);
+        display_bboard(candidates[i].primary, 32, 39);
         getchar();
+        #endif
         
-        score = -dumb_search(board, -beta, -alpha, depth - 1);
+        score = -dumb_search(&altered, -beta, -alpha, depth - 1);
         /*
         if(score >= beta) {
             unmake(board, &candidates[i]);
@@ -143,25 +172,21 @@ int dumb_search(board_state *board, int alpha, int beta, int depth) {
             alpha = score;
 
 
-        unmake(board, &candidates[i]);
+        #ifdef  DEBUG
         print_board(board, 1, 1);
         move_cursor(28, 1);
         clear_line();
         display_text("Unmake", 28, 1);
         move_cursor(30, 1);
-        printf("i: %d, depth: %d, src: %d, dest: %d\n", i, depth, candidates[i].src, candidates[i].dest);
+        clear_line();
+        printf("i: %d, depth: %d", i, depth);
         display_text("Pawns", 31, 1);
         display_bboard(board->bb[WHITE][PAWN], 32, 1);
         display_bboard(board->bb[BLACK][PAWN], 32, 20);
-        display_text("Target", 31, 39);
-        display_bboard(candidates[i].target, 32, 39);
+        display_text("Primary", 31, 39);
+        display_bboard(candidates[i].primary, 32, 39);
         getchar();
-        board->en_passant[0] = en_passant[0];
-        board->en_passant[1] = en_passant[1];
-        board->castle_q[0] = castle_q[0];
-        board->castle_q[1] = castle_q[1];
-        board->castle_k[0] = castle_k[0];
-        board->castle_k[1] = castle_k[1];
+        #endif
     }
     /* make move */
     //board->bb[turn][PAWN] ^= piece;
@@ -189,16 +214,26 @@ int dumb_search(board_state *board, int alpha, int beta, int depth) {
 
 void generate_pawn_moves(board_state *board, move *candidates,
         int *move_index) {
-    int turn = board->turn;
+    
+    generate_double_pushes(board, candidates, move_index);
+    generate_single_pushes(board, candidates, move_index); 
 
+    ///* captures */
+    //pieces = pawns_able_2_dbl_push(board->bb[turn][PAWN],
+    //        ~all_pieces(board), turn);
+    //while(pieces) {
+    //    ;
+    //}
+}
+
+void generate_single_pushes(board_state *board, move *candidates, 
+        int *move_index) {
+
+    int turn = board->turn;
     /* if captured piece is not -1, then that piece needs to be
      * restored during an unmake 
      **/
-    int captured_piece = -1;
-    int src, dest;
-
-    bboard pieces;
-    bboard piece;
+    bboard pieces, piece, target;
     //bboard target;
     /* Find candidate moves */ 
     /* Pawns */
@@ -208,50 +243,81 @@ void generate_pawn_moves(board_state *board, move *candidates,
     while(pieces) {
         /* get current location of a piece */
         piece = pieces & -pieces;
-                src = lsb(piece);
+        pieces ^= piece;
+        target = single_push_targets(piece, 
+                ~all_pieces(board), turn);
+
+        if((target & RANK1) | (target & RANK8)) {
+            /* promotion */
+            bboard b;
+            for(b = QUEEN; b <= ROOK; b++) {
+                move *m = &candidates[*move_index];
+                
+                m->flags = (board_flags){{0, 0}, 
+                    {board->flags.castle_q[0], board->flags.castle_q[1]}, 
+                    {board->flags.castle_k[0], board->flags.castle_k[1]},
+                };
+
+                m->p_mover = PAWN;
+                m->s_mover = b;
+                m->primary = piece;
+                m->secondary = target;
+                m->capture = BLACKOUT;
+                (*move_index)++;
+        
+            }
+            continue;
+        }
+        piece |= target;
+        /* Add it to candidates list */
+        move *m = &candidates[*move_index];
+
+        m->flags = (board_flags){{0, 0}, 
+            {board->flags.castle_q[0], board->flags.castle_q[1]}, 
+            {board->flags.castle_k[0], board->flags.castle_k[1]},
+        };
+
+        m->p_mover = PAWN;
+        m->s_mover = NO_PIECE;
+        m->primary = piece;
+        m->secondary = SENTINAL;
+        m->capture = BLACKOUT;
+        (*move_index)++;
+    }
+}
+
+void generate_double_pushes(board_state *board, move *candidates, 
+        int *move_index) {
+
+    int turn = board->turn;
+
+    bboard pieces, piece;
+
+    /* double pushes */
+    pieces = pawns_able_2_dbl_push(board->bb[turn][PAWN],
+            ~all_pieces(board), turn);
+    while(pieces) {
+        /* get current location of a piece */
+        piece = pieces & -pieces;
         pieces ^= piece;
         /* or it with target location */
-        bboard tmp = single_push_targets(piece, 
+        piece |= double_push_targets(piece, 
                 ~all_pieces(board), turn);
-        dest = lsb(tmp);
-        piece |= tmp;
-        //display_bboard(piece, 32, 1);
-        //display_bboard(pieces, 32, 20);
-        //getchar();
-
+        
         /* Add it to candidates list */
-        candidates[(*move_index)++] = (move){{0, 0}, {board->castle_q[0],
-            board->castle_q[1]}, {board->castle_k[0], board->castle_k[1]}, 
-            PAWN, NO_PIECE, src, dest, piece, 0,};
+        move *m = &candidates[*move_index];
+
+        m->flags = board->flags; 
+        m->flags.en_passant[turn] = south_fill(piece);
+        m->flags.en_passant[!turn] = 0;
+
+        m->p_mover = PAWN;
+        m->s_mover = NO_PIECE;
+        m->primary = piece;
+        m->secondary = SENTINAL;
+        m->capture = BLACKOUT;
+        (*move_index)++;
+
     }
-
-    ///* double pushes */
-    //pieces = pawns_able_2_dbl_push(board->bb[turn][PAWN],
-    //        ~all_pieces(board), turn);
-    //while(pieces) {
-    //    /* get current location of a piece */
-    //    piece = pieces & -pieces;
-    //    /* or it with target location */
-    //    piece |= double_push_targets(board->bb[turn][PAWN], 
-    //            ~all_pieces(board), turn);
-    //    /* en passant mask */
-    //    uint8_t ep_mask = south_fill(piece);
-    //    //candidates[move_index++] = (move){PAWN, NO_PIECE, piece, 0};
-    //    move *m = candidates + *move_index;
-    //    m->en_passant[turn] = ep_mask;
-    //    m->en_passant[!turn] = 0;
-    //    m->castle_q[0] = board->castle_q[0];
-    //    m->castle_q[1] = board->castle_q[1];
-    //    m->castle_k[0] = board->castle_k[0];
-    //    m->castle_k[1] = board->castle_k[1];
-    //    //m->mover = PAWN; m->captive = NO_PIECE; m->
-    //    pieces ^= piece;
-    //}
-
-    ///* captures */
-    //pieces = pawns_able_2_dbl_push(board->bb[turn][PAWN],
-    //        ~all_pieces(board), turn);
-    //while(pieces) {
-    //    ;
-    //}
 }
+

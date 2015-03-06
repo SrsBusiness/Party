@@ -6,7 +6,7 @@
 #define WHITE 0
 #define BLACK 1
 
-#define NO_PIECE    0xFF
+#define NO_PIECE    7
 #define KING    0
 #define QUEEN   1
 #define BISHOP  2
@@ -14,6 +14,9 @@
 #define ROOK    4
 #define PAWN    5
 
+#define SENTINAL 0x060438fAA905AA1B
+
+#define BLACKOUT 0xFFFFFFFFFFFFFFFF
 
 // File Masks
 #define AFILE       0x0101010101010101
@@ -191,20 +194,18 @@ typedef struct _magic_entry {
     int shift;  /* how much to shift by */
 } magic_entry;
 
-typedef struct _board_state {
-    uint8_t turn;   /* 0 if white, 1 if black */
+typedef struct _board_flags {
     uint8_t en_passant[2];  /* file field of pawns that have just double pushed */
     int castle_q[2];    /* 0 if either king or queen rook has moved, 1 otherwise */
     int castle_k[2];    /* 0 if either king or king rook has moved, 1 otherwise */
+} board_flags;
+
+typedef struct _board_state {
+    //char board88[64];
+    int turn;   /* 0 if white, 1 if black */
     /* bitboards */
-    bboard bb[2][7];
-    //bboard kings[2];    
-    //bboard queens[2];
-    //bboard bishops[2];
-    //bboard knights[2];
-    //bboard rooks[2];
-    //bboard pawns[2];
-    char board88[64];
+    bboard bb[2][8];
+    board_flags flags;
 } board_state;
 
 /* 
@@ -214,12 +215,11 @@ typedef struct _board_state {
  **/
 
 typedef struct _move {
-    uint8_t en_passant[2];
-    int castle_q[2];
-    int castle_k[2];
-    int mover, captive, src, dest;
-    bboard target;
-    bboard capture;
+    int p_mover, s_mover;
+    bboard primary;     /* xor with primary moving piece */
+    bboard secondary;   /* xor with secondary piece */
+    bboard capture;     /* xor with captive */
+    board_flags flags;
 } move;
 
 #define all_pieces(x) ((x)->bb[WHITE][KING] | (x)->bb[BLACK][KING] | (x)->bb[WHITE][QUEEN] |\
@@ -229,5 +229,14 @@ typedef struct _move {
 
 #define pieces(x, y) ((x).kings[y] | (x).queens[y] | (x).bishops[y] |\
         (x).knights[y] | (x).rooks[y] | (x).pawns[y] |)
+
+#define copy_flags(m, board) do{(m)->en_passant_pre[0] = (board)->en_passant[0];\
+        (m)->en_passant_pre[1] = (board)->en_passant[1];\
+        (m)->castle_q_pre[0] = (board)->castle_q[0];\
+        (m)->castle_q_pre[1] = (board)->castle_q[1];\
+        (m)->castle_k_pre[0] = (board)->castle_k[0];\
+        (m)->castle_k_pre[1] = (board)->castle_k[1];} while(0)
+
+
 
 #endif

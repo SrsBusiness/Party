@@ -25,32 +25,6 @@ void print_board(board_state *board, int row, int col) {
     int i, j;
     int color, piece, file, rank;
     char *graph;
-    uint8_t *board88 = board->board88;
-    /* mailbox board */
-    move_cursor(1, 1);
-    printf("Mailbox:");
-    for(i = 0; i < 64; i++) {
-        if (board88[i] == NO_PIECE)
-            graph = " ";
-        else {
-            piece = board88[i] & 0x0F;
-            color = !!(0x80 & board88[i]);
-            graph = piece_chars[piece];
-        }
-        file = i % 8;
-        rank = i / 8;
-        if((rank + file) % 2)
-            cyan_bg();
-        else
-            purple_bg();
-        move_cursor(7 - (i / 8) + row + 1, ((i & 7) << 1) + col);
-        if (color)
-            black_font();
-        else
-            white_font();
-        printf("%s ", graph);
-    }
-
     /* bitboards */
     move_cursor(11, 1);
     reset_attr();
@@ -88,19 +62,19 @@ void print_board(board_state *board, int row, int col) {
             }
         }
     }
-    assert((board->bb[WHITE][KING] |
-                board->bb[WHITE][QUEEN] |
-                board->bb[WHITE][BISHOP] |
-                board->bb[WHITE][KNIGHT] |
-                board->bb[WHITE][ROOK] |
-                board->bb[WHITE][PAWN]
-                ) == board->bb[WHITE][6]);
-    assert((board->bb[BLACK][KING] |
-                board->bb[BLACK][QUEEN] |
-                board->bb[BLACK][BISHOP] |
-                board->bb[BLACK][KNIGHT] |
-                board->bb[BLACK][ROOK] |
-                board->bb[BLACK][PAWN]
-                ) == board->bb[BLACK][6]);
+    //assert((board->bb[WHITE][KING] |
+    //            board->bb[WHITE][QUEEN] |
+    //            board->bb[WHITE][BISHOP] |
+    //            board->bb[WHITE][KNIGHT] |
+    //            board->bb[WHITE][ROOK] |
+    //            board->bb[WHITE][PAWN]
+    //            ) == board->bb[WHITE][6]);
+    //assert((board->bb[BLACK][KING] |
+    //            board->bb[BLACK][QUEEN] |
+    //            board->bb[BLACK][BISHOP] |
+    //            board->bb[BLACK][KNIGHT] |
+    //            board->bb[BLACK][ROOK] |
+    //            board->bb[BLACK][PAWN]
+    //            ) == board->bb[BLACK][6]);
     reset_attr();
 }
