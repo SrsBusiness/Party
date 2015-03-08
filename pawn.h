@@ -31,6 +31,9 @@
 #define east_attack_file_fill(x)    (east_one(file_fill(x)))
 #define west_attack_file_fill(x)    (west_one(file_fill(x)))
 
+#define w_pawn_capture_targets(x, y)    (w_pawn_any_attacks(x) & (y))
+#define b_pawn_capture_targets(x, y)    (b_pawn_any_attacks(x) & (y))
+
 typedef uint8_t fset;
 
 bboard w_single_push_targets(bboard, bboard);
@@ -80,6 +83,12 @@ bboard b_pawns_able_2_capture_any(bboard, bboard);
 bboard pawns_able_2_capture_east(bboard, bboard, int);
 bboard pawns_able_2_capture_west(bboard, bboard, int);
 bboard pawns_able_2_capture_any(bboard, bboard, int);
+
+/*
+ *  Pawn capture targets: return set of pawn capture target sets
+ */
+
+bboard pawn_capture_targets(bboard, bboard, int);
 
 /*
  *  returns defended pawns

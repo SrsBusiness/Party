@@ -6,13 +6,14 @@
 #define WHITE 0
 #define BLACK 1
 
-#define NO_PIECE    7
 #define KING    0
 #define QUEEN   1
 #define BISHOP  2
 #define KNIGHT  3
 #define ROOK    4
 #define PAWN    5
+#define ALL     6
+#define NO_PIECE    7
 
 #define SENTINAL 0x060438fAA905AA1B
 
@@ -195,9 +196,9 @@ typedef struct _magic_entry {
 } magic_entry;
 
 typedef struct _board_flags {
-    uint8_t en_passant[2];  /* file field of pawns that have just double pushed */
     int castle_q[2];    /* 0 if either king or queen rook has moved, 1 otherwise */
     int castle_k[2];    /* 0 if either king or king rook has moved, 1 otherwise */
+    bboard en_passant[2];  /* bitboard of pawns that have just double pushed */
 } board_flags;
 
 typedef struct _board_state {

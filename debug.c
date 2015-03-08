@@ -14,9 +14,9 @@
 static char *piece_chars[6] = {
     BKING,
     BQUEEN,
-    BROOK,
     BBISHOP,
     BKNIGHT,
+    BROOK,
     BPAWN
 };
 
@@ -26,9 +26,12 @@ void print_board(board_state *board, int row, int col) {
     int color, piece, file, rank;
     char *graph;
     /* bitboards */
-    move_cursor(11, 1);
-    reset_attr();
-    printf("Bitboards:");
+    move_cursor(1, 60);
+    printf("%d %d", board->flags.castle_q[WHITE],
+            board->flags.castle_k[WHITE]);
+    move_cursor(2, 60);
+    printf("%d %d", board->flags.castle_q[BLACK],
+            board->flags.castle_k[BLACK]);
     for(i = 0; i < 64; i++) {
         file = i % 8;
         rank = i / 8;
@@ -36,7 +39,7 @@ void print_board(board_state *board, int row, int col) {
             cyan_bg();
         else
             purple_bg();
-        move_cursor(7 - (i / 8) + row + 11, ((i & 7) << 1) + col);
+        move_cursor(7 - (i / 8) + row, ((i & 7) << 1) + col);
         printf("  ");
     }
     bboard current;
@@ -56,12 +59,23 @@ void print_board(board_state *board, int row, int col) {
                     black_font();
                 else
                     white_font();
-                move_cursor(7 - (square / 8) + row + 11, ((square & 7) << 1) + col);
+                move_cursor(7 - (square / 8) + row, ((square & 7) << 1) + col);
                 printf("%s ", piece_chars[j]);
                 current ^= (current & -current);
             }
         }
     }
+    reset_attr();
+    display_bboard(board->flags.en_passant[0], 1, 21);
+    display_bboard(board->flags.en_passant[1], 1, 41);
+    for(i = WHITE; i <= BLACK; i++) {
+        for(j = KING; j <= ALL; j++) {
+            display_bboard(board->bb[i][j], 10 + 10 * i, 20 * j + 1);
+        }
+    }
+    display_bboard(all_pieces(board), 10 + WHITE * 10, 20 * NO_PIECE + 1);
+    display_bboard(all_pieces(board), 10 + BLACK * 10, 20 * NO_PIECE + 1);
+
     //assert((board->bb[WHITE][KING] |
     //            board->bb[WHITE][QUEEN] |
     //            board->bb[WHITE][BISHOP] |

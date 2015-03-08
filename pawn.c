@@ -2,6 +2,7 @@
 #include "pawn.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include "minicurses.h"
 
 const bboard square_pp[64] = {0, 0, 0, 0, 0, 0, 0, 0,
     0x7F7F7F7F7F7F7F00, //A2
@@ -213,6 +214,12 @@ bboard w_pawns_able_2_capture_west(bboard wpawns, bboard bpieces) {
 }
 
 bboard w_pawns_able_2_capture_any(bboard wpawns, bboard bpieces) {
+    //bboard result = wpawns & b_pawn_any_attacks(bpieces);
+    //bboard b = b_pawn_any_attacks(bpieces);
+    //clear_all();
+    //display_bboard(bpieces, 1, 1);
+    //display_bboard(b, 1, 20);
+    //display_bboard(wpawns, 1, 40);
     return wpawns & b_pawn_any_attacks(bpieces);
 }
 
@@ -253,12 +260,24 @@ bboard pawns_able_2_capture_west(bboard pawns, bboard pieces, int color) {
     }
 }
 
-bboard pawns_able_2_capture_anyt(bboard pawns, bboard pieces, int color) {
+bboard pawns_able_2_capture_any(bboard pawns, bboard pieces, int color) {
     switch(color) {
         case WHITE:
             return w_pawns_able_2_capture_any(pawns, pieces);
         case BLACK:
             return b_pawns_able_2_capture_any(pawns, pieces);
+        default:
+            fprintf(stderr, "Invalid color\n");
+            exit(1);
+    }
+}
+
+bboard pawn_capture_targets(bboard pawns, bboard pieces, int color) {
+    switch(color) {
+        case WHITE:
+            return w_pawn_capture_targets(pawns, pieces);
+        case BLACK:
+            return b_pawn_capture_targets(pawns, pieces);
         default:
             fprintf(stderr, "Invalid color\n");
             exit(1);

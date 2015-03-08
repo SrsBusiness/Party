@@ -140,7 +140,7 @@ void double_args_tests() {
     double_args_test_empty(b_single_push_targets,
             "Black single push targets");
     /* bboard b_double_push_targets(bboard, bboard); */
-    double_args_test_empty(b_double_push_targets,
+    double_args_test_empty(b_dbl_push_targets,
             "Black double push targets");
     /* bboard w_pawns_able_2_push(bboard, bboard); */
     double_args_test_empty(w_pawns_able_2_push,
