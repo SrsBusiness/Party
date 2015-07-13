@@ -1,7 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <assert.h>
-#include "minicurses.h"
 #include "bitboard.h"
 
 bboard fliph0 (bboard x) {
@@ -373,23 +372,4 @@ bboard nw_occluded_fill(bboard gen, bboard pro) {
     pro &= (pro << 14);
     gen |= pro & (gen << 28);
     return gen;
-}
-
-/* for debugging purposes */
-
-void display_bboard(bboard b, int row, int col) {
-    int i;
-    for(i = 0; i < 64; i++) {
-        move_cursor(7 - (i / 8) + row, ((i & 7) << 1) + col);
-        if((1lu << i) & b)
-            putchar('#');
-        else
-            putchar('_');
-    }
-    fflush(stdin);
-}
-
-void display_text(char *string, int row, int col){
-    move_cursor(row, col);
-    printf("%s\n", string);
 }

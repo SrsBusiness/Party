@@ -1,5 +1,4 @@
 #include "bishop.h"
-#include "minicurses.h"
 #include "magic.h"
 
 const magic_entry bishop_magic_table[64] = {

@@ -1,8 +1,7 @@
-#include "bitboard.h"
-#include "pawn.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include "minicurses.h"
+#include "bitboard.h"
+#include "pawn.h"
 
 const bboard square_pp[64] = {0, 0, 0, 0, 0, 0, 0, 0,
     0x7F7F7F7F7F7F7F00, //A2

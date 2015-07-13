@@ -1,12 +1,10 @@
+#include <string.h>
+#include <assert.h>
 #include "pawn.h"
 #include "knight.h"
 #include "rook.h"
 #include "bishop.h"
 #include "search.h"
-#include "minicurses.h"
-#include "debug.h"
-#include <string.h>
-#include <assert.h>
 
 void generate_pawn_moves(board_state *, move *, int *);
 void generate_single_pushes(board_state *, move *, int *);

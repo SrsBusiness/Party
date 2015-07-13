@@ -1,5 +1,4 @@
 #include "rook.h"
-#include "minicurses.h"
 #include "magic.h"
 
 const magic_entry rook_magic_table[64] = {
