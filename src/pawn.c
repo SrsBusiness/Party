@@ -422,7 +422,7 @@ bboard half_isolanis(bboard pawns) {
 
 /* TODO: hanging pawns */
 bboard hanging_pawns() {
-
+    return 0;
 }
 
 /*

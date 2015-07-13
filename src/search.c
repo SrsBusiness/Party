@@ -114,8 +114,6 @@ int dumb_search(board_state *board, int alpha, int beta, int depth) {
         return 0;
     }
 
-    int turn = board->turn;
-
     /* Upperbound on number of candidate moves is 137, which is probably
      * unattainable. In case of bugs, check for buffer overflows with
      * candidates
@@ -155,25 +153,9 @@ int dumb_search(board_state *board, int alpha, int beta, int depth) {
         #endif
         
         score = -dumb_search(&altered, -beta, -alpha, depth - 1);
-        /*
-        if(score >= beta) {
-            unmake(board, &candidates[i]);
-            print_board(board, 1, 1);
-            move_cursor(30, 1);
-            printf("i: %d, depth: %d, src: %d, dest: %d\n", i, depth, candidates[i].src, candidates[i].dest);
-            display_text("Pawns", 31, 1);
-            display_bboard(board->bb[WHITE][PAWN], 32, 1);
-            display_bboard(board->bb[BLACK][PAWN], 32, 20);
-            display_text("Target", 31, 39);
-            display_bboard(candidates[i].target, 32, 39);
-            getchar();
 
-            return beta;
-        }
-        */
         if(score > alpha)
             alpha = score;
-
 
         #ifdef  DEBUG
         print_board(board, 1, 1);
@@ -191,27 +173,6 @@ int dumb_search(board_state *board, int alpha, int beta, int depth) {
         getchar();
         #endif
     }
-    /* make move */
-    //board->bb[turn][PAWN] ^= piece;
-    //score = -search(board, -beta, -alpha, depth - 1, !turn);
-    //if (score >= beta)
-    //    return beta;
-    //if (score > alpha)
-    //    alpha = score;
-
-    /*
-     *  for each move
-     *      make move
-     *      score = -search(-beta, -alpha, depth - 1, !turn);
-     *      if (score >= beta) {
-     *          return beta;
-     *      }
-     *      if (score > alpha) {
-     *          alpha = score;
-     *      }
-     *      return alpha
-     *
-     */
     return alpha;
 }
 
@@ -341,7 +302,7 @@ void generate_pawn_captures(board_state *board, move *candidates,
     /* Find candidate moves */ 
     /* Pawns */
     /* single pushes */
-    bboard anus = ~all_pieces(board);
+    //bboard anus = ~all_pieces(board);
     //pieces = pawns_able_2_capture_any(board->bb[turn][PAWN], 
     //        ~all_pieces(board), turn);
     pieces = pawns_able_2_capture_any(board->bb[turn][PAWN], 

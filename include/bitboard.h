@@ -15,73 +15,73 @@
 #define ALL     6
 #define NO_PIECE    7
 
-#define SENTINAL 0x060438fAA905AA1B
+#define SENTINAL 0x060438fAA905AA1Bul
 
-#define BLACKOUT 0xFFFFFFFFFFFFFFFF
+#define BLACKOUT 0xFFFFFFFFFFFFFFFFul
 
 // File Masks
-#define AFILE       0x0101010101010101
-#define BFILE       0x0202020202020202
-#define CFILE       0x0404040404040404
-#define DFILE       0x0808080808080808
-#define EFILE       0x1010101010101010
-#define FFILE       0x2020202020202020
-#define GFILE       0x4040404040404040
-#define HFILE       0x8080808080808080
+#define AFILE       0x0101010101010101ul
+#define BFILE       0x0202020202020202ul
+#define CFILE       0x0404040404040404ul
+#define DFILE       0x0808080808080808ul
+#define EFILE       0x1010101010101010ul
+#define FFILE       0x2020202020202020ul
+#define GFILE       0x4040404040404040ul
+#define HFILE       0x8080808080808080ul
 
 // Rank Masks
-#define RANK1       0x00000000000000FF
-#define RANK2       0x000000000000FF00
-#define RANK3       0x0000000000FF0000
-#define RANK4       0x00000000FF000000
-#define RANK5       0x000000FF00000000
-#define RANK6       0x0000FF0000000000
-#define RANK7       0x00FF000000000000
-#define RANK8       0xFF00000000000000
+#define RANK1       0x00000000000000FFul
+#define RANK2       0x000000000000FF00ul
+#define RANK3       0x0000000000FF0000ul
+#define RANK4       0x00000000FF000000ul
+#define RANK5       0x000000FF00000000ul
+#define RANK6       0x0000FF0000000000ul
+#define RANK7       0x00FF000000000000ul
+#define RANK8       0xFF00000000000000ul
 
 // Diagonals from bottom left to top right
-#define A7B8        0x0201000000000000
-#define A6C8        0x0402010000000000
-#define A5D8        0x0804020100000000
-#define A4E8        0x1008040201000000
-#define A3F8        0x2010080402010000
-#define A2G8        0x4020100804020100
-#define A1H8        0x8040201008040201
-#define B1H7        0x0080402010080402
-#define C1H6        0x0000804020100804
-#define D1H5        0x0000008040201008
-#define E1H4        0x0000000080402010
-#define F1H3        0x0000000000804020
-#define G1H2        0x0000000000008040
+#define A7B8        0x0201000000000000ul
+#define A6C8        0x0402010000000000ul
+#define A5D8        0x0804020100000000ul
+#define A4E8        0x1008040201000000ul
+#define A3F8        0x2010080402010000ul
+#define A2G8        0x4020100804020100ul
+#define A1H8        0x8040201008040201ul
+#define B1H7        0x0080402010080402ul
+#define C1H6        0x0000804020100804ul
+#define D1H5        0x0000008040201008ul
+#define E1H4        0x0000000080402010ul
+#define F1H3        0x0000000000804020ul
+#define G1H2        0x0000000000008040ul
 
 // Diagonals from top left to bottom right
-#define A2B1        0x0000000000000102
-#define A3C1        0x0000000000010204
-#define A4D1        0x0000000001020408
-#define A5E1        0x0000000102040810
-#define A6F1        0x0000010204081020
-#define A7G1        0x0001020408102040
-#define A8H1        0x0102040810204080
-#define B8H2        0x0204081020408000
-#define C8H3        0x0408102040800000
-#define D8H4        0x0810204080000000
-#define E8H5        0x1020408000000000
-#define F8H6        0x2040800000000000
-#define G8H7        0x4080000000000000
+#define A2B1        0x0000000000000102ul
+#define A3C1        0x0000000000010204ul
+#define A4D1        0x0000000001020408ul
+#define A5E1        0x0000000102040810ul
+#define A6F1        0x0000010204081020ul
+#define A7G1        0x0001020408102040ul
+#define A8H1        0x0102040810204080ul
+#define B8H2        0x0204081020408000ul
+#define C8H3        0x0408102040800000ul
+#define D8H4        0x0810204080000000ul
+#define E8H5        0x1020408000000000ul
+#define F8H6        0x2040800000000000ul
+#define G8H7        0x4080000000000000ul
 
 // Light/Dark square masks
-#define LIGHT       0x55AA55AA55AA55AA
-#define DARK        0xAA55AA55AA55AA55
+#define LIGHT       0x55AA55AA55AA55AAul
+#define DARK        0xAA55AA55AA55AA55ul
 
 // Starting Squares of pieces
-#define BB_KING        0x1000000000000010
-#define BB_QUEEN       0x0800000000000008
-#define BB_BISHOP      0x2400000000000024
-#define BB_KNIGHT      0x4200000000000042
-#define BB_ROOK        0x8100000000000081
-#define BB_PAWN        0x00FF00000000FF00
-#define BB_WHITE       0x000000000000FFFF
-#define BB_BLACK       0xFFFF000000000000
+#define BB_KING        0x1000000000000010ul
+#define BB_QUEEN       0x0800000000000008ul
+#define BB_BISHOP      0x2400000000000024ul
+#define BB_KNIGHT      0x4200000000000042ul
+#define BB_ROOK        0x8100000000000081ul
+#define BB_PAWN        0x00FF00000000FF00ul
+#define BB_WHITE       0x000000000000FFFFul
+#define BB_BLACK       0xFFFF000000000000ul
 
 
 // macro functions on bitboards
@@ -132,6 +132,11 @@ extern const bboard square_pp[64];
 
 
 #define fliph(x)        fliph0(x)
+bboard fliph0 (bboard x);
+bboard fliph1 (bboard x);
+bboard fliph2 (bboard x);
+
+
 bboard flipld(bboard);
 bboard flipdd(bboard);
 bboard rotate_pi(bboard);

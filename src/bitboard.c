@@ -1,8 +1,8 @@
-#include "bitboard.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <assert.h>
 #include "minicurses.h"
+#include "bitboard.h"
 
 bboard fliph0 (bboard x) {
     const bboard k1 = 0x5555555555555555;
@@ -188,7 +188,6 @@ bboard east_fill(bboard x) {
     bboard k1 = ~AFILE;
     bboard k2 = k1 & (k1 << 1);
     bboard k3 = k2 & (k2 << 2);
-    x = (x << 1) & k1;
     x |= (x << 1) & k1;
     x |= (x << 2) & k2;
     x |= (x << 4) & k3;
@@ -199,7 +198,6 @@ bboard west_fill(bboard x) {
     bboard k1 = ~HFILE;
     bboard k2 = k1 & (k1 >> 1);
     bboard k3 = k2 & (k2 >> 2);
-    x = (x >> 1) & k1;
     x |= (x >> 1) & k1;
     x |= (x >> 2) & k2;
     x |= (x >> 4) & k3;
@@ -210,7 +208,6 @@ bboard ne_fill(bboard x) {
     bboard k1 = ~AFILE;
     bboard k2 = k1 & (k1 << 9);
     bboard k3 = k2 & (k2 << 18);
-    x = (x << 9) & k1;
     x |= (x << 9) & k1;
     x |= (x << 18) & k2;
     x |= (x << 36) & k3;
@@ -221,7 +218,6 @@ bboard nw_fill(bboard x) {
     bboard k1 = ~HFILE;
     bboard k2 = k1 & (k1 << 7);
     bboard k3 = k2 & (k2 << 14);
-    x = (x << 7) & k1;
     x |= (x << 7) & k1;
     x |= (x << 14) & k2;
     x |= (x << 28) & k3;
@@ -232,7 +228,6 @@ bboard se_fill(bboard x) {
     bboard k1 = ~AFILE;
     bboard k2 = k1 & (k1 >> 7);
     bboard k3 = k2 & (k2 >> 14);
-    x = (x >> 7) & k1;
     x |= (x >> 7) & k1;
     x |= (x >> 14) & k2;
     x |= (x >> 28) & k3;
@@ -243,7 +238,6 @@ bboard sw_fill(bboard x) {
     bboard k1 = ~HFILE;
     bboard k2 = k1 & (k1 >> 9);
     bboard k3 = k2 & (k2 >> 18);
-    x = (x >> 9) & k1;
     x |= (x >> 9) & k1;
     x |= (x >> 18) & k2; 
     x |= (x >> 36) & k3;
