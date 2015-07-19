@@ -70,7 +70,7 @@ bboard w_single_push_targets(bboard wpawns, bboard empty) {
     return north_one(wpawns) & empty;
 }
 
-bboard w_dbl_push_targets(bboard wpawns, bboard empty) {
+bboard w_double_push_targets(bboard wpawns, bboard empty) {
     bboard single_pushs = w_single_push_targets(wpawns, empty);
     return north_one(single_pushs) & empty & RANK4;
 }
@@ -79,7 +79,7 @@ bboard b_single_push_targets(bboard bpawns, bboard empty) {
     return south_one(bpawns) & empty;
 }
 
-bboard b_dbl_push_targets(bboard bpawns, bboard empty) {
+bboard b_double_push_targets(bboard bpawns, bboard empty) {
     bboard single_pushs = b_single_push_targets(bpawns, empty);
     return south_one(single_pushs) & empty & RANK5;
 }
@@ -99,9 +99,9 @@ bboard single_push_targets(bboard pawns, bboard empty, int color) {
 bboard double_push_targets(bboard pawns, bboard empty, int color) {
     switch(color) {
         case WHITE:
-            return w_dbl_push_targets(pawns, empty);
+            return w_double_push_targets(pawns, empty);
         case BLACK:
-            return b_dbl_push_targets(pawns, empty);
+            return b_double_push_targets(pawns, empty);
         default:
             fprintf(stderr, "Invalid color\n");
             exit(1);
@@ -112,42 +112,42 @@ bboard double_push_targets(bboard pawns, bboard empty, int color) {
  *  returns source squares of pawns able to be pushed
  */
 
-bboard w_pawns_able_2_push(bboard wpawns, bboard empty) {
+bboard w_pawns_able_to_push(bboard wpawns, bboard empty) {
     return south_one(empty) & wpawns;
 }
 
-bboard w_pawns_able_2_dbl_push(bboard wpawns, bboard empty) {
+bboard w_pawns_able_to_double_push(bboard wpawns, bboard empty) {
     bboard emptyRank3 = south_one(empty & RANK4) & empty;
-    return w_pawns_able_2_push(wpawns, emptyRank3);
+    return w_pawns_able_to_push(wpawns, emptyRank3);
 }
 
-bboard b_pawns_able_2_push(bboard bpawns, bboard empty) {
+bboard b_pawns_able_to_push(bboard bpawns, bboard empty) {
     return north_one(empty) & bpawns;
 }
 
-bboard b_pawns_able_2_dbl_push(bboard bpawns, bboard empty) {
+bboard b_pawns_able_to_double_push(bboard bpawns, bboard empty) {
     bboard emptyRank6 = north_one(empty & RANK5) & empty;
-    return b_pawns_able_2_push(bpawns, emptyRank6);
+    return b_pawns_able_to_push(bpawns, emptyRank6);
 }
 
-bboard pawns_able_2_push(bboard pawns, bboard empty, int color) {
+bboard pawns_able_to_push(bboard pawns, bboard empty, int color) {
     switch(color) {
         case WHITE:
-            return w_pawns_able_2_push(pawns, empty);
+            return w_pawns_able_to_push(pawns, empty);
         case BLACK:
-            return b_pawns_able_2_push(pawns, empty);
+            return b_pawns_able_to_push(pawns, empty);
         default:
             fprintf(stderr, "Invalid color\n");
             exit(1);
     }
 }
 
-bboard pawns_able_2_dbl_push(bboard pawns, bboard empty, int color) {
+bboard pawns_able_to_double_push(bboard pawns, bboard empty, int color) {
     switch(color) {
         case WHITE:
-            return w_pawns_able_2_dbl_push(pawns, empty);
+            return w_pawns_able_to_double_push(pawns, empty);
         case BLACK:
-            return b_pawns_able_2_dbl_push(pawns, empty);
+            return b_pawns_able_to_double_push(pawns, empty);
         default:
             fprintf(stderr, "Invalid color\n");
             exit(1);
@@ -191,28 +191,28 @@ bboard b_any_lever(bboard wpawns, bboard bpawns) {
  */
 
 bboard w_safe_pawn_squares(bboard wpawns, bboard bpawns) {
-    return w_pawn_dbl_attacks(wpawns) | ~b_pawn_any_attacks(bpawns) |
-        (w_pawn_single_attacks(wpawns) & ~b_pawn_dbl_attacks(bpawns));
+    return w_pawn_double_attacks(wpawns) | ~b_pawn_any_attacks(bpawns) |
+        (w_pawn_single_attacks(wpawns) & ~b_pawn_double_attacks(bpawns));
 }
 
 bboard b_safe_pawn_squares(bboard wpawns, bboard bpawns) {
-    return b_pawn_dbl_attacks(bpawns) | ~w_pawn_any_attacks(wpawns) |
-        (b_pawn_single_attacks(bpawns) & ~w_pawn_dbl_attacks(wpawns));
+    return b_pawn_double_attacks(bpawns) | ~w_pawn_any_attacks(wpawns) |
+        (b_pawn_single_attacks(bpawns) & ~w_pawn_double_attacks(wpawns));
 }
 
 /*
  *  Pawn captures: returns set of pawns able to capture
  */
 
-bboard w_pawns_able_2_capture_east(bboard wpawns, bboard bpieces) {
+bboard w_pawns_able_to_capture_east(bboard wpawns, bboard bpieces) {
     return wpawns & b_pawn_west_attacks(bpieces);
 }
 
-bboard w_pawns_able_2_capture_west(bboard wpawns, bboard bpieces) {
+bboard w_pawns_able_to_capture_west(bboard wpawns, bboard bpieces) {
     return wpawns & b_pawn_east_attacks(bpieces);
 }
 
-bboard w_pawns_able_2_capture_any(bboard wpawns, bboard bpieces) {
+bboard w_pawns_able_to_capture_any(bboard wpawns, bboard bpieces) {
     //bboard result = wpawns & b_pawn_any_attacks(bpieces);
     //bboard b = b_pawn_any_attacks(bpieces);
     //clear_all();
@@ -223,48 +223,48 @@ bboard w_pawns_able_2_capture_any(bboard wpawns, bboard bpieces) {
 }
 
 
-bboard b_pawns_able_2_capture_east(bboard bpawns, bboard wpieces) {
+bboard b_pawns_able_to_capture_east(bboard bpawns, bboard wpieces) {
     return bpawns & w_pawn_west_attacks(wpieces);
 }
 
-bboard b_pawns_able_2_capture_west(bboard bpawns, bboard wpieces) {
+bboard b_pawns_able_to_capture_west(bboard bpawns, bboard wpieces) {
     return bpawns & w_pawn_east_attacks(wpieces);
 }
 
-bboard b_pawns_able_2_capture_any(bboard bpawns, bboard wpieces) {
+bboard b_pawns_able_to_capture_any(bboard bpawns, bboard wpieces) {
     return bpawns & w_pawn_any_attacks(wpieces);
 }
 
-bboard pawns_able_2_capture_east(bboard pawns, bboard pieces, int color) {
+bboard pawns_able_to_capture_east(bboard pawns, bboard pieces, int color) {
     switch(color) {
         case WHITE:
-            return w_pawns_able_2_capture_east(pawns, pieces);
+            return w_pawns_able_to_capture_east(pawns, pieces);
         case BLACK:
-            return b_pawns_able_2_capture_east(pawns, pieces);
+            return b_pawns_able_to_capture_east(pawns, pieces);
         default:
             fprintf(stderr, "Invalid color\n");
             exit(1);
     }
 }
 
-bboard pawns_able_2_capture_west(bboard pawns, bboard pieces, int color) {
+bboard pawns_able_to_capture_west(bboard pawns, bboard pieces, int color) {
     switch(color) {
         case WHITE:
-            return w_pawns_able_2_capture_west(pawns, pieces);
+            return w_pawns_able_to_capture_west(pawns, pieces);
         case BLACK:
-            return b_pawns_able_2_capture_west(pawns, pieces);
+            return b_pawns_able_to_capture_west(pawns, pieces);
         default:
             fprintf(stderr, "Invalid color\n");
             exit(1);
     }
 }
 
-bboard pawns_able_2_capture_any(bboard pawns, bboard pieces, int color) {
+bboard pawns_able_to_capture_any(bboard pawns, bboard pieces, int color) {
     switch(color) {
         case WHITE:
-            return w_pawns_able_2_capture_any(pawns, pieces);
+            return w_pawns_able_to_capture_any(pawns, pieces);
         case BLACK:
-            return b_pawns_able_2_capture_any(pawns, pieces);
+            return b_pawns_able_to_capture_any(pawns, pieces);
         default:
             fprintf(stderr, "Invalid color\n");
             exit(1);
@@ -372,11 +372,11 @@ bboard b_half_open_files(bboard wpawns, bboard bpawns) {
  *  Filesets 
  */
 
-fset bboard_2_fset(bboard pawns) {
+fset bboard_to_fset(bboard pawns) {
     return (fset)south_fill(pawns);
 }
 
-bboard fset_2_file_fill(fset f) {
+bboard fset_to_file_fill(fset f) {
     bboard fill = f;
     return fill * AFILE;
 }

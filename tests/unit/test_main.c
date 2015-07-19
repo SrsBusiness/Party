@@ -55,7 +55,13 @@ int main() {
 
         /* pawn tests */
         cmocka_unit_test(w_single_push_targets_test),
-        cmocka_unit_test(w_dbl_push_targets_test),
+        cmocka_unit_test(w_double_push_targets_test),
+        cmocka_unit_test(b_single_push_targets_test),
+        cmocka_unit_test(b_double_push_targets_test),
+        cmocka_unit_test(single_push_targets_test),
+        cmocka_unit_test(double_push_targets_test),
+        cmocka_unit_test(w_pawns_able_to_push_test),
+        cmocka_unit_test(w_pawns_able_to_double_push_test),
     };
     return cmocka_run_group_tests(tests, NULL, NULL);
 }

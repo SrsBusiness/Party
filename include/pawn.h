@@ -12,10 +12,10 @@
 
 /* return squares attack by 1 or 2 pawns */
 #define w_pawn_any_attacks(x)   (w_pawn_east_attacks(x) | w_pawn_west_attacks(x))
-#define w_pawn_dbl_attacks(x)   (w_pawn_east_attacks(x) & w_pawn_west_attacks(x))
+#define w_pawn_double_attacks(x)   (w_pawn_east_attacks(x) & w_pawn_west_attacks(x))
 #define w_pawn_single_attacks(x)    (w_pawn_east_attacks(x) ^ w_pawn_west_attacks(x))
 #define b_pawn_any_attacks(x)   (b_pawn_east_attacks(x) | b_pawn_west_attacks(x))
-#define b_pawn_dbl_attacks(x)   (b_pawn_east_attacks(x) & b_pawn_west_attacks(x))
+#define b_pawn_double_attacks(x)   (b_pawn_east_attacks(x) & b_pawn_west_attacks(x))
 #define b_pawn_single_attacks(x)    (b_pawn_east_attacks(x) ^ b_pawn_west_attacks(x))
 
 #define w_east_attack_front_span(x) (east_one(w_front_span(x)))
@@ -37,21 +37,21 @@
 typedef uint8_t fset;
 
 bboard w_single_push_targets(bboard, bboard);
-bboard w_dbl_push_targets(bboard, bboard);
+bboard w_double_push_targets(bboard, bboard);
 bboard b_single_push_targets(bboard, bboard);
-bboard b_dbl_push_targets(bboard, bboard);
+bboard b_double_push_targets(bboard, bboard);
 bboard single_push_targets(bboard, bboard, int);
 bboard double_push_targets(bboard, bboard, int);
 /*
  *  returns source squares of pawns able to be pushed
  */
 
-bboard w_pawns_able_2_push(bboard, bboard);
-bboard w_pawns_able_2_dbl_push(bboard, bboard);
-bboard b_pawns_able_2_push(bboard, bboard);
-bboard b_pawns_able_2_dbl_push(bboard, bboard);
-bboard pawns_able_2_push(bboard, bboard, int);
-bboard pawns_able_2_dbl_push(bboard, bboard, int);
+bboard w_pawns_able_to_push(bboard, bboard);
+bboard w_pawns_able_to_double_push(bboard, bboard);
+bboard b_pawns_able_to_push(bboard, bboard);
+bboard b_pawns_able_to_double_push(bboard, bboard);
+bboard pawns_able_to_push(bboard, bboard, int);
+bboard pawns_able_to_double_push(bboard, bboard, int);
 /*
  *  Pawn lever functions
  */
@@ -74,15 +74,15 @@ bboard b_safe_pawn_squares(bboard, bboard);
  *  Pawn captures: returns set of pawns able to capture
  */
 
-bboard w_pawns_able_2_capture_east(bboard, bboard);
-bboard w_pawns_able_2_capture_west(bboard, bboard);
-bboard w_pawns_able_2_capture_any(bboard, bboard);
-bboard b_pawns_able_2_capture_east(bboard, bboard);
-bboard b_pawns_able_2_capture_west(bboard, bboard);
-bboard b_pawns_able_2_capture_any(bboard, bboard);
-bboard pawns_able_2_capture_east(bboard, bboard, int);
-bboard pawns_able_2_capture_west(bboard, bboard, int);
-bboard pawns_able_2_capture_any(bboard, bboard, int);
+bboard w_pawns_able_to_capture_east(bboard, bboard);
+bboard w_pawns_able_to_capture_west(bboard, bboard);
+bboard w_pawns_able_to_capture_any(bboard, bboard);
+bboard b_pawns_able_to_capture_east(bboard, bboard);
+bboard b_pawns_able_to_capture_west(bboard, bboard);
+bboard b_pawns_able_to_capture_any(bboard, bboard);
+bboard pawns_able_to_capture_east(bboard, bboard, int);
+bboard pawns_able_to_capture_west(bboard, bboard, int);
+bboard pawns_able_to_capture_any(bboard, bboard, int);
 
 /*
  *  Pawn capture targets: return set of pawn capture target sets
@@ -142,8 +142,8 @@ bboard b_half_open_files(bboard, bboard);
  *  Filesets 
  */
 
-fset bboard_2_fset(bboard);
-bboard fset_2_file_fill(fset f);
+fset bboard_to_fset(bboard);
+bboard fset_to_file_fill(fset f);
 
 /*
  *  For doubled/tripled pawns, or with file and popcount

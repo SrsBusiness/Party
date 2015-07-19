@@ -185,7 +185,7 @@ void generate_pawn_moves(board_state *board, move *candidates,
     //printf("%d\n", *move_index);
     //while(1);
     ///* captures */
-    //pieces = pawns_able_2_dbl_push(board->bb[turn][PAWN],
+    //pieces = pawns_able_to_double_push(board->bb[turn][PAWN],
     //        ~all_pieces(board), turn);
     //while(pieces) {
     //    ;
@@ -204,7 +204,7 @@ void generate_single_pushes(board_state *board, move *candidates,
     /* Find candidate moves */ 
     /* Pawns */
     /* single pushes */
-    pieces = pawns_able_2_push(board->bb[turn][PAWN], 
+    pieces = pawns_able_to_push(board->bb[turn][PAWN], 
             ~all_pieces(board), turn);
     while(pieces) {
         /* get current location of a piece */
@@ -261,7 +261,7 @@ void generate_double_pushes(board_state *board, move *candidates,
     bboard pieces, piece, target;
 
     /* double pushes */
-    pieces = pawns_able_2_dbl_push(board->bb[turn][PAWN],
+    pieces = pawns_able_to_double_push(board->bb[turn][PAWN],
             ~all_pieces(board), turn);
     while(pieces) {
         /* get current location of a piece */
@@ -301,9 +301,9 @@ void generate_pawn_captures(board_state *board, move *candidates,
     /* Pawns */
     /* single pushes */
     //bboard anus = ~all_pieces(board);
-    //pieces = pawns_able_2_capture_any(board->bb[turn][PAWN], 
+    //pieces = pawns_able_to_capture_any(board->bb[turn][PAWN], 
     //        ~all_pieces(board), turn);
-    pieces = pawns_able_2_capture_any(board->bb[turn][PAWN], 
+    pieces = pawns_able_to_capture_any(board->bb[turn][PAWN], 
             board->bb[!turn][ALL], turn);
 
     while(pieces) {
