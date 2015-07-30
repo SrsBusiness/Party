@@ -213,12 +213,6 @@ bboard w_pawns_able_to_capture_west(bboard wpawns, bboard bpieces) {
 }
 
 bboard w_pawns_able_to_capture_any(bboard wpawns, bboard bpieces) {
-    //bboard result = wpawns & b_pawn_any_attacks(bpieces);
-    //bboard b = b_pawn_any_attacks(bpieces);
-    //clear_all();
-    //display_bboard(bpieces, 1, 1);
-    //display_bboard(b, 1, 20);
-    //display_bboard(wpawns, 1, 40);
     return wpawns & b_pawn_any_attacks(bpieces);
 }
 
@@ -328,11 +322,11 @@ bboard b_pawn_defenders_from_east(bboard bpawns) {
  */
 
 bboard pawns_with_east_adj_neighbors(bboard pawns) {
-    return pawns & west_one (pawns);
+    return pawns & west_one(pawns);
 }
 
 bboard pawns_with_west_adj_neighbors(bboard pawns) {
-    return pawns & east_one (pawns);
+    return pawns & east_one(pawns);
 }
 
 /*
