@@ -376,10 +376,6 @@ void islands_west_files_test(void **state) {
             islands_west_files(0x7E));
 }
 
-///*
-// *  Pawn Isolanis and Hanging Pawns
-// */
-//
 //bboard no_east_neighbors(bboard);
 void no_east_neighbors_test(void **state) {
     assert_int_equal(0x0000000000001000ul,
@@ -402,64 +398,48 @@ void half_isolanis_test(void **state) {
     assert_int_equal(0x0000000000004400ul,
             half_isolanis(0x0000000000007C00ul));
 }
-///* TODO: hanging pawns */
+
 //bboard hanging_pawns();
 void hanging_pawns_test(void **state) {
 }
-///*
-// *  Unfree pawns
-// */
-//
+
 //bboard w_unfree_pawns(bboard, bboard);
 void w_unfree_pawns_test(void **state) {
     assert_int_equal(0x0000000010000000ul,
             w_unfree_pawns(0x0000000018000000ul, 0x0000001000000000ul));
 }
+
 //bboard b_unfree_pawns(bboard, bboard);
 void b_unfree_pawns_test(void **state) {
     assert_int_equal(0x0000001000000000ul,
             b_unfree_pawns(0x0000000010000000ul, 0x0000001800000000ul));
 }
-//
-///*
-// *  Open pawns (opposite of unfree pawns)
-// */
-//
+
 //bboard w_open_pawns(bboard, bboard);
 void w_open_pawns_test(void **state) {
     assert_int_equal(0x0000000008000000ul,
             w_open_pawns(0x0000000018000000ul, 0x0000001000000000ul));
 
 }
+
 //bboard b_open_pawns(bboard, bboard);
 void b_open_pawns_test(void **state) {
     assert_int_equal(0x0000000800000000ul,
             b_open_pawns(0x0000000010000000ul, 0x0000001800000000ul));
 }
-///*
-// *  Passed Pawns
-// */
-//
+
 //bboard w_passed_pawns(bboard, bboard);
 void w_passed_pawns_test(void **state) {
     assert_int_equal(0x0000000000000800ul,
             w_passed_pawns(0x0000000000001800ul, 0x0020000000000000ul));
 }
+
 //bboard b_passed_pawns(bboard, bboard);
 void b_passed_pawns_test(void **state) {
     assert_int_equal(0x0008000000000000ul,
             b_passed_pawns(0x0000000000002000ul, 0x0018000000000000ul));
 }
-//
-///*
-// *  TODO: Candidate Pawns
-// */
-//
-//
-///*
-// *   Backward Pawns
-// */
-//
+
 //bboard w_backward(bboard, bboard);
 void w_backward_test(void **state) {
     assert_int_equal(0x0000000000000200ul,
@@ -467,6 +447,7 @@ void w_backward_test(void **state) {
     assert_int_equal(0x0000000000000200ul,
             w_backward(0x0000000004000200ul, 0x0000000100000000ul));
 }
+
 //bboard b_backward(bboard, bboard);
 void b_backward_test(void **state) {
     assert_int_equal(0x0002000000000000ul,

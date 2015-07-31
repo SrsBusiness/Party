@@ -4,6 +4,8 @@
 #include <cmocka.h>
 #include "bitboard_test.h"
 #include "pawn_test.h"
+#include "bishop_test.h"
+#include "rook_test.h"
 
 int main() {
     const struct CMUnitTest tests[] = {
@@ -116,6 +118,14 @@ int main() {
         cmocka_unit_test(b_passed_pawns_test),
         cmocka_unit_test(w_backward_test),
         cmocka_unit_test(b_backward_test),
+
+        /* bishop tests */
+        cmocka_unit_test(exhaustive_bishop_magic_test),
+        cmocka_unit_test(bishop_attacks_test),
+
+        /* rook test */
+        cmocka_unit_test(exhaustive_rook_magic_test),
+        cmocka_unit_test(rook_attacks_test),
     };
     return cmocka_run_group_tests(tests, NULL, NULL);
 }
