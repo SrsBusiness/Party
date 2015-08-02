@@ -92,6 +92,7 @@
  **/
 #define lsb(board) (__builtin_ctzll(board))
 #define msb(board) (63 - __builtin_clzll(board))
+#define popcnt(board) (__builtin_popcountll(board))
 //#define bit_scan(board) (__builtin_ffsll(board))
 
 // flips the bytes of the word

@@ -6,22 +6,25 @@ SRC		=	src
 LIB		=	lib
 OBJ		=	obj
 BIN		=	bin
-TARGET		=	$(BIN)/test
+TARGET		=	$(BIN)/main
 SRCFILES	:= $(wildcard $(SRC)/*.c)
 OBJECTS 	:= $(patsubst $(SRC)/%.c,$(OBJ)/%.o, $(SRCFILES))
 
 UNIT	=	tests/unit
 
-all: tests
+all: $(TARGET)
 
-$(TARGET): $(OBJECTS) $(BIN)
-	$(CC) $(BINFLAGS) -o $@ test.c $(OBJECTS)
+debug: OBJFLAGS += -DDEBUG
+debug: $(TARGET)
+
+$(TARGET): $(OBJECTS) | $(BIN)
+	$(CC) $(BINFLAGS) -o $@ main.c $(OBJECTS)
 
 $(OBJ)/%.o: $(SRC)/%.c | $(OBJ)
 	$(CC) $(OBJFLAGS) $< -o $@
 
 .PHONY: tests
-tests: $(OBJECTS)
+test: $(OBJECTS)
 	$(CC) $(BINFLAGS) -o $(UNIT)/tests $(OBJECTS) $(UNIT)/*.c -lcmocka
 	$(UNIT)/tests
 
@@ -31,8 +34,3 @@ clean:
 
 $(BIN) $(OBJ):
 	mkdir -p $@
-
-debug:
-	gcc -g -o test test.c search.c bitboard.c pawn.c bishop.c rook.c knight.c magic.c debug.c -std=gnu99 -DDEBUG
-
-	

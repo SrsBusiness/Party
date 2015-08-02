@@ -5,13 +5,15 @@
 #include "rook.h"
 #include "bishop.h"
 #include "search.h"
+#include "move.h"
+#include "eval.h"
+#include "bboard_utils.h"
 
 void generate_pawn_moves(board_state *, move *, int *);
 void generate_single_pushes(board_state *, move *, int *);
 void generate_double_pushes(board_state *, move *, int *);
 void generate_pawn_captures(board_state *, move *, int *);
 void generate_en_passant(board_state *, move *, int *);
-
 
 static board_flags initial_flags = {{0, 0}, {1, 1}, {1, 1}};
 static bboard initial_bb[2][8] = {{
@@ -34,7 +36,7 @@ static bboard initial_bb[2][8] = {{
     SENTINAL,
 }};
 
-static board_state initial_state = {
+const board_state initial_state = {
     0,
     {{
         BB_KING & BB_WHITE,
@@ -74,42 +76,11 @@ void board_init(board_state *board) {
     *board = initial_state;
 }
 
-void bb_make(board_state *board, move *m, int turn) {
-    /* capture */
-    int i;
-    for(i = QUEEN; i <= ALL; i++)
-        board->bb[!board->turn][i] &= m->capture;
-    
-    /* primary move */
-    board->bb[board->turn][m->p_mover] ^= m->primary;
-    board->bb[board->turn][ALL] ^= m->primary;
-    
-    /* Pawn promotion and castling */
-    if(m->s_mover != NO_PIECE) {
-        board->bb[board->turn][m->s_mover] ^= m->secondary;
-        board->bb[board->turn][ALL] ^= m->secondary;
-    }
-}
-
-void make(board_state *board, move *m) {
-    /* modify bitboards */
-    bb_make(board, m, board->turn);
-    board->turn = !board->turn;
-    board->flags = m->flags;
-}
-
-/* unused */
-void unmake(board_state *board, move *m) {
-    board->turn = !board->turn;
-    bb_make(board, m, board->turn);
-    board->flags = m->flags;
-}
-
 /* dumb because it considers every possible branch */
 int dumb_search(board_state *board, int alpha, int beta, int depth) {
     if (depth <= 0) {
         /* return quiescent search */
-        return 0;
+        return compute_material(board);
     }
 
     /* Upperbound on number of candidate moves is 137, which is probably
@@ -391,4 +362,3 @@ void generate_en_passant(board_state *board, move *candidates,
         (*move_index)++;
     }
 }
-

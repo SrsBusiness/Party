@@ -6,6 +6,7 @@
 #include "pawn_test.h"
 #include "bishop_test.h"
 #include "rook_test.h"
+#include "pqueue_test.h"
 
 int main() {
     const struct CMUnitTest tests[] = {
@@ -126,6 +127,10 @@ int main() {
         /* rook test */
         cmocka_unit_test(exhaustive_rook_magic_test),
         cmocka_unit_test(rook_attacks_test),
+
+        /* priority queue test */
+        cmocka_unit_test(priority_queue_push_test),
+        cmocka_unit_test(priority_queue_pop_test),
     };
     return cmocka_run_group_tests(tests, NULL, NULL);
 }
