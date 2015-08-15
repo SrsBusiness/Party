@@ -211,7 +211,7 @@ typedef struct _board_state {
     //char board88[64];
     int turn;   /* 0 if white, 1 if black */
     /* bitboards */
-    bboard bb[2][8];
+    bboard bb[2][7];
     board_flags flags;
 } board_state;
 
@@ -222,11 +222,8 @@ typedef struct _board_state {
  **/
 
 typedef struct _move {
-    int p_mover, s_mover;
-    bboard primary;     /* xor with primary moving piece */
-    bboard secondary;   /* xor with secondary piece */
-    bboard capture;     /* xor with captive */
-    board_flags flags;
+    int p_mover, s_mover, t_mover;
+    bboard primary, secondary, tertiary;
 } move;
 
 #define all_pieces(x) ((x)->bb[WHITE][KING] | (x)->bb[BLACK][KING] | (x)->bb[WHITE][QUEEN] |\
