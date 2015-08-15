@@ -36,103 +36,103 @@
 
 typedef uint8_t fset;
 
-bboard w_single_push_targets(bboard, bboard);
-bboard w_double_push_targets(bboard, bboard);
-bboard b_single_push_targets(bboard, bboard);
-bboard b_double_push_targets(bboard, bboard);
-bboard single_push_targets(bboard, bboard, int);
-bboard double_push_targets(bboard, bboard, int);
+uint64_t w_single_push_targets(uint64_t, uint64_t);
+uint64_t w_double_push_targets(uint64_t, uint64_t);
+uint64_t b_single_push_targets(uint64_t, uint64_t);
+uint64_t b_double_push_targets(uint64_t, uint64_t);
+uint64_t single_push_targets(uint64_t, uint64_t, int);
+uint64_t double_push_targets(uint64_t, uint64_t, int);
 /*
  *  returns source squares of pawns able to be pushed
  */
 
-bboard w_pawns_able_to_push(bboard, bboard);
-bboard w_pawns_able_to_double_push(bboard, bboard);
-bboard b_pawns_able_to_push(bboard, bboard);
-bboard b_pawns_able_to_double_push(bboard, bboard);
-bboard pawns_able_to_push(bboard, bboard, int);
-bboard pawns_able_to_double_push(bboard, bboard, int);
+uint64_t w_pawns_able_to_push(uint64_t, uint64_t);
+uint64_t w_pawns_able_to_double_push(uint64_t, uint64_t);
+uint64_t b_pawns_able_to_push(uint64_t, uint64_t);
+uint64_t b_pawns_able_to_double_push(uint64_t, uint64_t);
+uint64_t pawns_able_to_push(uint64_t, uint64_t, int);
+uint64_t pawns_able_to_double_push(uint64_t, uint64_t, int);
 /*
  *  Pawn lever functions
  */
 
-bboard w_east_lever(bboard, bboard);
-bboard w_west_lever(bboard, bboard);
-bboard w_any_lever(bboard, bboard);
-bboard b_east_lever(bboard, bboard);
-bboard b_west_lever(bboard, bboard);
-bboard b_any_lever(bboard, bboard);
+uint64_t w_east_lever(uint64_t, uint64_t);
+uint64_t w_west_lever(uint64_t, uint64_t);
+uint64_t w_any_lever(uint64_t, uint64_t);
+uint64_t b_east_lever(uint64_t, uint64_t);
+uint64_t b_west_lever(uint64_t, uint64_t);
+uint64_t b_any_lever(uint64_t, uint64_t);
 
 /*
  *  Static exchange eval for pawn attacks
  */
 
-bboard w_safe_pawn_squares(bboard, bboard);
-bboard b_safe_pawn_squares(bboard, bboard);
+uint64_t w_safe_pawn_squares(uint64_t, uint64_t);
+uint64_t b_safe_pawn_squares(uint64_t, uint64_t);
 
 /*
  *  Pawn captures: returns set of pawns able to capture
  */
 
-bboard w_pawns_able_to_capture_east(bboard, bboard);
-bboard w_pawns_able_to_capture_west(bboard, bboard);
-bboard w_pawns_able_to_capture_any(bboard, bboard);
-bboard b_pawns_able_to_capture_east(bboard, bboard);
-bboard b_pawns_able_to_capture_west(bboard, bboard);
-bboard b_pawns_able_to_capture_any(bboard, bboard);
-bboard pawns_able_to_capture_east(bboard, bboard, int);
-bboard pawns_able_to_capture_west(bboard, bboard, int);
-bboard pawns_able_to_capture_any(bboard, bboard, int);
+uint64_t w_pawns_able_to_capture_east(uint64_t, uint64_t);
+uint64_t w_pawns_able_to_capture_west(uint64_t, uint64_t);
+uint64_t w_pawns_able_to_capture_any(uint64_t, uint64_t);
+uint64_t b_pawns_able_to_capture_east(uint64_t, uint64_t);
+uint64_t b_pawns_able_to_capture_west(uint64_t, uint64_t);
+uint64_t b_pawns_able_to_capture_any(uint64_t, uint64_t);
+uint64_t pawns_able_to_capture_east(uint64_t, uint64_t, int);
+uint64_t pawns_able_to_capture_west(uint64_t, uint64_t, int);
+uint64_t pawns_able_to_capture_any(uint64_t, uint64_t, int);
 
 /*
  *  Pawn capture targets: return set of pawn capture target sets
  */
 
-bboard pawn_capture_targets(bboard, bboard, int);
+uint64_t pawn_capture_targets(uint64_t, uint64_t, int);
 
 /*
  *  returns defended pawns
  */
 
-bboard w_pawn_defended_from_west(bboard);
-bboard w_pawn_defended_from_east(bboard);
-bboard b_pawn_defended_from_west(bboard);
-bboard b_pawn_defended_from_east(bboard);
+uint64_t w_pawn_defended_from_west(uint64_t);
+uint64_t w_pawn_defended_from_east(uint64_t);
+uint64_t b_pawn_defended_from_west(uint64_t);
+uint64_t b_pawn_defended_from_east(uint64_t);
 
 /*
  *  returns pawn defenders
  */
 
-bboard w_pawn_defenders_from_west(bboard);
-bboard w_pawn_defenders_from_east(bboard);
-bboard b_pawn_defenders_from_west(bboard);
-bboard b_pawn_defenders_from_east(bboard);
+uint64_t w_pawn_defenders_from_west(uint64_t);
+uint64_t w_pawn_defenders_from_east(uint64_t);
+uint64_t b_pawn_defenders_from_west(uint64_t);
+uint64_t b_pawn_defenders_from_east(uint64_t);
 
 /*
  *  returns pawns with neighbors
  */
 
-bboard pawns_with_east_adj_neighbors(bboard);
-bboard pawns_with_west_adj_neighbors(bboard);
+uint64_t pawns_with_east_adj_neighbors(uint64_t);
+uint64_t pawns_with_west_adj_neighbors(uint64_t);
 
 /*
  *  returns closed files
  */
 
-bboard closed_files(bboard, bboard);
+uint64_t closed_files(uint64_t, uint64_t);
 
 /*
  *  returns open files
  */
 
-bboard open_files(bboard, bboard);
+uint64_t open_files(uint64_t, uint64_t);
 
 /*
  *  returns half-open files
  */
 
-bboard w_half_open_files(bboard, bboard);
-bboard b_half_open_files(bboard, bboard);
+uint64_t w_half_open_files(uint64_t, uint64_t);
+uint64_t b_half_open_files(uint64_t, uint64_t);
 
 /*
  *  TODO: half-closed files
@@ -142,8 +142,8 @@ bboard b_half_open_files(bboard, bboard);
  *  Filesets 
  */
 
-fset bboard_to_fset(bboard);
-bboard fset_to_file_fill(fset f);
+fset bboard_to_fset(uint64_t);
+uint64_t fset_to_file_fill(fset f);
 
 /*
  *  For doubled/tripled pawns, or with file and popcount
@@ -162,32 +162,32 @@ fset islands_west_files(fset pawns);
  *  Pawn Isolanis and Hanging Pawns
  */
 
-bboard no_east_neighbors(bboard);
-bboard no_west_neighbors(bboard);
-bboard isolanis(bboard);
-bboard half_isolanis(bboard);
+uint64_t no_east_neighbors(uint64_t);
+uint64_t no_west_neighbors(uint64_t);
+uint64_t isolanis(uint64_t);
+uint64_t half_isolanis(uint64_t);
 
 /* TODO: hanging pawns */
-bboard hanging_pawns();
+uint64_t hanging_pawns();
 /*
  *  Unfree pawns
  */
 
-bboard w_unfree_pawns(bboard, bboard);
-bboard b_unfree_pawns(bboard, bboard);
+uint64_t w_unfree_pawns(uint64_t, uint64_t);
+uint64_t b_unfree_pawns(uint64_t, uint64_t);
 
 /*
  *  Open pawns (opposite of unfree pawns)
  */
 
-bboard w_open_pawns(bboard, bboard);
-bboard b_open_pawns(bboard, bboard);
+uint64_t w_open_pawns(uint64_t, uint64_t);
+uint64_t b_open_pawns(uint64_t, uint64_t);
 /*
  *  Passed Pawns
  */
 
-bboard w_passed_pawns(bboard, bboard);
-bboard b_passed_pawns(bboard, bboard);
+uint64_t w_passed_pawns(uint64_t, uint64_t);
+uint64_t b_passed_pawns(uint64_t, uint64_t);
 
 /*
  *  TODO: Candidate Pawns
@@ -198,7 +198,7 @@ bboard b_passed_pawns(bboard, bboard);
  *   Backward Pawns
  */
 
-bboard w_backward(bboard, bboard);
-bboard b_backward(bboard, bboard);
+uint64_t w_backward(uint64_t, uint64_t);
+uint64_t b_backward(uint64_t, uint64_t);
 
 #endif

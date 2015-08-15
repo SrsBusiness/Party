@@ -5,10 +5,10 @@
 
 #define knight_attacks(x)       knight_attacks2(x)
 #define knight_fill(x)          (knight_attacks(x) | x)
-int knight_distance(bboard, bboard);
-bboard knight_fork(bboard);
-bboard knight_attacks0(bboard);
-bboard knight_attacks1(bboard);
-bboard knight_attacks2(bboard);
+int knight_distance(uint64_t, uint64_t);
+uint64_t knight_fork(uint64_t);
+uint64_t knight_attacks0(uint64_t);
+uint64_t knight_attacks1(uint64_t);
+uint64_t knight_attacks2(uint64_t);
 
 #endif

@@ -1,6 +1,6 @@
 #include "minicurses.h"
 /* for debugging purposes */
-void display_bboard(bboard b, int row, int col) {
+void display_uint64_t(uint64_t b, int row, int col) {
     int i;
     for(i = 0; i < 64; i++) {
         move_cursor(7 - (i / 8) + row, ((i & 7) << 1) + col);
@@ -52,7 +52,7 @@ void print_board(board_state *board, int row, int col) {
         move_cursor(7 - (i / 8) + row, ((i & 7) << 1) + col);
         printf("  ");
     }
-    bboard current;
+    uint64_t current;
      
     for(i = WHITE; i <= BLACK; i++) {
         for(j = KING; j <= PAWN; j++) {
@@ -76,15 +76,15 @@ void print_board(board_state *board, int row, int col) {
         }
     }
     reset_attr();
-    display_bboard(board->flags.en_passant[0], 1, 21);
-    display_bboard(board->flags.en_passant[1], 1, 41);
+    display_uint64_t(board->flags.en_passant[0], 1, 21);
+    display_uint64_t(board->flags.en_passant[1], 1, 41);
     for(i = WHITE; i <= BLACK; i++) {
         for(j = KING; j <= ALL; j++) {
-            display_bboard(board->bb[i][j], 10 + 10 * i, 20 * j + 1);
+            display_uint64_t(board->bb[i][j], 10 + 10 * i, 20 * j + 1);
         }
     }
-    display_bboard(all_pieces(board), 10 + WHITE * 10, 20 * NO_PIECE + 1);
-    display_bboard(all_pieces(board), 10 + BLACK * 10, 20 * NO_PIECE + 1);
+    display_uint64_t(all_pieces(board), 10 + WHITE * 10, 20 * NO_PIECE + 1);
+    display_uint64_t(all_pieces(board), 10 + BLACK * 10, 20 * NO_PIECE + 1);
 
     //assert((board->bb[WHITE][KING] |
     //            board->bb[WHITE][QUEEN] |

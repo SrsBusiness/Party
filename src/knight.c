@@ -1,6 +1,6 @@
 #include "knight.h"
 
-bboard knight_attacks0(bboard b){
+uint64_t knight_attacks0(uint64_t b){
     return ((b << 17) & ~BITBOARD_AFILE) |
         ((b << 10) & ~BITBOARD_AFILE & ~BITBOARD_BFILE) |
         ((b >>  6) & ~BITBOARD_AFILE & ~BITBOARD_BFILE) |
@@ -11,8 +11,8 @@ bboard knight_attacks0(bboard b){
         ((b >> 17) & ~BITBOARD_HFILE);
 }
 
-bboard knight_attacks1(bboard knights){
-    bboard west, east, attacks;
+uint64_t knight_attacks1(uint64_t knights){
+    uint64_t west, east, attacks;
     east     = east_one (knights);
     west     = west_one (knights);
     attacks  = (east|west) << 16;
@@ -24,18 +24,18 @@ bboard knight_attacks1(bboard knights){
     return attacks; 
 }
 
-bboard knight_attacks2(bboard knights) {
-    bboard l1 = (knights >> 1) & ~BITBOARD_HFILE;
-    bboard l2 = (knights >> 2) & ~BITBOARD_GFILE & ~BITBOARD_HFILE;
-    bboard r1 = (knights << 1) & ~BITBOARD_AFILE;
-    bboard r2 = (knights << 2) & ~BITBOARD_AFILE & ~BITBOARD_BFILE;
-    bboard h1 = l1 | r1;
-    bboard h2 = l2 | r2;
+uint64_t knight_attacks2(uint64_t knights) {
+    uint64_t l1 = (knights >> 1) & ~BITBOARD_HFILE;
+    uint64_t l2 = (knights >> 2) & ~BITBOARD_GFILE & ~BITBOARD_HFILE;
+    uint64_t r1 = (knights << 1) & ~BITBOARD_AFILE;
+    uint64_t r2 = (knights << 2) & ~BITBOARD_AFILE & ~BITBOARD_BFILE;
+    uint64_t h1 = l1 | r1;
+    uint64_t h2 = l2 | r2;
     return (h1<<16) | (h1>>16) | (h2<<8) | (h2>>8);
 }
 
-bboard knight_fork(bboard targets) {
-    bboard west, east, attak, forks;
+uint64_t knight_fork(uint64_t targets) {
+    uint64_t west, east, attak, forks;
     east = east_one(targets);
     west = west_one(targets);
     attak = east << 16;
@@ -59,7 +59,7 @@ bboard knight_fork(bboard targets) {
 
 // no set should be empty -> assert (b1 != 0 && b2 != 0 )
 // b1 != b2
-int knight_distance(bboard b1, bboard b2) {
+int knight_distance(uint64_t b1, uint64_t b2) {
     int d = 0;
     while ((b1 & b2) == 0) {
         b1 = knight_attacks(b1); // as long as sets are disjoint

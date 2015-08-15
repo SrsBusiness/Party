@@ -68,7 +68,7 @@ const magic_entry rook_magic_table[64] = {
     {rook_63, 0x7e80808080808000, 0x200022d00840246, 52},
 };
 
-bboard rook_attacks(bboard rook, bboard occupancy) {
+uint64_t rook_attacks(uint64_t rook, uint64_t occupancy) {
     int index = lsb(rook);
     const magic_entry *m = &rook_magic_table[index];
     return m->attack_table[((occupancy & m->mask) * m->magic) >> m->shift];

@@ -3,41 +3,41 @@
 #include <assert.h>
 #include "bitboard.h"
 
-bboard fliph0 (bboard x) {
-    const bboard k1 = 0x5555555555555555;
-    const bboard k2 = 0x3333333333333333;
-    const bboard k4 = 0x0f0f0f0f0f0f0f0f;
+uint64_t fliph0 (uint64_t x) {
+    const uint64_t k1 = 0x5555555555555555;
+    const uint64_t k2 = 0x3333333333333333;
+    const uint64_t k4 = 0x0f0f0f0f0f0f0f0f;
     x = ((x >> 1) & k1) | ((x & k1) << 1);
     x = ((x >> 2) & k2) | ((x & k2) << 2);
     x = ((x >> 4) & k4) | ((x & k4) << 4);
     return x;
 }
 
-bboard fliph1 (bboard x) {
-    const bboard k1 = 0x5555555555555555;
-    const bboard k2 = 0x3333333333333333;
-    const bboard k4 = 0x0f0f0f0f0f0f0f0f;
+uint64_t fliph1 (uint64_t x) {
+    const uint64_t k1 = 0x5555555555555555;
+    const uint64_t k2 = 0x3333333333333333;
+    const uint64_t k4 = 0x0f0f0f0f0f0f0f0f;
     x = ((x >> 1) & k1) +  2*(x & k1);
     x = ((x >> 2) & k2) +  4*(x & k2);
     x = ((x >> 4) & k4) + 16*(x & k4);
     return x;
 }
 
-bboard fliph2 (bboard x) {
-    const bboard k1 = 0x5555555555555555;
-    const bboard k2 = 0x3333333333333333;
-    const bboard k4 = 0x0f0f0f0f0f0f0f0f;
+uint64_t fliph2 (uint64_t x) {
+    const uint64_t k1 = 0x5555555555555555;
+    const uint64_t k2 = 0x3333333333333333;
+    const uint64_t k4 = 0x0f0f0f0f0f0f0f0f;
     x ^= k4 & (x ^ rolll(x, 8));
     x ^= k2 & (x ^ rolll(x, 4));
     x ^= k1 & (x ^ rolll(x, 2));
     return rorll(x, 7);
 }
 
-bboard flipdd(bboard x) { // light square diagonal
-    bboard t;
-    const bboard k1 = 0x5500550055005500;
-    const bboard k2 = 0x3333000033330000;
-    const bboard k4 = 0x0f0f0f0f00000000;
+uint64_t flipdd(uint64_t x) { // light square diagonal
+    uint64_t t;
+    const uint64_t k1 = 0x5500550055005500;
+    const uint64_t k2 = 0x3333000033330000;
+    const uint64_t k4 = 0x0f0f0f0f00000000;
     t = k4 & (x ^ (x << 28));
     x ^= t ^ (t >> 28);
     t = k2 & (x ^ (x << 14));
@@ -47,11 +47,11 @@ bboard flipdd(bboard x) { // light square diagonal
     return x;
 }
 
-bboard flipld(bboard x) { // dark square diagonal
-    bboard t;
-    const bboard k1 = 0xaa00aa00aa00aa00;
-    const bboard k2 = 0xcccc0000cccc0000;
-    const bboard k4 = 0xf0f0f0f00f0f0f0f;
+uint64_t flipld(uint64_t x) { // dark square diagonal
+    uint64_t t;
+    const uint64_t k1 = 0xaa00aa00aa00aa00;
+    const uint64_t k2 = 0xcccc0000cccc0000;
+    const uint64_t k4 = 0xf0f0f0f00f0f0f0f;
     t = x ^ (x << 36);
     x ^= k4 & (t ^ (x >> 36));
     t = k2 & (x ^ (x << 18));
@@ -62,13 +62,13 @@ bboard flipld(bboard x) { // dark square diagonal
 }
 
 // 180 rotation
-bboard rotate_pi(bboard x){
+uint64_t rotate_pi(uint64_t x){
     // vertical flip
     x = flipv(x);
     // horizontal flip
-    const bboard k1 = 0x5555555555555555;
-    const bboard k2 = 0x3333333333333333;
-    const bboard k4 = 0x0f0f0f0f0f0f0f0f;
+    const uint64_t k1 = 0x5555555555555555;
+    const uint64_t k2 = 0x3333333333333333;
+    const uint64_t k4 = 0x0f0f0f0f0f0f0f0f;
     x = ((x >> 1) & k1) +  2*(x & k1);
     x = ((x >> 2) & k2) +  4*(x & k2);
     x = ((x >> 4) & k4) + 16*(x & k4);
@@ -76,18 +76,18 @@ bboard rotate_pi(bboard x){
 }
 
 // 90 clockwise
-bboard rotate_clockwise(bboard x){
+uint64_t rotate_clockwise(uint64_t x){
     // to be optimized with inlining...
     return flipld(flipv(x));
 }
 
 // 90 anticlockwise
-bboard rotate_anticlockwise(bboard x){
+uint64_t rotate_anticlockwise(uint64_t x){
     // to be optimized with inlining...
     return flipdd(flipv(x));
 }
 
-bboard north_span(bboard x){
+uint64_t north_span(uint64_t x){
     x <<= 8;
     x |= (x << 8);
     x |= (x << 16);
@@ -95,7 +95,7 @@ bboard north_span(bboard x){
     return x;
 }
 
-bboard south_span(bboard x){
+uint64_t south_span(uint64_t x){
     x >>= 8;
     x |= (x >> 8);
     x |= (x >> 16);
@@ -103,10 +103,10 @@ bboard south_span(bboard x){
     return x;
 }
 
-bboard east_span(bboard x) {
-    bboard k1 = ~BITBOARD_AFILE;
-    bboard k2 = k1 & (k1 << 1);
-    bboard k3 = k2 & (k2 << 2);
+uint64_t east_span(uint64_t x) {
+    uint64_t k1 = ~BITBOARD_AFILE;
+    uint64_t k2 = k1 & (k1 << 1);
+    uint64_t k3 = k2 & (k2 << 2);
     x = (x << 1) & k1;
     x |= (x << 1) & k1;
     x |= (x << 2) & k2;
@@ -114,10 +114,10 @@ bboard east_span(bboard x) {
     return x;
 }
 
-bboard west_span(bboard x) {
-    bboard k1 = ~BITBOARD_HFILE;
-    bboard k2 = k1 & (k1 >> 1);
-    bboard k3 = k2 & (k2 >> 2);
+uint64_t west_span(uint64_t x) {
+    uint64_t k1 = ~BITBOARD_HFILE;
+    uint64_t k2 = k1 & (k1 >> 1);
+    uint64_t k3 = k2 & (k2 >> 2);
     x = (x >> 1) & k1;
     x |= (x >> 1) & k1;
     x |= (x >> 2) & k2;
@@ -125,10 +125,10 @@ bboard west_span(bboard x) {
     return x;
 }
 
-bboard ne_span(bboard x) {
-    bboard k1 = ~BITBOARD_AFILE;
-    bboard k2 = k1 & (k1 << 9);
-    bboard k3 = k2 & (k2 << 18);
+uint64_t ne_span(uint64_t x) {
+    uint64_t k1 = ~BITBOARD_AFILE;
+    uint64_t k2 = k1 & (k1 << 9);
+    uint64_t k3 = k2 & (k2 << 18);
     x = (x << 9) & k1;
     x |= (x << 9) & k1;
     x |= (x << 18) & k2;
@@ -136,10 +136,10 @@ bboard ne_span(bboard x) {
     return x;
 }
 
-bboard nw_span(bboard x) {
-    bboard k1 = ~BITBOARD_HFILE;
-    bboard k2 = k1 & (k1 << 7);
-    bboard k3 = k2 & (k2 << 14);
+uint64_t nw_span(uint64_t x) {
+    uint64_t k1 = ~BITBOARD_HFILE;
+    uint64_t k2 = k1 & (k1 << 7);
+    uint64_t k3 = k2 & (k2 << 14);
     x = (x << 7) & k1;
     x |= (x << 7) & k1;
     x |= (x << 14) & k2;
@@ -147,10 +147,10 @@ bboard nw_span(bboard x) {
     return x;
 }
 
-bboard se_span(bboard x) {
-    bboard k1 = ~BITBOARD_AFILE;
-    bboard k2 = k1 & (k1 >> 7);
-    bboard k3 = k2 & (k2 >> 14);
+uint64_t se_span(uint64_t x) {
+    uint64_t k1 = ~BITBOARD_AFILE;
+    uint64_t k2 = k1 & (k1 >> 7);
+    uint64_t k3 = k2 & (k2 >> 14);
     x = (x >> 7) & k1;
     x |= (x >> 7) & k1;
     x |= (x >> 14) & k2;
@@ -158,10 +158,10 @@ bboard se_span(bboard x) {
     return x;
 }
 
-bboard sw_span(bboard x) {
-    bboard k1 = ~BITBOARD_HFILE;
-    bboard k2 = k1 & (k1 >> 9);
-    bboard k3 = k2 & (k2 >> 18);
+uint64_t sw_span(uint64_t x) {
+    uint64_t k1 = ~BITBOARD_HFILE;
+    uint64_t k2 = k1 & (k1 >> 9);
+    uint64_t k3 = k2 & (k2 >> 18);
     x = (x >> 9) & k1;
     x |= (x >> 9) & k1;
     x |= (x >> 18) & k2; 
@@ -169,74 +169,74 @@ bboard sw_span(bboard x) {
     return x;
 }
 
-bboard north_fill(bboard gen) {
+uint64_t north_fill(uint64_t gen) {
    gen |= (gen <<  8);
    gen |= (gen << 16);
    gen |= (gen << 32);
    return gen;
 }
  
-bboard south_fill(bboard gen) {
+uint64_t south_fill(uint64_t gen) {
    gen |= (gen >>  8);
    gen |= (gen >> 16);
    gen |= (gen >> 32);
    return gen;
 }
 
-bboard east_fill(bboard x) {
-    bboard k1 = ~BITBOARD_AFILE;
-    bboard k2 = k1 & (k1 << 1);
-    bboard k3 = k2 & (k2 << 2);
+uint64_t east_fill(uint64_t x) {
+    uint64_t k1 = ~BITBOARD_AFILE;
+    uint64_t k2 = k1 & (k1 << 1);
+    uint64_t k3 = k2 & (k2 << 2);
     x |= (x << 1) & k1;
     x |= (x << 2) & k2;
     x |= (x << 4) & k3;
     return x;
 }
 
-bboard west_fill(bboard x) {
-    bboard k1 = ~BITBOARD_HFILE;
-    bboard k2 = k1 & (k1 >> 1);
-    bboard k3 = k2 & (k2 >> 2);
+uint64_t west_fill(uint64_t x) {
+    uint64_t k1 = ~BITBOARD_HFILE;
+    uint64_t k2 = k1 & (k1 >> 1);
+    uint64_t k3 = k2 & (k2 >> 2);
     x |= (x >> 1) & k1;
     x |= (x >> 2) & k2;
     x |= (x >> 4) & k3;
     return x;
 }
 
-bboard ne_fill(bboard x) {
-    bboard k1 = ~BITBOARD_AFILE;
-    bboard k2 = k1 & (k1 << 9);
-    bboard k3 = k2 & (k2 << 18);
+uint64_t ne_fill(uint64_t x) {
+    uint64_t k1 = ~BITBOARD_AFILE;
+    uint64_t k2 = k1 & (k1 << 9);
+    uint64_t k3 = k2 & (k2 << 18);
     x |= (x << 9) & k1;
     x |= (x << 18) & k2;
     x |= (x << 36) & k3;
     return x;
 }
 
-bboard nw_fill(bboard x) {
-    bboard k1 = ~BITBOARD_HFILE;
-    bboard k2 = k1 & (k1 << 7);
-    bboard k3 = k2 & (k2 << 14);
+uint64_t nw_fill(uint64_t x) {
+    uint64_t k1 = ~BITBOARD_HFILE;
+    uint64_t k2 = k1 & (k1 << 7);
+    uint64_t k3 = k2 & (k2 << 14);
     x |= (x << 7) & k1;
     x |= (x << 14) & k2;
     x |= (x << 28) & k3;
     return x;
 }
 
-bboard se_fill(bboard x) {
-    bboard k1 = ~BITBOARD_AFILE;
-    bboard k2 = k1 & (k1 >> 7);
-    bboard k3 = k2 & (k2 >> 14);
+uint64_t se_fill(uint64_t x) {
+    uint64_t k1 = ~BITBOARD_AFILE;
+    uint64_t k2 = k1 & (k1 >> 7);
+    uint64_t k3 = k2 & (k2 >> 14);
     x |= (x >> 7) & k1;
     x |= (x >> 14) & k2;
     x |= (x >> 28) & k3;
     return x;
 }
 
-bboard sw_fill(bboard x) {
-    bboard k1 = ~BITBOARD_HFILE;
-    bboard k2 = k1 & (k1 >> 9);
-    bboard k3 = k2 & (k2 >> 18);
+uint64_t sw_fill(uint64_t x) {
+    uint64_t k1 = ~BITBOARD_HFILE;
+    uint64_t k2 = k1 & (k1 >> 9);
+    uint64_t k3 = k2 & (k2 >> 18);
     x |= (x >> 9) & k1;
     x |= (x >> 18) & k2; 
     x |= (x >> 36) & k3;
@@ -268,17 +268,17 @@ bboard sw_fill(bboard x) {
 // is represented by an input bitboard
 //
 
-bboard catchable_passers_white(bboard king){
+uint64_t catchable_passers_white(uint64_t king){
     return 0;
 }
 
-bboard catchable_passers_black(bboard king){
+uint64_t catchable_passers_black(uint64_t king){
     return 0;
 }
 
 
 
-//int knight_distance_occl(bboard b1, bboard b2, bboard occupied){
+//int knight_distance_occl(uint64_t b1, uint64_t b2, uint64_t occupied){
 //    int d = 0;
 //    while ((b1 & b2) == 0) {
 //        b1 = knight_attacks(b1) & ~occupied; // as long as sets are disjoint
@@ -287,7 +287,7 @@ bboard catchable_passers_black(bboard king){
 //    return d;
 //}
 
-//int knightDistance(bboard source, bboard dest) {
+//int knightDistance(uint64_t source, uint64_t dest) {
 //    return calcKnightDistance(source, dest);
 //}
 
@@ -296,7 +296,7 @@ bboard catchable_passers_black(bboard king){
  * pro refers to the propgation set i.e. set of empty squares on the board 
  */
 
-bboard south_occluded_fill(bboard gen, bboard pro) {
+uint64_t south_occluded_fill(uint64_t gen, uint64_t pro) {
     gen |= pro & (gen >> 8);
     pro &= (pro >>  8);
     gen |= pro & (gen >> 16);
@@ -305,7 +305,7 @@ bboard south_occluded_fill(bboard gen, bboard pro) {
     return gen;
 }
 
-bboard north_occluded_fill(bboard gen, bboard pro) {
+uint64_t north_occluded_fill(uint64_t gen, uint64_t pro) {
     gen |= pro & (gen << 8);
     pro &= (pro <<  8);
     gen |= pro & (gen << 16);
@@ -314,7 +314,7 @@ bboard north_occluded_fill(bboard gen, bboard pro) {
     return gen;
 }
 
-bboard east_occluded_fill(bboard gen, bboard pro) {
+uint64_t east_occluded_fill(uint64_t gen, uint64_t pro) {
     pro &= ~BITBOARD_AFILE;
     gen |= pro & (gen << 1);
     pro &= (pro << 1);
@@ -324,7 +324,7 @@ bboard east_occluded_fill(bboard gen, bboard pro) {
     return gen;
 }
 
-bboard ne_occluded_fill(bboard gen, bboard pro) {
+uint64_t ne_occluded_fill(uint64_t gen, uint64_t pro) {
     pro &= ~BITBOARD_AFILE;
     gen |= pro & (gen << 9);
     pro &= (pro <<  9);
@@ -334,7 +334,7 @@ bboard ne_occluded_fill(bboard gen, bboard pro) {
     return gen;
 }
 
-bboard se_occluded_fill(bboard gen, bboard pro) {
+uint64_t se_occluded_fill(uint64_t gen, uint64_t pro) {
     pro &= ~BITBOARD_AFILE;
     gen |= pro & (gen >> 7);
     pro &= (pro >>  7);
@@ -344,7 +344,7 @@ bboard se_occluded_fill(bboard gen, bboard pro) {
     return gen;
 }
 
-bboard west_occluded_fill(bboard gen, bboard pro) {
+uint64_t west_occluded_fill(uint64_t gen, uint64_t pro) {
     pro &= ~BITBOARD_HFILE;
     gen |= pro & (gen >> 1);
     pro &= (pro >> 1);
@@ -354,7 +354,7 @@ bboard west_occluded_fill(bboard gen, bboard pro) {
     return gen;
 }
 
-bboard sw_occluded_fill(bboard gen, bboard pro) {
+uint64_t sw_occluded_fill(uint64_t gen, uint64_t pro) {
     pro &= ~BITBOARD_HFILE;
     gen |= pro & (gen >> 9);
     pro &= (pro >>  9);
@@ -364,7 +364,7 @@ bboard sw_occluded_fill(bboard gen, bboard pro) {
     return gen;
 }
 
-bboard nw_occluded_fill(bboard gen, bboard pro) {
+uint64_t nw_occluded_fill(uint64_t gen, uint64_t pro) {
     pro &= ~BITBOARD_HFILE;
     gen |= pro & (gen << 7);
     pro &= (pro <<  7);

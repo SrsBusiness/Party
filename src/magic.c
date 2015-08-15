@@ -1,6 +1,6 @@
 #include "magic.h"
 
-const bboard rook_0[4096] = {
+const uint64_t rook_0[4096] = {
     0x1010101010101FE,
     0x102,
     0x102,
@@ -4098,7 +4098,7 @@ const bboard rook_0[4096] = {
     0x1010102,
     0x102};
 
-const bboard rook_1[2048] = {
+const uint64_t rook_1[2048] = {
     0x2020202020202FD,
     0x2FD,
     0x2020D,
@@ -6148,7 +6148,7 @@ const bboard rook_1[2048] = {
     0x20205,
     0x205};
 
-const bboard rook_2[2048] = {
+const uint64_t rook_2[2048] = {
     0x4040404040404FB,
     0x4FB,
     0x4040A,
@@ -8198,7 +8198,7 @@ const bboard rook_2[2048] = {
     0x4040A,
     0x40A};
 
-const bboard rook_3[2048] = {
+const uint64_t rook_3[2048] = {
     0x8080808080808F7,
     0x8F7,
     0x80817,
@@ -10248,7 +10248,7 @@ const bboard rook_3[2048] = {
     0x80874,
     0x874};
 
-const bboard rook_4[2048] = {
+const uint64_t rook_4[2048] = {
     0x10101010101010EF,
     0x10106F,
     0x10101010101068,
@@ -12298,7 +12298,7 @@ const bboard rook_4[2048] = {
     0x102E,
     0x102E};
 
-const bboard rook_5[2048] = {
+const uint64_t rook_5[2048] = {
     0x20202020202020DF,
     0x2020202020DF,
     0x205C,
@@ -14348,7 +14348,7 @@ const bboard rook_5[2048] = {
     0x20205C,
     0x20205C};
 
-const bboard rook_6[2048] = {
+const uint64_t rook_6[2048] = {
     0x40404040404040BF,
     0x40BF,
     0x4040404040BF,
@@ -16398,7 +16398,7 @@ const bboard rook_6[2048] = {
     0x4040A0,
     0x40A0};
 
-const bboard rook_7[4096] = {
+const uint64_t rook_7[4096] = {
     0x808080808080807F,
     0x8040,
     0x807F,
@@ -20496,7 +20496,7 @@ const bboard rook_7[4096] = {
     0x8070,
     0x808040};
 
-const bboard rook_8[2048] = {
+const uint64_t rook_8[2048] = {
     0x10101010101FE01,
     0x1FE01,
     0x1017E01,
@@ -22546,7 +22546,7 @@ const bboard rook_8[2048] = {
     0x1010201,
     0x10201};
 
-const bboard rook_9[1024] = {
+const uint64_t rook_9[1024] = {
     0x20202020202FD02,
     0x2FD02,
     0x20202FD02,
@@ -23572,7 +23572,7 @@ const bboard rook_9[1024] = {
     0x2020502,
     0x20502};
 
-const bboard rook_10[1024] = {
+const uint64_t rook_10[1024] = {
     0x40404040404FB04,
     0x4FB04,
     0x40404043B04,
@@ -24598,7 +24598,7 @@ const bboard rook_10[1024] = {
     0x4040A04,
     0x40A04};
 
-const bboard rook_11[1024] = {
+const uint64_t rook_11[1024] = {
     0x80808080808F708,
     0x808081408,
     0x808F708,
@@ -25624,7 +25624,7 @@ const bboard rook_11[1024] = {
     0x81408,
     0x81408};
 
-const bboard rook_12[1024] = {
+const uint64_t rook_12[1024] = {
     0x101010101010EF10,
     0x1010101010EF10,
     0x1010EF10,
@@ -26650,7 +26650,7 @@ const bboard rook_12[1024] = {
     0x102810,
     0x102810};
 
-const bboard rook_13[1024] = {
+const uint64_t rook_13[1024] = {
     0x202020202020DF20,
     0x20DF20,
     0x20205F20,
@@ -27676,7 +27676,7 @@ const bboard rook_13[1024] = {
     0x20205020,
     0x205020};
 
-const bboard rook_14[1024] = {
+const uint64_t rook_14[1024] = {
     0x404040404040BF40,
     0x4040404040BF40,
     0x4040BF40,
@@ -28702,7 +28702,7 @@ const bboard rook_14[1024] = {
     0x40B040,
     0x40B040};
 
-const bboard rook_15[2048] = {
+const uint64_t rook_15[2048] = {
     0x8080808080807F80,
     0x807F80,
     0x80804080,
@@ -30752,7 +30752,7 @@ const bboard rook_15[2048] = {
     0x80807080,
     0x807080};
 
-const bboard rook_16[2048] = {
+const uint64_t rook_16[2048] = {
     0x101010101FE0101,
     0x101017E0100,
     0x1060100,
@@ -32802,7 +32802,7 @@ const bboard rook_16[2048] = {
     0x1020100,
     0x101020100};
 
-const bboard rook_17[1024] = {
+const uint64_t rook_17[1024] = {
     0x202020202FD0202,
     0x202020202FD0200,
     0x2FD0202,
@@ -33828,7 +33828,7 @@ const bboard rook_17[1024] = {
     0x2050202,
     0x2050200};
 
-const bboard rook_18[1024] = {
+const uint64_t rook_18[1024] = {
     0x404040404FB0404,
     0x41A0400,
     0x4047B0404,
@@ -34854,7 +34854,7 @@ const bboard rook_18[1024] = {
     0x4041A0400,
     0x41A0400};
 
-const bboard rook_19[1024] = {
+const uint64_t rook_19[1024] = {
     0x808080808F70808,
     0x808140808,
     0x8F70808,
@@ -35880,7 +35880,7 @@ const bboard rook_19[1024] = {
     0x8140800,
     0x8160808};
 
-const bboard rook_20[1024] = {
+const uint64_t rook_20[1024] = {
     0x1010101010EF1010,
     0x101010EF1010,
     0x10EF1010,
@@ -36906,7 +36906,7 @@ const bboard rook_20[1024] = {
     0x10281010,
     0x10281010};
 
-const bboard rook_21[1024] = {
+const uint64_t rook_21[1024] = {
     0x2020202020DF2020,
     0x202020DF2020,
     0x20D02000,
@@ -37932,7 +37932,7 @@ const bboard rook_21[1024] = {
     0x20582000,
     0x20582000};
 
-const bboard rook_22[1024] = {
+const uint64_t rook_22[1024] = {
     0x4040404040BF4040,
     0x40A04000,
     0x404040BF4040,
@@ -38958,7 +38958,7 @@ const bboard rook_22[1024] = {
     0x4040A04000,
     0x40A04000};
 
-const bboard rook_23[2048] = {
+const uint64_t rook_23[2048] = {
     0x80808080807F8080,
     0x80408080,
     0x80608080,
@@ -41008,7 +41008,7 @@ const bboard rook_23[2048] = {
     0x808080408080,
     0x80408000};
 
-const bboard rook_24[2048] = {
+const uint64_t rook_24[2048] = {
     0x1010101FE010101,
     0x102010100,
     0x10101011E010000,
@@ -43058,7 +43058,7 @@ const bboard rook_24[2048] = {
     0x102010000,
     0x106010000};
 
-const bboard rook_25[1024] = {
+const uint64_t rook_25[1024] = {
     0x2020202FD020202,
     0x20202FD020202,
     0x2FD020202,
@@ -44084,7 +44084,7 @@ const bboard rook_25[1024] = {
     0x205020000,
     0x205020000};
 
-const bboard rook_26[1024] = {
+const uint64_t rook_26[1024] = {
     0x4040404FB040404,
     0x40404FB040404,
     0x4041B040000,
@@ -45110,7 +45110,7 @@ const bboard rook_26[1024] = {
     0x41B040000,
     0x41B040000};
 
-const bboard rook_27[1024] = {
+const uint64_t rook_27[1024] = {
     0x8080808F7080808,
     0x80814080000,
     0x8F7080808,
@@ -46136,7 +46136,7 @@ const bboard rook_27[1024] = {
     0x814080000,
     0x814080800};
 
-const bboard rook_28[1024] = {
+const uint64_t rook_28[1024] = {
     0x10101010EF101010,
     0x10EF101010,
     0x1010101028100000,
@@ -47162,7 +47162,7 @@ const bboard rook_28[1024] = {
     0x10101028100000,
     0x1028100000};
 
-const bboard rook_29[1024] = {
+const uint64_t rook_29[1024] = {
     0x20202020DF202020,
     0x205C200000,
     0x20D8202020,
@@ -48188,7 +48188,7 @@ const bboard rook_29[1024] = {
     0x20D8202020,
     0x2020205C200000};
 
-const bboard rook_30[1024] = {
+const uint64_t rook_30[1024] = {
     0x40404040BF404040,
     0x40404040BF404000,
     0x404040A0404040,
@@ -49214,7 +49214,7 @@ const bboard rook_30[1024] = {
     0x40A0400000,
     0x40A0400000};
 
-const bboard rook_31[2048] = {
+const uint64_t rook_31[2048] = {
     0x808080807F808080,
     0x807F808080,
     0x808060808080,
@@ -51264,7 +51264,7 @@ const bboard rook_31[2048] = {
     0x808040800000,
     0x8040800000};
 
-const bboard rook_32[2048] = {
+const uint64_t rook_32[2048] = {
     0x10101FE01010101,
     0x10101FE01000000,
     0x10101FE01010100,
@@ -53314,7 +53314,7 @@ const bboard rook_32[2048] = {
     0x1010201010000,
     0x1010201000000};
 
-const bboard rook_33[1024] = {
+const uint64_t rook_33[1024] = {
     0x20202FD02020202,
     0x2FD02020202,
     0x20202FD02020000,
@@ -54340,7 +54340,7 @@ const bboard rook_33[1024] = {
     0x202020D02020000,
     0x20D02020000};
 
-const bboard rook_34[1024] = {
+const uint64_t rook_34[1024] = {
     0x40404FB04040404,
     0x4040B04000000,
     0x4FB04040404,
@@ -55366,7 +55366,7 @@ const bboard rook_34[1024] = {
     0x40A04000000,
     0x40A04000000};
 
-const bboard rook_35[1024] = {
+const uint64_t rook_35[1024] = {
     0x80808F708080808,
     0x8F708080808,
     0x80808F708080000,
@@ -56392,7 +56392,7 @@ const bboard rook_35[1024] = {
     0x8081608000000,
     0x81608000000};
 
-const bboard rook_36[1024] = {
+const uint64_t rook_36[1024] = {
     0x101010EF10101010,
     0x102810000000,
     0x101010EF10100000,
@@ -57418,7 +57418,7 @@ const bboard rook_36[1024] = {
     0x10102810000000,
     0x102810000000};
 
-const bboard rook_37[1024] = {
+const uint64_t rook_37[1024] = {
     0x202020DF20202020,
     0x20DF20202020,
     0x202020DF20200000,
@@ -58444,7 +58444,7 @@ const bboard rook_37[1024] = {
     0x20205020000000,
     0x205020000000};
 
-const bboard rook_38[1024] = {
+const uint64_t rook_38[1024] = {
     0x404040BF40404040,
     0x404040A040404000,
     0x404040A040400000,
@@ -59470,7 +59470,7 @@ const bboard rook_38[1024] = {
     0x40B840000000,
     0x40B840000000};
 
-const bboard rook_39[2048] = {
+const uint64_t rook_39[2048] = {
     0x8080807F80808080,
     0x8080804080808000,
     0x804080000000,
@@ -61520,7 +61520,7 @@ const bboard rook_39[2048] = {
     0x806080000000,
     0x807080000000};
 
-const bboard rook_40[2048] = {
+const uint64_t rook_40[2048] = {
     0x101FE0101010101,
     0x1060100000000,
     0x1017E0101000000,
@@ -63570,7 +63570,7 @@ const bboard rook_40[2048] = {
     0x101020100000000,
     0x101060101000000};
 
-const bboard rook_41[1024] = {
+const uint64_t rook_41[1024] = {
     0x202FD0202020202,
     0x202FD0202000000,
     0x2FD0202020202,
@@ -64596,7 +64596,7 @@ const bboard rook_41[1024] = {
     0x20D0200000000,
     0x20D0200000000};
 
-const bboard rook_42[1024] = {
+const uint64_t rook_42[1024] = {
     0x404FB0404040404,
     0x4040A0400000000,
     0x4040B0404040000,
@@ -65622,7 +65622,7 @@ const bboard rook_42[1024] = {
     0x41A0404000000,
     0x41B0400000000};
 
-const bboard rook_43[1024] = {
+const uint64_t rook_43[1024] = {
     0x808F70808080808,
     0x808F70808080000,
     0x808370808000000,
@@ -66648,7 +66648,7 @@ const bboard rook_43[1024] = {
     0x8140800000000,
     0x8140800000000};
 
-const bboard rook_44[1024] = {
+const uint64_t rook_44[1024] = {
     0x1010EF1010101010,
     0x10E81000000000,
     0x1010EF1010100000,
@@ -67674,7 +67674,7 @@ const bboard rook_44[1024] = {
     0x1010E81000000000,
     0x10E81000000000};
 
-const bboard rook_45[1024] = {
+const uint64_t rook_45[1024] = {
     0x2020DF2020202020,
     0x20DF2020202020,
     0x2020DF2020200000,
@@ -68700,7 +68700,7 @@ const bboard rook_45[1024] = {
     0x2020D82000000000,
     0x20D82000000000};
 
-const bboard rook_46[1024] = {
+const uint64_t rook_46[1024] = {
     0x4040BF4040404040,
     0x40A04000000000,
     0x4040B84040400000,
@@ -69726,7 +69726,7 @@ const bboard rook_46[1024] = {
     0x40B84000000000,
     0x40B04000000000};
 
-const bboard rook_47[2048] = {
+const uint64_t rook_47[2048] = {
     0x80807F8080808080,
     0x80807F8080000000,
     0x8080408080808000,
@@ -71776,7 +71776,7 @@ const bboard rook_47[2048] = {
     0x80408000000000,
     0x80408000000000};
 
-const bboard rook_48[2048] = {
+const uint64_t rook_48[2048] = {
     0x1FE010101010101,
     0x102010000000000,
     0x102010000000000,
@@ -73826,7 +73826,7 @@ const bboard rook_48[2048] = {
     0x102010000000000,
     0x102010100000000};
 
-const bboard rook_49[1024] = {
+const uint64_t rook_49[1024] = {
     0x2FD020202020202,
     0x205020200000000,
     0x2FD020202020200,
@@ -74852,7 +74852,7 @@ const bboard rook_49[1024] = {
     0x205020000000000,
     0x205020000000000};
 
-const bboard rook_50[1024] = {
+const uint64_t rook_50[1024] = {
     0x4FB040404040404,
     0x40A040000000000,
     0x4FB040400000000,
@@ -75878,7 +75878,7 @@ const bboard rook_50[1024] = {
     0x43A040000000000,
     0x40A040400000000};
 
-const bboard rook_51[1024] = {
+const uint64_t rook_51[1024] = {
     0x8F7080808080808,
     0x837080808080000,
     0x8F7080800000000,
@@ -76904,7 +76904,7 @@ const bboard rook_51[1024] = {
     0x834080800000000,
     0x874080800000000};
 
-const bboard rook_52[1024] = {
+const uint64_t rook_52[1024] = {
     0x10EF101010101010,
     0x10EF101010100000,
     0x1028100000000000,
@@ -77930,7 +77930,7 @@ const bboard rook_52[1024] = {
     0x102C100000000000,
     0x102C100000000000};
 
-const bboard rook_53[1024] = {
+const uint64_t rook_53[1024] = {
     0x20DF202020202020,
     0x2050200000000000,
     0x2050200000000000,
@@ -78956,7 +78956,7 @@ const bboard rook_53[1024] = {
     0x20D8200000000000,
     0x20D8200000000000};
 
-const bboard rook_54[1024] = {
+const uint64_t rook_54[1024] = {
     0x40BF404040404040,
     0x40B0404040000000,
     0x40B0404000000000,
@@ -79982,7 +79982,7 @@ const bboard rook_54[1024] = {
     0x40B0400000000000,
     0x40BC400000000000};
 
-const bboard rook_55[2048] = {
+const uint64_t rook_55[2048] = {
     0x807F808080808080,
     0x8060808080800000,
     0x807F808000000000,
@@ -82032,7 +82032,7 @@ const bboard rook_55[2048] = {
     0x8040800000000000,
     0x807E800000000000};
 
-const bboard rook_56[4096] = {
+const uint64_t rook_56[4096] = {
     0xFE01010101010101,
     0x1E01010100000000,
     0xFE01010101000000,
@@ -86130,7 +86130,7 @@ const bboard rook_56[4096] = {
     0x201000000000000,
     0x201000000000000};
 
-const bboard rook_57[2048] = {
+const uint64_t rook_57[2048] = {
     0xFD02020202020202,
     0xFD02000000000000,
     0xFD02020202000000,
@@ -88180,7 +88180,7 @@ const bboard rook_57[2048] = {
     0xD02020200000000,
     0xD02000000000000};
 
-const bboard rook_58[2048] = {
+const uint64_t rook_58[2048] = {
     0xFB04040404040404,
     0xFB04040404040400,
     0xFB04040400000000,
@@ -90230,7 +90230,7 @@ const bboard rook_58[2048] = {
     0x1A04000000000000,
     0x1A04000000000000};
 
-const bboard rook_59[2048] = {
+const uint64_t rook_59[2048] = {
     0xF708080808080808,
     0xF708080808000000,
     0x3608000000000000,
@@ -92280,7 +92280,7 @@ const bboard rook_59[2048] = {
     0x1408000000000000,
     0x1408000000000000};
 
-const bboard rook_60[2048] = {
+const uint64_t rook_60[2048] = {
     0xEF10101010101010,
     0x6810000000000000,
     0x6C10101010000000,
@@ -94330,7 +94330,7 @@ const bboard rook_60[2048] = {
     0x6810100000000000,
     0x2810000000000000};
 
-const bboard rook_61[2048] = {
+const uint64_t rook_61[2048] = {
     0xDF20202020202020,
     0xD020000000000000,
     0x5020200000000000,
@@ -96380,7 +96380,7 @@ const bboard rook_61[2048] = {
     0x5020200000000000,
     0x5020000000000000};
 
-const bboard rook_62[2048] = {
+const uint64_t rook_62[2048] = {
     0xBF40404040404040,
     0xBF40404040000000,
     0xBF40000000000000,
@@ -98430,7 +98430,7 @@ const bboard rook_62[2048] = {
     0xB040000000000000,
     0xB040000000000000};
 
-const bboard rook_63[4096] = {
+const uint64_t rook_63[4096] = {
     0x7F80808080808080,
     0x6080000000000000,
     0x6080000000000000,
@@ -102530,7 +102530,7 @@ const bboard rook_63[4096] = {
 
 /* bishops */
 
-const bboard bishop_0[64] = {
+const uint64_t bishop_0[64] = {
     0x8040201008040200,
     0x201008040200,
     0x1008040200,
@@ -102596,7 +102596,7 @@ const bboard bishop_0[64] = {
     0x200,
     0x200};
 
-const bboard bishop_1[32] = {
+const uint64_t bishop_1[32] = {
     0x80402010080500,
     0x500,
     0x402010080500,
@@ -102629,7 +102629,7 @@ const bboard bishop_1[32] = {
     0x80500,
     0x500,
     0x500};
-const bboard bishop_2[32] = {
+const uint64_t bishop_2[32] = {
     0x804020110A00,
     0x804020100A00,
     0x110A00,
@@ -102663,7 +102663,7 @@ const bboard bishop_2[32] = {
     0x10A00,
     0xA00};
 
-const bboard bishop_3[32] = {
+const uint64_t bishop_3[32] = {
     0x8041221400,
     0x1021400,
     0x41221400,
@@ -102697,7 +102697,7 @@ const bboard bishop_3[32] = {
     0x201400,
     0x1400};
 
-const bboard bishop_4[32] = {
+const uint64_t bishop_4[32] = {
     0x182442800,
     0x2800,
     0x102442800,
@@ -102731,7 +102731,7 @@ const bboard bishop_4[32] = {
     0x42800,
     0x402800};
 
-const bboard bishop_5[32] = {
+const uint64_t bishop_5[32] = {
     0x10204885000,
     0x5000,
     0x805000,
@@ -102765,7 +102765,7 @@ const bboard bishop_5[32] = {
     0x5000,
     0x85000};
 
-const bboard bishop_6[32] = {
+const uint64_t bishop_6[32] = {
     0x102040810A000,
     0x810A000,
     0xA000,
@@ -102799,7 +102799,7 @@ const bboard bishop_6[32] = {
     0xA000,
     0xA000};
 
-const bboard bishop_7[64] = {
+const uint64_t bishop_7[64] = {
     0x102040810204000,
     0x4000,
     0x810204000,
@@ -102865,7 +102865,7 @@ const bboard bishop_7[64] = {
     0x10204000,
     0x4000};
 
-const bboard bishop_8[32] = {
+const uint64_t bishop_8[32] = {
     0x4020100804020002,
     0x20002,
     0x20100804020002,
@@ -102899,7 +102899,7 @@ const bboard bishop_8[32] = {
     0x20002,
     0x4020002};
 
-const bboard bishop_9[32] = {
+const uint64_t bishop_9[32] = {
     0x8040201008050005,
     0x1008050005,
     0x50005,
@@ -102933,7 +102933,7 @@ const bboard bishop_9[32] = {
     0x50005,
     0x50005};
 
-const bboard bishop_10[32] = {
+const uint64_t bishop_10[32] = {
     0x804020110A000A,
     0x100A000A,
     0x110A000A,
@@ -102967,7 +102967,7 @@ const bboard bishop_10[32] = {
     0x10A000A,
     0xA000A};
 
-const bboard bishop_11[32] = {
+const uint64_t bishop_11[32] = {
     0x804122140014,
     0x804022140014,
     0x102140014,
@@ -103001,7 +103001,7 @@ const bboard bishop_11[32] = {
     0x140014,
     0x140014};
 
-const bboard bishop_12[32] = {
+const uint64_t bishop_12[32] = {
     0x18244280028,
     0x8040280028,
     0x44280028,
@@ -103035,7 +103035,7 @@ const bboard bishop_12[32] = {
     0x204280028,
     0x280028};
 
-const bboard bishop_13[32] = {
+const uint64_t bishop_13[32] = {
     0x1020488500050,
     0x8500050,
     0x488500050,
@@ -103069,7 +103069,7 @@ const bboard bishop_13[32] = {
     0x500050,
     0x500050};
 
-const bboard bishop_14[32] = {
+const uint64_t bishop_14[32] = {
     0x102040810A000A0,
     0xA000A0,
     0xA000A0,
@@ -103103,7 +103103,7 @@ const bboard bishop_14[32] = {
     0x10A000A0,
     0x10A000A0};
 
-const bboard bishop_15[32] = {
+const uint64_t bishop_15[32] = {
     0x204081020400040,
     0x400040,
     0x1020400040,
@@ -103137,7 +103137,7 @@ const bboard bishop_15[32] = {
     0x400040,
     0x20400040};
 
-const bboard bishop_16[32] = {
+const uint64_t bishop_16[32] = {
     0x2010080402000204,
     0x2010080402000200,
     0x2000204,
@@ -103171,7 +103171,7 @@ const bboard bishop_16[32] = {
     0x2000204,
     0x2000200};
 
-const bboard bishop_17[32] = {
+const uint64_t bishop_17[32] = {
     0x4020100805000508,
     0x4020100805000500,
     0x20100805000508,
@@ -103205,7 +103205,7 @@ const bboard bishop_17[32] = {
     0x5000508,
     0x5000500};
 
-const bboard bishop_18[128] = {
+const uint64_t bishop_18[128] = {
     0x804020110A000A11,
     0x110A000A11,
     0x804020100A000A11,
@@ -103335,7 +103335,7 @@ const bboard bishop_18[128] = {
     0xA000A00,
     0xA000A00};
 
-const bboard bishop_19[128] = {
+const uint64_t bishop_19[128] = {
     0x80412214001422,
     0x10214001400,
     0x80402014001422,
@@ -103465,7 +103465,7 @@ const bboard bishop_19[128] = {
     0x2014001420,
     0x14001422};
 
-const bboard bishop_20[128] = {
+const uint64_t bishop_20[128] = {
     0x1824428002844,
     0x1024428002844,
     0x1020428002844,
@@ -103595,7 +103595,7 @@ const bboard bishop_20[128] = {
     0x28002800,
     0x28002800};
 
-const bboard bishop_21[128] = {
+const uint64_t bishop_21[128] = {
     0x102048850005088,
     0x2048850005088,
     0x8850005088,
@@ -103725,7 +103725,7 @@ const bboard bishop_21[128] = {
     0x50005088,
     0x50005088};
 
-const bboard bishop_22[32] = {
+const uint64_t bishop_22[32] = {
     0x2040810A000A010,
     0x40810A000A010,
     0x10A000A010,
@@ -103759,7 +103759,7 @@ const bboard bishop_22[32] = {
     0xA000A000,
     0xA000A000};
 
-const bboard bishop_23[32] = {
+const uint64_t bishop_23[32] = {
     0x408102040004020,
     0x40004000,
     0x40004020,
@@ -103793,7 +103793,7 @@ const bboard bishop_23[32] = {
     0x40004020,
     0x2040004020};
 
-const bboard bishop_24[32] = {
+const uint64_t bishop_24[32] = {
     0x1008040200020408,
     0x40200020408,
     0x8040200020408,
@@ -103827,7 +103827,7 @@ const bboard bishop_24[32] = {
     0x200020000,
     0x200020000};
 
-const bboard bishop_25[32] = {
+const uint64_t bishop_25[32] = {
     0x2010080500050810,
     0x2010080500050000,
     0x2010080500050800,
@@ -103861,7 +103861,7 @@ const bboard bishop_25[32] = {
     0x500050800,
     0x500050000};
 
-const bboard bishop_26[128] = {
+const uint64_t bishop_26[128] = {
     0x4020110A000A1120,
     0x10A000A0100,
     0x4020110A000A1100,
@@ -103991,7 +103991,7 @@ const bboard bishop_26[128] = {
     0x20100A000A0000,
     0x100A000A1000};
 
-const bboard bishop_27[512] = {
+const uint64_t bishop_27[512] = {
     0x8041221400142241,
     0x221400140000,
     0x1221400140201,
@@ -104505,7 +104505,7 @@ const bboard bishop_27[512] = {
     0x21400140000,
     0x40221400142000};
 
-const bboard bishop_28[512] = {
+const uint64_t bishop_28[512] = {
     0x182442800284482,
     0x80402800284482,
     0x80442800284402,
@@ -105019,7 +105019,7 @@ const bboard bishop_28[512] = {
     0x42800280000,
     0x2800280000};
 
-const bboard bishop_29[128] = {
+const uint64_t bishop_29[128] = {
     0x204885000508804,
     0x204085000508804,
     0x805000508800,
@@ -105149,7 +105149,7 @@ const bboard bishop_29[128] = {
     0x885000500000,
     0x85000500000};
 
-const bboard bishop_30[32] = {
+const uint64_t bishop_30[32] = {
     0x40810A000A01008,
     0x10A000A01008,
     0xA000A01008,
@@ -105183,7 +105183,7 @@ const bboard bishop_30[32] = {
     0xA000A00000,
     0xA000A00000};
 
-const bboard bishop_31[32] = {
+const uint64_t bishop_31[32] = {
     0x810204000402010,
     0x4000402010,
     0x204000402010,
@@ -105217,7 +105217,7 @@ const bboard bishop_31[32] = {
     0x204000400000,
     0x4000400000};
 
-const bboard bishop_32[32] = {
+const uint64_t bishop_32[32] = {
     0x804020002040810,
     0x804020002040800,
     0x20002040810,
@@ -105251,7 +105251,7 @@ const bboard bishop_32[32] = {
     0x20002000000,
     0x20002000000};
 
-const bboard bishop_33[32] = {
+const uint64_t bishop_33[32] = {
     0x1008050005081020,
     0x50005080000,
     0x1008050005000000,
@@ -105285,7 +105285,7 @@ const bboard bishop_33[32] = {
     0x50005000000,
     0x50005000000};
 
-const bboard bishop_34[128] = {
+const uint64_t bishop_34[128] = {
     0x20110A000A112040,
     0x20110A000A102040,
     0x110A000A110000,
@@ -105415,7 +105415,7 @@ const bboard bishop_34[128] = {
     0xA000A010000,
     0xA000A000000};
 
-const bboard bishop_35[512] = {
+const uint64_t bishop_35[512] = {
     0x4122140014224180,
     0x102140014224180,
     0x4122140014224100,
@@ -105929,7 +105929,7 @@ const bboard bishop_35[512] = {
     0x20140014200000,
     0x140014200000};
 
-const bboard bishop_36[512] = {
+const uint64_t bishop_36[512] = {
     0x8244280028448201,
     0x204280028408000,
     0x8244280028000000,
@@ -106443,7 +106443,7 @@ const bboard bishop_36[512] = {
     0x40280028000000,
     0x280028440000};
 
-const bboard bishop_37[128] = {
+const uint64_t bishop_37[128] = {
     0x488500050880402,
     0x8500050880000,
     0x488500050800000,
@@ -106573,7 +106573,7 @@ const bboard bishop_37[128] = {
     0x80500050000000,
     0x500050000000};
 
-const bboard bishop_38[32] = {
+const uint64_t bishop_38[32] = {
     0x810A000A0100804,
     0x10A000A0100804,
     0x810A000A0000000,
@@ -106607,7 +106607,7 @@ const bboard bishop_38[32] = {
     0xA000A0100000,
     0xA000A0100000};
 
-const bboard bishop_39[32] = {
+const uint64_t bishop_39[32] = {
     0x1020400040201008,
     0x1020400040000000,
     0x20400040200000,
@@ -106641,7 +106641,7 @@ const bboard bishop_39[32] = {
     0x400040201000,
     0x400040000000};
 
-const bboard bishop_40[32] = {
+const uint64_t bishop_40[32] = {
     0x402000204081020,
     0x402000204080000,
     0x402000204081000,
@@ -106675,7 +106675,7 @@ const bboard bishop_40[32] = {
     0x2000200000000,
     0x2000200000000};
 
-const bboard bishop_41[32] = {
+const uint64_t bishop_41[32] = {
     0x805000508102040,
     0x805000500000000,
     0x805000508100000,
@@ -106709,7 +106709,7 @@ const bboard bishop_41[32] = {
     0x5000508000000,
     0x5000500000000};
 
-const bboard bishop_42[128] = {
+const uint64_t bishop_42[128] = {
     0x110A000A11204080,
     0x10A000A11000000,
     0x110A000A10204080,
@@ -106839,7 +106839,7 @@ const bboard bishop_42[128] = {
     0x100A000A10000000,
     0xA000A10204000};
 
-const bboard bishop_43[128] = {
+const uint64_t bishop_43[128] = {
     0x2214001422418000,
     0x14001402010000,
     0x2214001402000000,
@@ -106969,7 +106969,7 @@ const bboard bishop_43[128] = {
     0x214001422000000,
     0x2014001420000000};
 
-const bboard bishop_44[128] = {
+const uint64_t bishop_44[128] = {
     0x4428002844820100,
     0x428002844020100,
     0x4028002800000000,
@@ -107099,7 +107099,7 @@ const bboard bishop_44[128] = {
     0x4028002840800000,
     0x28002840000000};
 
-const bboard bishop_45[128] = {
+const uint64_t bishop_45[128] = {
     0x8850005088040201,
     0x8850005080000000,
     0x50005008000000,
@@ -107229,7 +107229,7 @@ const bboard bishop_45[128] = {
     0x50005088000000,
     0x50005080000000};
 
-const bboard bishop_46[32] = {
+const uint64_t bishop_46[32] = {
     0x10A000A010080402,
     0xA000A010080402,
     0x10A000A010000000,
@@ -107263,7 +107263,7 @@ const bboard bishop_46[32] = {
     0x10A000A000000000,
     0xA000A000000000};
 
-const bboard bishop_47[32] = {
+const uint64_t bishop_47[32] = {
     0x2040004020100804,
     0x40004020000000,
     0x2040004020100800,
@@ -107297,7 +107297,7 @@ const bboard bishop_47[32] = {
     0x2040004000000000,
     0x2040004000000000};
 
-const bboard bishop_48[32] = {
+const uint64_t bishop_48[32] = {
     0x200020408102040,
     0x200020000000000,
     0x200020400000000,
@@ -107331,7 +107331,7 @@ const bboard bishop_48[32] = {
     0x200020400000000,
     0x200020000000000};
 
-const bboard bishop_49[32] = {
+const uint64_t bishop_49[32] = {
     0x500050810204080,
     0x500050000000000,
     0x500050800000000,
@@ -107365,7 +107365,7 @@ const bboard bishop_49[32] = {
     0x500050810000000,
     0x500050000000000};
 
-const bboard bishop_50[32] = {
+const uint64_t bishop_50[32] = {
     0xA000A1120408000,
     0xA000A1120000000,
     0xA000A1100000000,
@@ -107399,7 +107399,7 @@ const bboard bishop_50[32] = {
     0xA000A0000000000,
     0xA000A0000000000};
 
-const bboard bishop_51[32] = {
+const uint64_t bishop_51[32] = {
     0x1400142241800000,
     0x1400140200000000,
     0x1400142201000000,
@@ -107433,7 +107433,7 @@ const bboard bishop_51[32] = {
     0x1400140000000000,
     0x1400140000000000};
 
-const bboard bishop_52[32] = {
+const uint64_t bishop_52[32] = {
     0x2800284482010000,
     0x2800284480000000,
     0x2800284080000000,
@@ -107467,7 +107467,7 @@ const bboard bishop_52[32] = {
     0x2800280000000000,
     0x2800280000000000};
 
-const bboard bishop_53[32] = {
+const uint64_t bishop_53[32] = {
     0x5000508804020100,
     0x5000508804020000,
     0x5000508800000000,
@@ -107501,7 +107501,7 @@ const bboard bishop_53[32] = {
     0x5000500000000000,
     0x5000500000000000};
 
-const bboard bishop_54[32] = {
+const uint64_t bishop_54[32] = {
     0xA000A01008040201,
     0xA000A01000000000,
     0xA000A00000000000,
@@ -107535,7 +107535,7 @@ const bboard bishop_54[32] = {
     0xA000A00000000000,
     0xA000A00000000000};
 
-const bboard bishop_55[32] = {
+const uint64_t bishop_55[32] = {
     0x4000402010080402,
     0x4000402000000000,
     0x4000400000000000,
@@ -107569,7 +107569,7 @@ const bboard bishop_55[32] = {
     0x4000400000000000,
     0x4000400000000000};
 
-const bboard bishop_56[64] = {
+const uint64_t bishop_56[64] = {
     0x2040810204080,
     0x2000000000000,
     0x2040800000000,
@@ -107635,7 +107635,7 @@ const bboard bishop_56[64] = {
     0x2040000000000,
     0x2000000000000};
 
-const bboard bishop_57[32] = {
+const uint64_t bishop_57[32] = {
     0x5081020408000,
     0x5081020000000,
     0x5081000000000,
@@ -107669,7 +107669,7 @@ const bboard bishop_57[32] = {
     0x5000000000000,
     0x5000000000000};
 
-const bboard bishop_58[32] = {
+const uint64_t bishop_58[32] = {
     0xA112040800000,
     0xA000000000000,
     0xA112040000000,
@@ -107703,7 +107703,7 @@ const bboard bishop_58[32] = {
     0xA000000000000,
     0xA010000000000};
 
-const bboard bishop_59[32] = {
+const uint64_t bishop_59[32] = {
     0x14224180000000,
     0x14224080000000,
     0x14020100000000,
@@ -107737,7 +107737,7 @@ const bboard bishop_59[32] = {
     0x14200000000000,
     0x14200000000000};
 
-const bboard bishop_60[32] = {
+const uint64_t bishop_60[32] = {
     0x28448201000000,
     0x28040000000000,
     0x28408000000000,
@@ -107771,7 +107771,7 @@ const bboard bishop_60[32] = {
     0x28408000000000,
     0x28000000000000};
 
-const bboard bishop_61[32] = {
+const uint64_t bishop_61[32] = {
     0x50880402010000,
     0x50000000000000,
     0x50880402000000,
@@ -107805,7 +107805,7 @@ const bboard bishop_61[32] = {
     0x50080000000000,
     0x50000000000000};
 
-const bboard bishop_62[32] = {
+const uint64_t bishop_62[32] = {
     0xA0100804020100,
     0xA0000000000000,
     0xA0100800000000,
@@ -107839,7 +107839,7 @@ const bboard bishop_62[32] = {
     0xA0100000000000,
     0xA0000000000000};
 
-const bboard bishop_63[64] = {
+const uint64_t bishop_63[64] = {
     0x40201008040201,
     0x40200000000000,
     0x40201000000000,

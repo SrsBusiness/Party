@@ -3,7 +3,7 @@
 #include "bitboard.h"
 #include "pawn.h"
 
-const bboard square_pp[64] = {0, 0, 0, 0, 0, 0, 0, 0,
+const uint64_t square_pp[64] = {0, 0, 0, 0, 0, 0, 0, 0,
     0x7F7F7F7F7F7F7F00, //A2
     0xFFFFFFFFFFFFFF00, //b2
     0xFFFFFFFFFFFFFF00, //c2
@@ -66,25 +66,25 @@ const bboard square_pp[64] = {0, 0, 0, 0, 0, 0, 0, 0,
  *  returns destination squares of pawn pushes
  */
 
-bboard w_single_push_targets(bboard wpawns, bboard empty) {
+uint64_t w_single_push_targets(uint64_t wpawns, uint64_t empty) {
     return north_one(wpawns) & empty;
 }
 
-bboard w_double_push_targets(bboard wpawns, bboard empty) {
-    bboard single_pushs = w_single_push_targets(wpawns, empty);
+uint64_t w_double_push_targets(uint64_t wpawns, uint64_t empty) {
+    uint64_t single_pushs = w_single_push_targets(wpawns, empty);
     return north_one(single_pushs) & empty & BITBOARD_RANK4;
 }
 
-bboard b_single_push_targets(bboard bpawns, bboard empty) {
+uint64_t b_single_push_targets(uint64_t bpawns, uint64_t empty) {
     return south_one(bpawns) & empty;
 }
 
-bboard b_double_push_targets(bboard bpawns, bboard empty) {
-    bboard single_pushs = b_single_push_targets(bpawns, empty);
+uint64_t b_double_push_targets(uint64_t bpawns, uint64_t empty) {
+    uint64_t single_pushs = b_single_push_targets(bpawns, empty);
     return south_one(single_pushs) & empty & BITBOARD_RANK5;
 }
 
-bboard single_push_targets(bboard pawns, bboard empty, int color) {
+uint64_t single_push_targets(uint64_t pawns, uint64_t empty, int color) {
     switch(color) {
         case WHITE:
             return w_single_push_targets(pawns, empty);
@@ -96,7 +96,7 @@ bboard single_push_targets(bboard pawns, bboard empty, int color) {
     }
 }
 
-bboard double_push_targets(bboard pawns, bboard empty, int color) {
+uint64_t double_push_targets(uint64_t pawns, uint64_t empty, int color) {
     switch(color) {
         case WHITE:
             return w_double_push_targets(pawns, empty);
@@ -112,25 +112,25 @@ bboard double_push_targets(bboard pawns, bboard empty, int color) {
  *  returns source squares of pawns able to be pushed
  */
 
-bboard w_pawns_able_to_push(bboard wpawns, bboard empty) {
+uint64_t w_pawns_able_to_push(uint64_t wpawns, uint64_t empty) {
     return south_one(empty) & wpawns;
 }
 
-bboard w_pawns_able_to_double_push(bboard wpawns, bboard empty) {
-    bboard emptyRank3 = south_one(empty & BITBOARD_RANK4) & empty;
+uint64_t w_pawns_able_to_double_push(uint64_t wpawns, uint64_t empty) {
+    uint64_t emptyRank3 = south_one(empty & BITBOARD_RANK4) & empty;
     return w_pawns_able_to_push(wpawns, emptyRank3);
 }
 
-bboard b_pawns_able_to_push(bboard bpawns, bboard empty) {
+uint64_t b_pawns_able_to_push(uint64_t bpawns, uint64_t empty) {
     return north_one(empty) & bpawns;
 }
 
-bboard b_pawns_able_to_double_push(bboard bpawns, bboard empty) {
-    bboard emptyRank6 = north_one(empty & BITBOARD_RANK5) & empty;
+uint64_t b_pawns_able_to_double_push(uint64_t bpawns, uint64_t empty) {
+    uint64_t emptyRank6 = north_one(empty & BITBOARD_RANK5) & empty;
     return b_pawns_able_to_push(bpawns, emptyRank6);
 }
 
-bboard pawns_able_to_push(bboard pawns, bboard empty, int color) {
+uint64_t pawns_able_to_push(uint64_t pawns, uint64_t empty, int color) {
     switch(color) {
         case WHITE:
             return w_pawns_able_to_push(pawns, empty);
@@ -142,7 +142,7 @@ bboard pawns_able_to_push(bboard pawns, bboard empty, int color) {
     }
 }
 
-bboard pawns_able_to_double_push(bboard pawns, bboard empty, int color) {
+uint64_t pawns_able_to_double_push(uint64_t pawns, uint64_t empty, int color) {
     switch(color) {
         case WHITE:
             return w_pawns_able_to_double_push(pawns, empty);
@@ -158,30 +158,30 @@ bboard pawns_able_to_double_push(bboard pawns, bboard empty, int color) {
  *  Pawn lever functions
  */
 
-bboard w_east_lever(bboard wpawns, bboard bpawns) {
+uint64_t w_east_lever(uint64_t wpawns, uint64_t bpawns) {
     return wpawns & b_pawn_west_attacks(bpawns);
 }
 
-bboard w_west_lever(bboard wpawns, bboard bpawns) {
+uint64_t w_west_lever(uint64_t wpawns, uint64_t bpawns) {
     return wpawns & b_pawn_east_attacks(bpawns);
 }
 
-bboard w_any_lever(bboard wpawns, bboard bpawns) {
+uint64_t w_any_lever(uint64_t wpawns, uint64_t bpawns) {
     return w_east_lever(wpawns, bpawns) | 
         w_west_lever(wpawns, bpawns);
 }
 
 
 
-bboard b_east_lever(bboard wpawns, bboard bpawns) {
+uint64_t b_east_lever(uint64_t wpawns, uint64_t bpawns) {
     return bpawns & w_pawn_west_attacks(wpawns);
 }
 
-bboard b_west_lever(bboard wpawns, bboard bpawns) {
+uint64_t b_west_lever(uint64_t wpawns, uint64_t bpawns) {
     return bpawns & w_pawn_east_attacks(wpawns);
 }
 
-bboard b_any_lever(bboard wpawns, bboard bpawns) {
+uint64_t b_any_lever(uint64_t wpawns, uint64_t bpawns) {
     return b_east_lever(wpawns, bpawns) | 
         b_west_lever(wpawns, bpawns);
 }
@@ -190,12 +190,12 @@ bboard b_any_lever(bboard wpawns, bboard bpawns) {
  *  Static exchange eval for pawn attacks
  */
 
-bboard w_safe_pawn_squares(bboard wpawns, bboard bpawns) {
+uint64_t w_safe_pawn_squares(uint64_t wpawns, uint64_t bpawns) {
     return w_pawn_double_attacks(wpawns) | ~b_pawn_any_attacks(bpawns) |
         (w_pawn_single_attacks(wpawns) & ~b_pawn_double_attacks(bpawns));
 }
 
-bboard b_safe_pawn_squares(bboard wpawns, bboard bpawns) {
+uint64_t b_safe_pawn_squares(uint64_t wpawns, uint64_t bpawns) {
     return b_pawn_double_attacks(bpawns) | ~w_pawn_any_attacks(wpawns) |
         (b_pawn_single_attacks(bpawns) & ~w_pawn_double_attacks(wpawns));
 }
@@ -204,32 +204,32 @@ bboard b_safe_pawn_squares(bboard wpawns, bboard bpawns) {
  *  Pawn captures: returns set of pawns able to capture
  */
 
-bboard w_pawns_able_to_capture_east(bboard wpawns, bboard bpieces) {
+uint64_t w_pawns_able_to_capture_east(uint64_t wpawns, uint64_t bpieces) {
     return wpawns & b_pawn_west_attacks(bpieces);
 }
 
-bboard w_pawns_able_to_capture_west(bboard wpawns, bboard bpieces) {
+uint64_t w_pawns_able_to_capture_west(uint64_t wpawns, uint64_t bpieces) {
     return wpawns & b_pawn_east_attacks(bpieces);
 }
 
-bboard w_pawns_able_to_capture_any(bboard wpawns, bboard bpieces) {
+uint64_t w_pawns_able_to_capture_any(uint64_t wpawns, uint64_t bpieces) {
     return wpawns & b_pawn_any_attacks(bpieces);
 }
 
 
-bboard b_pawns_able_to_capture_east(bboard bpawns, bboard wpieces) {
+uint64_t b_pawns_able_to_capture_east(uint64_t bpawns, uint64_t wpieces) {
     return bpawns & w_pawn_west_attacks(wpieces);
 }
 
-bboard b_pawns_able_to_capture_west(bboard bpawns, bboard wpieces) {
+uint64_t b_pawns_able_to_capture_west(uint64_t bpawns, uint64_t wpieces) {
     return bpawns & w_pawn_east_attacks(wpieces);
 }
 
-bboard b_pawns_able_to_capture_any(bboard bpawns, bboard wpieces) {
+uint64_t b_pawns_able_to_capture_any(uint64_t bpawns, uint64_t wpieces) {
     return bpawns & w_pawn_any_attacks(wpieces);
 }
 
-bboard pawns_able_to_capture_east(bboard pawns, bboard pieces, int color) {
+uint64_t pawns_able_to_capture_east(uint64_t pawns, uint64_t pieces, int color) {
     switch(color) {
         case WHITE:
             return w_pawns_able_to_capture_east(pawns, pieces);
@@ -241,7 +241,7 @@ bboard pawns_able_to_capture_east(bboard pawns, bboard pieces, int color) {
     }
 }
 
-bboard pawns_able_to_capture_west(bboard pawns, bboard pieces, int color) {
+uint64_t pawns_able_to_capture_west(uint64_t pawns, uint64_t pieces, int color) {
     switch(color) {
         case WHITE:
             return w_pawns_able_to_capture_west(pawns, pieces);
@@ -253,7 +253,7 @@ bboard pawns_able_to_capture_west(bboard pawns, bboard pieces, int color) {
     }
 }
 
-bboard pawns_able_to_capture_any(bboard pawns, bboard pieces, int color) {
+uint64_t pawns_able_to_capture_any(uint64_t pawns, uint64_t pieces, int color) {
     switch(color) {
         case WHITE:
             return w_pawns_able_to_capture_any(pawns, pieces);
@@ -265,7 +265,7 @@ bboard pawns_able_to_capture_any(bboard pawns, bboard pieces, int color) {
     }
 }
 
-bboard pawn_capture_targets(bboard pawns, bboard pieces, int color) {
+uint64_t pawn_capture_targets(uint64_t pawns, uint64_t pieces, int color) {
     switch(color) {
         case WHITE:
             return w_pawn_capture_targets(pawns, pieces);
@@ -281,19 +281,19 @@ bboard pawn_capture_targets(bboard pawns, bboard pieces, int color) {
  *  returns defended pawns
  */
 
-bboard w_pawn_defended_from_west(bboard wpawns) {
+uint64_t w_pawn_defended_from_west(uint64_t wpawns) {
     return wpawns & w_pawn_east_attacks(wpawns);
 }
 
-bboard w_pawn_defended_from_east(bboard wpawns) {
+uint64_t w_pawn_defended_from_east(uint64_t wpawns) {
     return wpawns & w_pawn_west_attacks(wpawns);
 }
 
-bboard b_pawn_defended_from_west(bboard bpawns) {
+uint64_t b_pawn_defended_from_west(uint64_t bpawns) {
     return bpawns & b_pawn_east_attacks(bpawns);
 }
 
-bboard b_pawn_defended_from_east(bboard bpawns) {
+uint64_t b_pawn_defended_from_east(uint64_t bpawns) {
     return bpawns & b_pawn_west_attacks(bpawns);
 }
 
@@ -301,19 +301,19 @@ bboard b_pawn_defended_from_east(bboard bpawns) {
  *  returns pawn defenders
  */
 
-bboard w_pawn_defenders_from_west(bboard wpawns) {
+uint64_t w_pawn_defenders_from_west(uint64_t wpawns) {
     return wpawns & b_pawn_west_attacks(wpawns);
 }
 
-bboard w_pawn_defenders_from_east(bboard wpawns) {
+uint64_t w_pawn_defenders_from_east(uint64_t wpawns) {
     return wpawns & b_pawn_east_attacks(wpawns);
 }
 
-bboard b_pawn_defenders_from_west(bboard bpawns) {
+uint64_t b_pawn_defenders_from_west(uint64_t bpawns) {
     return bpawns & w_pawn_west_attacks(bpawns);
 }
 
-bboard b_pawn_defenders_from_east(bboard bpawns) {
+uint64_t b_pawn_defenders_from_east(uint64_t bpawns) {
     return bpawns & w_pawn_east_attacks(bpawns);
 }
 
@@ -321,11 +321,11 @@ bboard b_pawn_defenders_from_east(bboard bpawns) {
  *  returns pawns with neighbors
  */
 
-bboard pawns_with_east_adj_neighbors(bboard pawns) {
+uint64_t pawns_with_east_adj_neighbors(uint64_t pawns) {
     return pawns & west_one(pawns);
 }
 
-bboard pawns_with_west_adj_neighbors(bboard pawns) {
+uint64_t pawns_with_west_adj_neighbors(uint64_t pawns) {
     return pawns & east_one(pawns);
 }
 
@@ -333,7 +333,7 @@ bboard pawns_with_west_adj_neighbors(bboard pawns) {
  *  returns closed files
  */
 
-bboard closed_files(bboard wpawns, bboard bpawns) {
+uint64_t closed_files(uint64_t wpawns, uint64_t bpawns) {
     return file_fill(wpawns) & file_fill(bpawns);
 }
 
@@ -341,7 +341,7 @@ bboard closed_files(bboard wpawns, bboard bpawns) {
  *  returns open files
  */
 
-bboard open_files(bboard wpawns, bboard bpawns) {
+uint64_t open_files(uint64_t wpawns, uint64_t bpawns) {
     return ~file_fill(wpawns | bpawns);
 }
 
@@ -350,11 +350,11 @@ bboard open_files(bboard wpawns, bboard bpawns) {
  *  returns half-open files
  */
 
-bboard w_half_open_files(bboard wpawns, bboard bpawns) {
+uint64_t w_half_open_files(uint64_t wpawns, uint64_t bpawns) {
     return ~file_fill(wpawns) ^ open_files(wpawns, bpawns);
 }
 
-bboard b_half_open_files(bboard wpawns, bboard bpawns) {
+uint64_t b_half_open_files(uint64_t wpawns, uint64_t bpawns) {
     return ~file_fill(bpawns) ^ open_files(wpawns, bpawns);
 }
 
@@ -366,12 +366,12 @@ bboard b_half_open_files(bboard wpawns, bboard bpawns) {
  *  Filesets 
  */
 
-fset bboard_to_fset(bboard pawns) {
+fset bboard_to_fset(uint64_t pawns) {
     return (fset)south_fill(pawns);
 }
 
-bboard fset_to_file_fill(fset f) {
-    bboard fill = f;
+uint64_t fset_to_file_fill(fset f) {
+    uint64_t fill = f;
     return fill * BITBOARD_AFILE;
 }
 
@@ -397,24 +397,24 @@ fset islands_west_files(fset pawns) {
  *  Pawn Isolanis and Hanging Pawns
  */
 
-bboard no_east_neighbors(bboard pawns) {
+uint64_t no_east_neighbors(uint64_t pawns) {
     return pawns & ~west_attack_file_fill(pawns);
 }
 
-bboard no_west_neighbors(bboard pawns) {
+uint64_t no_west_neighbors(uint64_t pawns) {
     return pawns & ~east_attack_file_fill(pawns);
 }
 
-bboard isolanis(bboard pawns) {
+uint64_t isolanis(uint64_t pawns) {
     return no_east_neighbors(pawns) & no_west_neighbors(pawns);
 }
 
-bboard half_isolanis(bboard pawns) {
+uint64_t half_isolanis(uint64_t pawns) {
     return no_east_neighbors(pawns) ^ no_west_neighbors(pawns);
 }
 
 /* TODO: hanging pawns */
-bboard hanging_pawns() {
+uint64_t hanging_pawns() {
     return 0;
 }
 
@@ -422,11 +422,11 @@ bboard hanging_pawns() {
  *  Unfree pawns
  */
 
-bboard w_unfree_pawns(bboard wpawns, bboard bpawns) {
+uint64_t w_unfree_pawns(uint64_t wpawns, uint64_t bpawns) {
     return wpawns & b_front_span(bpawns);
 }
 
-bboard b_unfree_pawns(bboard wpawns, bboard bpawns) {
+uint64_t b_unfree_pawns(uint64_t wpawns, uint64_t bpawns) {
     return bpawns & w_front_span(wpawns);
 }
 
@@ -434,11 +434,11 @@ bboard b_unfree_pawns(bboard wpawns, bboard bpawns) {
  *  Open pawns (opposite of unfree pawns)
  */
 
-bboard w_open_pawns(bboard wpawns, bboard bpawns) {
+uint64_t w_open_pawns(uint64_t wpawns, uint64_t bpawns) {
     return wpawns & ~b_front_span(bpawns);
 }
 
-bboard b_open_pawns(bboard wpawns, bboard bpawns) {
+uint64_t b_open_pawns(uint64_t wpawns, uint64_t bpawns) {
     return bpawns & ~w_front_span(wpawns);
 }
 
@@ -446,14 +446,14 @@ bboard b_open_pawns(bboard wpawns, bboard bpawns) {
  *  Passed Pawns
  */
 
-bboard w_passed_pawns(bboard wpawns, bboard bpawns) {
-    bboard all_front_spans = b_front_span(bpawns);
+uint64_t w_passed_pawns(uint64_t wpawns, uint64_t bpawns) {
+    uint64_t all_front_spans = b_front_span(bpawns);
     all_front_spans |= east_one(all_front_spans) | west_one(all_front_spans);
     return wpawns & ~all_front_spans;
 }
 
-bboard b_passed_pawns(bboard wpawns, bboard bpawns) {
-    bboard all_front_spans = w_front_span(wpawns);
+uint64_t b_passed_pawns(uint64_t wpawns, uint64_t bpawns) {
+    uint64_t all_front_spans = w_front_span(wpawns);
     all_front_spans |= east_one(all_front_spans) | west_one(all_front_spans);
     return bpawns & ~all_front_spans;
 }
@@ -467,19 +467,19 @@ bboard b_passed_pawns(bboard wpawns, bboard bpawns) {
  *   Backward Pawns
  */
 
-bboard w_backward(bboard wpawns, bboard bpawns) {
-    bboard w_attack_spans = w_east_attack_front_span(wpawns) | 
+uint64_t w_backward(uint64_t wpawns, uint64_t bpawns) {
+    uint64_t w_attack_spans = w_east_attack_front_span(wpawns) | 
         w_west_attack_front_span(wpawns);
-    bboard b_attacks = b_pawn_east_attacks(bpawns) |
+    uint64_t b_attacks = b_pawn_east_attacks(bpawns) |
         b_pawn_west_attacks(bpawns);
     return south_fill(b_attacks & ~w_attack_spans) &
         w_open_pawns(wpawns, bpawns);
 }
 
-bboard b_backward(bboard wpawns, bboard bpawns) {
-    bboard b_attack_spans = b_east_attack_front_span(bpawns) | 
+uint64_t b_backward(uint64_t wpawns, uint64_t bpawns) {
+    uint64_t b_attack_spans = b_east_attack_front_span(bpawns) | 
         b_west_attack_front_span(bpawns);
-    bboard w_attacks = w_pawn_east_attacks(wpawns) |
+    uint64_t w_attacks = w_pawn_east_attacks(wpawns) |
         w_pawn_west_attacks(wpawns);
     return north_fill(w_attacks & ~b_attack_spans) &
         b_open_pawns(wpawns, bpawns);

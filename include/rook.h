@@ -4,5 +4,5 @@
 #include "bitboard.h"
 
 extern const magic_entry rook_magic_table[64];
-bboard rook_attacks(bboard, bboard);
+uint64_t rook_attacks(uint64_t, uint64_t);
 #endif

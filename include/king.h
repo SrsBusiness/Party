@@ -3,7 +3,7 @@
 
 #include "bitboard.h"
 
-bboard king_attacks(bboard);
+uint64_t king_attacks(uint64_t);
 
 
 #endif

@@ -183,49 +183,48 @@
 //#define rook_attacks(x) (nortOccl(x) | eastOccl(x) | soutOccl(x) | westOccl(x))
 //#define queen_attacks(x) (bishop_attacks(x) | rook_attacks(x))
 
-typedef uint64_t bboard;
 // square of passed pawns
 
-extern const bboard square_pp[64];
+extern const uint64_t square_pp[64];
 
 // for black's pov, just vertical flip the index, index into the table, then
 // vertical flip the bitboard.
 
 
 #define fliph(x)        fliph0(x)
-bboard fliph0 (bboard x);
-bboard fliph1 (bboard x);
-bboard fliph2 (bboard x);
+uint64_t fliph0 (uint64_t x);
+uint64_t fliph1 (uint64_t x);
+uint64_t fliph2 (uint64_t x);
 
 
-bboard flipld(bboard);
-bboard flipdd(bboard);
-bboard rotate_pi(bboard);
-bboard rotate_clockwise(bboard);
-bboard rotate_anticlockwise(bboard);
+uint64_t flipld(uint64_t);
+uint64_t flipdd(uint64_t);
+uint64_t rotate_pi(uint64_t);
+uint64_t rotate_clockwise(uint64_t);
+uint64_t rotate_anticlockwise(uint64_t);
 
-bboard north_span(bboard);
-bboard south_span(bboard);
-bboard east_span(bboard);
-bboard west_span(bboard);
-bboard ne_span(bboard);
-bboard nw_span(bboard);
-bboard se_span(bboard);
-bboard sw_span(bboard);
+uint64_t north_span(uint64_t);
+uint64_t south_span(uint64_t);
+uint64_t east_span(uint64_t);
+uint64_t west_span(uint64_t);
+uint64_t ne_span(uint64_t);
+uint64_t nw_span(uint64_t);
+uint64_t se_span(uint64_t);
+uint64_t sw_span(uint64_t);
 
 #define w_front_span(x) (north_span(x))
 #define w_rear_span(x)  (south_span(x))
 #define b_front_span(x) (south_span(x))
 #define b_rear_span(x)  (north_span(x))
 
-bboard north_fill(bboard);
-bboard south_fill(bboard);
-bboard east_fill(bboard);
-bboard west_fill(bboard);
-bboard ne_fill(bboard);
-bboard nw_fill(bboard);
-bboard se_fill(bboard);
-bboard sw_fill(bboard);
+uint64_t north_fill(uint64_t);
+uint64_t south_fill(uint64_t);
+uint64_t east_fill(uint64_t);
+uint64_t west_fill(uint64_t);
+uint64_t ne_fill(uint64_t);
+uint64_t nw_fill(uint64_t);
+uint64_t se_fill(uint64_t);
+uint64_t sw_fill(uint64_t);
 
 #define w_front_fill(x) (north_fill(x))
 #define w_rear_fill(x)  (south_fill(x))
@@ -233,17 +232,17 @@ bboard sw_fill(bboard);
 #define b_rear_fill(x)  (north_fill(x))
 
 #define file_fill(x)    (north_fill(x) | south_fill(x))
-bboard south_occluded_fill(bboard, bboard);
-bboard north_occluded_fill(bboard, bboard);
-bboard east_occluded_fill(bboard, bboard);
-bboard ne_occluded_fill(bboard, bboard);
-bboard se_occluded_fill(bboard, bboard);
-bboard west_occluded_fill(bboard, bboard);
-bboard sw_occluded_fill(bboard, bboard);
-bboard nw_occluded_fill(bboard, bboard);
+uint64_t south_occluded_fill(uint64_t, uint64_t);
+uint64_t north_occluded_fill(uint64_t, uint64_t);
+uint64_t east_occluded_fill(uint64_t, uint64_t);
+uint64_t ne_occluded_fill(uint64_t, uint64_t);
+uint64_t se_occluded_fill(uint64_t, uint64_t);
+uint64_t west_occluded_fill(uint64_t, uint64_t);
+uint64_t sw_occluded_fill(uint64_t, uint64_t);
+uint64_t nw_occluded_fill(uint64_t, uint64_t);
 
-// iterate through all pieces in a bboard
-// bboard b;
+// iterate through all pieces in a uint64_t
+// uint64_t b;
 // while(b){
 //     int index = __builtin_ctz(b);
 //     ...
@@ -251,27 +250,27 @@ bboard nw_occluded_fill(bboard, bboard);
 //
 // }
 
-void display_bboard(bboard, int, int);
+void display_uint64_t(uint64_t, int, int);
 void display_text(char *, int, int);
 
 typedef struct _magic_entry {
-    const bboard *attack_table; /* lookup table of attack sets */
-    bboard mask;    /* occupancy mask */
-    bboard magic;   /* magic number */
+    const uint64_t *attack_table; /* lookup table of attack sets */
+    uint64_t mask;    /* occupancy mask */
+    uint64_t magic;   /* magic number */
     int shift;  /* how much to shift by */
 } magic_entry;
 
 typedef struct _board_flags {
     int castle_q[2];    /* 0 if either king or queen rook has moved, 1 otherwise */
     int castle_k[2];    /* 0 if either king or king rook has moved, 1 otherwise */
-    bboard en_passant[2];  /* bitboard of pawns that have just double pushed */
+    uint64_t en_passant[2];  /* bitboard of pawns that have just double pushed */
 } board_flags;
 
 typedef struct _board_state {
     //char board88[64];
     int turn;   /* 0 if white, 1 if black */
     /* bitboards */
-    bboard bb[2][7];
+    uint64_t bb[2][7];
     board_flags flags;
 } board_state;
 
@@ -283,7 +282,7 @@ typedef struct _board_state {
 
 typedef struct _move {
     int p_mover, s_mover, t_mover;
-    bboard primary, secondary, tertiary;
+    uint64_t primary, secondary, tertiary;
 } move;
 
 #define all_pieces(x) ((x)->bb[WHITE][KING] | (x)->bb[BLACK][KING] | (x)->bb[WHITE][QUEEN] |\
