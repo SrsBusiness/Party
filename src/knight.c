@@ -1,14 +1,14 @@
 #include "knight.h"
 
 bboard knight_attacks0(bboard b){
-    return ((b << 17) & ~AFILE) |
-        ((b << 10) & ~AFILE & ~BFILE) |
-        ((b >>  6) & ~AFILE & ~BFILE) |
-        ((b >> 15) & ~AFILE) |
-        ((b << 15) & ~HFILE) |
-        ((b <<  6) & ~GFILE & ~HFILE) |
-        ((b >> 10) & ~GFILE & ~HFILE) |
-        ((b >> 17) & ~HFILE);
+    return ((b << 17) & ~BITBOARD_AFILE) |
+        ((b << 10) & ~BITBOARD_AFILE & ~BITBOARD_BFILE) |
+        ((b >>  6) & ~BITBOARD_AFILE & ~BITBOARD_BFILE) |
+        ((b >> 15) & ~BITBOARD_AFILE) |
+        ((b << 15) & ~BITBOARD_HFILE) |
+        ((b <<  6) & ~BITBOARD_GFILE & ~BITBOARD_HFILE) |
+        ((b >> 10) & ~BITBOARD_GFILE & ~BITBOARD_HFILE) |
+        ((b >> 17) & ~BITBOARD_HFILE);
 }
 
 bboard knight_attacks1(bboard knights){
@@ -25,10 +25,10 @@ bboard knight_attacks1(bboard knights){
 }
 
 bboard knight_attacks2(bboard knights) {
-    bboard l1 = (knights >> 1) & ~HFILE;
-    bboard l2 = (knights >> 2) & ~GFILE & ~HFILE;
-    bboard r1 = (knights << 1) & ~AFILE;
-    bboard r2 = (knights << 2) & ~AFILE & ~BFILE;
+    bboard l1 = (knights >> 1) & ~BITBOARD_HFILE;
+    bboard l2 = (knights >> 2) & ~BITBOARD_GFILE & ~BITBOARD_HFILE;
+    bboard r1 = (knights << 1) & ~BITBOARD_AFILE;
+    bboard r2 = (knights << 2) & ~BITBOARD_AFILE & ~BITBOARD_BFILE;
     bboard h1 = l1 | r1;
     bboard h2 = l2 | r2;
     return (h1<<16) | (h1>>16) | (h2<<8) | (h2>>8);

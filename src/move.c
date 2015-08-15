@@ -72,6 +72,32 @@
  * 
  **/
 
+const board_state initial_state = {
+    WHITE,
+    {{
+        BITBOARD_KING   & BITBOARD_WHITE,
+        BITBOARD_QUEEN  & BITBOARD_WHITE,
+        BITBOARD_BISHOP & BITBOARD_WHITE,
+        BITBOARD_KNIGHT & BITBOARD_WHITE,
+        BITBOARD_ROOK   & BITBOARD_WHITE,
+        BITBOARD_PAWN   & BITBOARD_WHITE,
+        BITBOARD_WHITE
+    }, {
+        BITBOARD_KING   & BITBOARD_BLACK,
+        BITBOARD_QUEEN  & BITBOARD_BLACK,
+        BITBOARD_BISHOP & BITBOARD_BLACK,
+        BITBOARD_KNIGHT & BITBOARD_BLACK,
+        BITBOARD_ROOK   & BITBOARD_BLACK,
+        BITBOARD_PAWN   & BITBOARD_BLACK,
+        BITBOARD_BLACK
+    }},
+    {{1, 1}, {1, 1}, {0, 0}}
+};
+
+void board_init(board_state *board) {
+    *board = initial_state;
+}
+
 void bb_make(board_state *board, move *m) {
     /* primary mover */
     board->bb[board->turn][m->p_mover] ^= m->primary;

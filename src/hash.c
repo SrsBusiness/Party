@@ -1,6 +1,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <inttypes.h>
 #include "bitboard.h"
 #include "pawn.h"
 
@@ -371,6 +372,7 @@ uint64_t ZOBRIST_hash(board_state *board) {
             }
         }
     }
+    return hash;
 }
 
 void print_literal_keys() {
@@ -380,27 +382,27 @@ void print_literal_keys() {
         for (int j = 0; j < 6; j++) {
             printf("        {\n");
             for (int k = 0; k < 63; k += 3) {
-                printf("            0x%llX, 0x%llX, 0x%llX,\n",
+                printf("            0x%"PRIu64"X, 0x%"PRIu64"X, 0x%"PRIu64"X,\n",
                         ZOBRIST_piece_keys[i][j][k],
                         ZOBRIST_piece_keys[i][j][k + 1],
                         ZOBRIST_piece_keys[i][j][k + 2]);
             }
-            printf("            0x%llX\n", ZOBRIST_piece_keys[i][j][63]);
+            printf("            0x%"PRIu64"X\n", ZOBRIST_piece_keys[i][j][63]);
             printf("        },\n");
         }
         printf("    },\n");
     }
     printf("};\n");
 
-    printf("uint64_t ZOBRIST_castle_q_keys[2][2] = {0x%llX, 0x%llX};",
+    printf("uint64_t ZOBRIST_castle_q_keys[2][2] = {0x%"PRIu64"X, 0x%"PRIu64"X};\n",
             ZOBRIST_castle_q_keys[0], ZOBRIST_castle_q_keys[1]);
-    printf("uint64_t ZOBRIST_castle_k_keys[2][2] = {0x%llX, 0x%llX};",
+    printf("uint64_t ZOBRIST_castle_k_keys[2][2] = {0x%"PRIu64"X, 0x%"PRIu64"X};\n",
             ZOBRIST_castle_k_keys[0], ZOBRIST_castle_k_keys[1]);
 
     printf("uint64_t ZOBRIST_enpassant_keys[8] = {\n");
     for (int i = 0; i < 8; i++) {
-        printf("    0x%llX,\n", ZOBRIST_enpassant_keys[i]);
+        printf("    0x%"PRIu64"X,\n", ZOBRIST_enpassant_keys[i]);
     }
     printf("};\n");
-    printf("uint64_t ZOBRIST_turn_key = 0x%llX;\n", ZOBRIST_turn_key);
+    printf("uint64_t ZOBRIST_turn_key = 0x%"PRIu64"X;\n", ZOBRIST_turn_key);
 }

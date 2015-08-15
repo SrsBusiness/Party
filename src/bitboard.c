@@ -104,7 +104,7 @@ bboard south_span(bboard x){
 }
 
 bboard east_span(bboard x) {
-    bboard k1 = ~AFILE;
+    bboard k1 = ~BITBOARD_AFILE;
     bboard k2 = k1 & (k1 << 1);
     bboard k3 = k2 & (k2 << 2);
     x = (x << 1) & k1;
@@ -115,7 +115,7 @@ bboard east_span(bboard x) {
 }
 
 bboard west_span(bboard x) {
-    bboard k1 = ~HFILE;
+    bboard k1 = ~BITBOARD_HFILE;
     bboard k2 = k1 & (k1 >> 1);
     bboard k3 = k2 & (k2 >> 2);
     x = (x >> 1) & k1;
@@ -126,7 +126,7 @@ bboard west_span(bboard x) {
 }
 
 bboard ne_span(bboard x) {
-    bboard k1 = ~AFILE;
+    bboard k1 = ~BITBOARD_AFILE;
     bboard k2 = k1 & (k1 << 9);
     bboard k3 = k2 & (k2 << 18);
     x = (x << 9) & k1;
@@ -137,7 +137,7 @@ bboard ne_span(bboard x) {
 }
 
 bboard nw_span(bboard x) {
-    bboard k1 = ~HFILE;
+    bboard k1 = ~BITBOARD_HFILE;
     bboard k2 = k1 & (k1 << 7);
     bboard k3 = k2 & (k2 << 14);
     x = (x << 7) & k1;
@@ -148,7 +148,7 @@ bboard nw_span(bboard x) {
 }
 
 bboard se_span(bboard x) {
-    bboard k1 = ~AFILE;
+    bboard k1 = ~BITBOARD_AFILE;
     bboard k2 = k1 & (k1 >> 7);
     bboard k3 = k2 & (k2 >> 14);
     x = (x >> 7) & k1;
@@ -159,7 +159,7 @@ bboard se_span(bboard x) {
 }
 
 bboard sw_span(bboard x) {
-    bboard k1 = ~HFILE;
+    bboard k1 = ~BITBOARD_HFILE;
     bboard k2 = k1 & (k1 >> 9);
     bboard k3 = k2 & (k2 >> 18);
     x = (x >> 9) & k1;
@@ -184,7 +184,7 @@ bboard south_fill(bboard gen) {
 }
 
 bboard east_fill(bboard x) {
-    bboard k1 = ~AFILE;
+    bboard k1 = ~BITBOARD_AFILE;
     bboard k2 = k1 & (k1 << 1);
     bboard k3 = k2 & (k2 << 2);
     x |= (x << 1) & k1;
@@ -194,7 +194,7 @@ bboard east_fill(bboard x) {
 }
 
 bboard west_fill(bboard x) {
-    bboard k1 = ~HFILE;
+    bboard k1 = ~BITBOARD_HFILE;
     bboard k2 = k1 & (k1 >> 1);
     bboard k3 = k2 & (k2 >> 2);
     x |= (x >> 1) & k1;
@@ -204,7 +204,7 @@ bboard west_fill(bboard x) {
 }
 
 bboard ne_fill(bboard x) {
-    bboard k1 = ~AFILE;
+    bboard k1 = ~BITBOARD_AFILE;
     bboard k2 = k1 & (k1 << 9);
     bboard k3 = k2 & (k2 << 18);
     x |= (x << 9) & k1;
@@ -214,7 +214,7 @@ bboard ne_fill(bboard x) {
 }
 
 bboard nw_fill(bboard x) {
-    bboard k1 = ~HFILE;
+    bboard k1 = ~BITBOARD_HFILE;
     bboard k2 = k1 & (k1 << 7);
     bboard k3 = k2 & (k2 << 14);
     x |= (x << 7) & k1;
@@ -224,7 +224,7 @@ bboard nw_fill(bboard x) {
 }
 
 bboard se_fill(bboard x) {
-    bboard k1 = ~AFILE;
+    bboard k1 = ~BITBOARD_AFILE;
     bboard k2 = k1 & (k1 >> 7);
     bboard k3 = k2 & (k2 >> 14);
     x |= (x >> 7) & k1;
@@ -234,7 +234,7 @@ bboard se_fill(bboard x) {
 }
 
 bboard sw_fill(bboard x) {
-    bboard k1 = ~HFILE;
+    bboard k1 = ~BITBOARD_HFILE;
     bboard k2 = k1 & (k1 >> 9);
     bboard k3 = k2 & (k2 >> 18);
     x |= (x >> 9) & k1;
@@ -315,7 +315,7 @@ bboard north_occluded_fill(bboard gen, bboard pro) {
 }
 
 bboard east_occluded_fill(bboard gen, bboard pro) {
-    pro &= ~AFILE;
+    pro &= ~BITBOARD_AFILE;
     gen |= pro & (gen << 1);
     pro &= (pro << 1);
     gen |= pro & (gen << 2);
@@ -325,7 +325,7 @@ bboard east_occluded_fill(bboard gen, bboard pro) {
 }
 
 bboard ne_occluded_fill(bboard gen, bboard pro) {
-    pro &= ~AFILE;
+    pro &= ~BITBOARD_AFILE;
     gen |= pro & (gen << 9);
     pro &= (pro <<  9);
     gen |= pro & (gen << 18);
@@ -335,7 +335,7 @@ bboard ne_occluded_fill(bboard gen, bboard pro) {
 }
 
 bboard se_occluded_fill(bboard gen, bboard pro) {
-    pro &= ~AFILE;
+    pro &= ~BITBOARD_AFILE;
     gen |= pro & (gen >> 7);
     pro &= (pro >>  7);
     gen |= pro & (gen >> 14);
@@ -345,7 +345,7 @@ bboard se_occluded_fill(bboard gen, bboard pro) {
 }
 
 bboard west_occluded_fill(bboard gen, bboard pro) {
-    pro &= ~HFILE;
+    pro &= ~BITBOARD_HFILE;
     gen |= pro & (gen >> 1);
     pro &= (pro >> 1);
     gen |= pro & (gen >> 2);
@@ -355,7 +355,7 @@ bboard west_occluded_fill(bboard gen, bboard pro) {
 }
 
 bboard sw_occluded_fill(bboard gen, bboard pro) {
-    pro &= ~HFILE;
+    pro &= ~BITBOARD_HFILE;
     gen |= pro & (gen >> 9);
     pro &= (pro >>  9);
     gen |= pro & (gen >> 18);
@@ -365,7 +365,7 @@ bboard sw_occluded_fill(bboard gen, bboard pro) {
 }
 
 bboard nw_occluded_fill(bboard gen, bboard pro) {
-    pro &= ~HFILE;
+    pro &= ~BITBOARD_HFILE;
     gen |= pro & (gen << 7);
     pro &= (pro <<  7);
     gen |= pro & (gen << 14);

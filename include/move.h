@@ -1,5 +1,8 @@
 #include "bitboard.h"
 
+extern const board_state initial_state;
+
+void board_init(board_state *);
 void make(board_state *, move *);
 void unmake(board_state *, move *);
 

@@ -15,49 +15,6 @@ void generate_double_pushes(board_state *, move *, int *);
 void generate_pawn_captures(board_state *, move *, int *);
 void generate_en_passant(board_state *, move *, int *);
 
-static board_flags initial_flags = {{0, 0}, {1, 1}, {1, 1}};
-static bboard initial_bb[2][8] = {{
-    BB_KING & BB_WHITE,
-    BB_QUEEN & BB_WHITE,
-    BB_BISHOP & BB_WHITE,
-    BB_KNIGHT & BB_WHITE,
-    BB_ROOK & BB_WHITE,
-    BB_PAWN & BB_WHITE,
-    BB_WHITE,
-    SENTINAL,
-}, {
-    BB_KING & BB_BLACK,
-    BB_QUEEN & BB_BLACK,
-    BB_BISHOP & BB_BLACK,
-    BB_KNIGHT & BB_BLACK,
-    BB_ROOK & BB_BLACK,
-    BB_PAWN & BB_BLACK,
-    BB_BLACK,
-    SENTINAL,
-}};
-
-const board_state initial_state = {
-    0,
-    {{
-        BB_KING & BB_WHITE,
-        BB_QUEEN & BB_WHITE,
-        BB_BISHOP & BB_WHITE,
-        BB_KNIGHT & BB_WHITE,
-        BB_ROOK & BB_WHITE,
-        BB_PAWN & BB_WHITE,
-        BB_WHITE
-    }, {
-        BB_KING & BB_BLACK,
-        BB_QUEEN & BB_BLACK,
-        BB_BISHOP & BB_BLACK,
-        BB_KNIGHT & BB_BLACK,
-        BB_ROOK & BB_BLACK,
-        BB_PAWN & BB_BLACK,
-        BB_BLACK
-    }},
-    {{1, 1}, {1, 1}, {0, 0}}
-
-};
 
 static const uint8_t start_pos[64] = {
     ROOK, KNIGHT, BISHOP, QUEEN, KING, BISHOP, KNIGHT, ROOK,
@@ -69,12 +26,6 @@ static const uint8_t start_pos[64] = {
     PAWN | 0x80, PAWN | 0x80, PAWN | 0x80, PAWN | 0x80, PAWN | 0x80, PAWN | 0x80, PAWN | 0x80, PAWN | 0x80, 
     ROOK | 0x80, KNIGHT | 0x80, BISHOP | 0x80, QUEEN | 0x80, KING | 0x80, BISHOP | 0x80, KNIGHT | 0x80, ROOK | 0x80,
 };
-
-
-
-void board_init(board_state *board) {
-    *board = initial_state;
-}
 
 /* dumb because it considers every possible branch */
 int dumb_search(board_state *board, int alpha, int beta, int depth) {

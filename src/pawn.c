@@ -72,7 +72,7 @@ bboard w_single_push_targets(bboard wpawns, bboard empty) {
 
 bboard w_double_push_targets(bboard wpawns, bboard empty) {
     bboard single_pushs = w_single_push_targets(wpawns, empty);
-    return north_one(single_pushs) & empty & RANK4;
+    return north_one(single_pushs) & empty & BITBOARD_RANK4;
 }
 
 bboard b_single_push_targets(bboard bpawns, bboard empty) {
@@ -81,7 +81,7 @@ bboard b_single_push_targets(bboard bpawns, bboard empty) {
 
 bboard b_double_push_targets(bboard bpawns, bboard empty) {
     bboard single_pushs = b_single_push_targets(bpawns, empty);
-    return south_one(single_pushs) & empty & RANK5;
+    return south_one(single_pushs) & empty & BITBOARD_RANK5;
 }
 
 bboard single_push_targets(bboard pawns, bboard empty, int color) {
@@ -117,7 +117,7 @@ bboard w_pawns_able_to_push(bboard wpawns, bboard empty) {
 }
 
 bboard w_pawns_able_to_double_push(bboard wpawns, bboard empty) {
-    bboard emptyRank3 = south_one(empty & RANK4) & empty;
+    bboard emptyRank3 = south_one(empty & BITBOARD_RANK4) & empty;
     return w_pawns_able_to_push(wpawns, emptyRank3);
 }
 
@@ -126,7 +126,7 @@ bboard b_pawns_able_to_push(bboard bpawns, bboard empty) {
 }
 
 bboard b_pawns_able_to_double_push(bboard bpawns, bboard empty) {
-    bboard emptyRank6 = north_one(empty & RANK5) & empty;
+    bboard emptyRank6 = north_one(empty & BITBOARD_RANK5) & empty;
     return b_pawns_able_to_push(bpawns, emptyRank6);
 }
 
@@ -372,7 +372,7 @@ fset bboard_to_fset(bboard pawns) {
 
 bboard fset_to_file_fill(fset f) {
     bboard fill = f;
-    return fill * AFILE;
+    return fill * BITBOARD_AFILE;
 }
 
 /*
