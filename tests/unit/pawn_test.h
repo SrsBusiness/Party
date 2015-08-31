@@ -328,26 +328,27 @@ void pawns_with_west_adj_neighbors_test(void **state) {
 
 //bboard closed_files(bboard, bboard);
 void closed_files_test(void **state) {
-    assert_int_equal(AFILE | BFILE | FFILE,
+    assert_int_equal(BITBOARD_AFILE | BITBOARD_BFILE | BITBOARD_FFILE,
             closed_files(0x0000000000003300ul, 0x0023000000000000ul));
 }
 
 //bboard open_files(bboard, bboard);
 void open_files_test(void **state) {
-    assert_int_equal(CFILE | DFILE | GFILE | HFILE,
+    assert_int_equal(
+            BITBOARD_CFILE | BITBOARD_DFILE | BITBOARD_GFILE | BITBOARD_HFILE,
             open_files(0x0000000000003300ul, 0x0023000000000000ul));
 }
 
 //bboard w_half_open_files(bboard, bboard);
 void w_half_open_files_test(void **state) {
-    assert_int_equal(EFILE | GFILE,
+    assert_int_equal(BITBOARD_EFILE | BITBOARD_GFILE,
             w_half_open_files(0x000000000000AF00ul,
                 0x00FF000000000000ul));
 }
 
 //bboard b_half_open_files(bboard, bboard);
 void b_half_open_files_test(void **state) {
-    assert_int_equal(EFILE | GFILE,
+    assert_int_equal(BITBOARD_EFILE | BITBOARD_GFILE,
             b_half_open_files(0x000000000000FF00ul,
                 0x00AF000000000000ul));
 }
@@ -360,7 +361,8 @@ void bboard_to_fset_test(void **state) {
 
 //bboard fset_to_file_fill(fset f);
 void fset_to_file_fill_test(void **state) {
-    assert_int_equal(AFILE | CFILE | DFILE | FFILE,
+    assert_int_equal(
+            BITBOARD_AFILE | BITBOARD_CFILE | BITBOARD_DFILE | BITBOARD_FFILE,
             fset_to_file_fill(0x2D));
 }
 

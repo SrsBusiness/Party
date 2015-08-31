@@ -1,7 +1,7 @@
 #include "bishop.h"
 #include "magic.h"
 
-const magic_entry bishop_magic_table[64] = {
+const struct magic_entry bishop_magic_table[64] = {
     {bishop_0, 0x40201008040200, 0x4008100c40902201, 58},
     {bishop_1, 0x402010080400, 0x8080800d04030, 59},
     {bishop_2, 0x4020100a00, 0x504010409000401, 59},
@@ -70,6 +70,6 @@ const magic_entry bishop_magic_table[64] = {
 
 uint64_t bishop_attacks(uint64_t rook, uint64_t occupancy) {
     int index = lsb(rook);       
-    const magic_entry *m = &bishop_magic_table[index];
+    const struct magic_entry *m = &bishop_magic_table[index];
     return m->attack_table[((occupancy & m->mask) * m->magic) >> m->shift];
 }

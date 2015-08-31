@@ -2,8 +2,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <inttypes.h>
+#include <string.h>
 #include "bitboard.h"
 #include "pawn.h"
+
+uint64_t ZOBRIST_table_size;
+int32_t *ZOBRIST_transposition_table;
 
 /* Zobrist Hashing */
 int seed = 0x4CF10177;
@@ -342,7 +346,7 @@ void ZOBRIST_rng_init() {
     fread(&ZOBRIST_turn_key, 1, sizeof(ZOBRIST_turn_key), f);
 }
 
-uint64_t ZOBRIST_hash(board_state *board) {
+uint64_t ZOBRIST_hash(struct board_state *board) {
     uint64_t hash = 0ul;
     if (board->turn == BLACK) {
         hash ^= ZOBRIST_turn_key;
@@ -373,6 +377,12 @@ uint64_t ZOBRIST_hash(board_state *board) {
         }
     }
     return hash;
+}
+
+void ZOBRIST_transposition_init(uint64_t table_size) {
+    ZOBRIST_table_size = table_size;
+    ZOBRIST_transposition_table = malloc(sizeof(int32_t) * table_size);
+    memset(ZOBRIST_transposition_table, 0xFF, sizeof(int32_t) * table_size);
 }
 
 void print_literal_keys() {

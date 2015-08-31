@@ -7,6 +7,7 @@
 #include "bishop_test.h"
 #include "rook_test.h"
 #include "pqueue_test.h"
+#include "move_test.h"
 
 int main() {
     const struct CMUnitTest tests[] = {
@@ -124,13 +125,18 @@ int main() {
         cmocka_unit_test(exhaustive_bishop_magic_test),
         cmocka_unit_test(bishop_attacks_test),
 
-        /* rook test */
+        /* rook tests */
         cmocka_unit_test(exhaustive_rook_magic_test),
         cmocka_unit_test(rook_attacks_test),
 
-        /* priority queue test */
+        /* priority queue tests */
         cmocka_unit_test(priority_queue_push_test),
         cmocka_unit_test(priority_queue_pop_test),
+
+        /* move tests*/
+        cmocka_unit_test(normal_move_test),
+        cmocka_unit_test(capture_move_test),
+        cmocka_unit_test(promotion_capture_move_test),
     };
     return cmocka_run_group_tests(tests, NULL, NULL);
 }

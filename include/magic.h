@@ -1,3 +1,6 @@
+#ifndef MAGIC_H
+#define MAGIC_H
+
 #include "bitboard.h"
 extern const uint64_t rook_0[];
 extern const uint64_t rook_1[];
@@ -127,3 +130,5 @@ extern const uint64_t bishop_60[];
 extern const uint64_t bishop_61[];
 extern const uint64_t bishop_62[];
 extern const uint64_t bishop_63[];
+
+#endif

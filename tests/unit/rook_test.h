@@ -9,9 +9,9 @@
 void exhaustive_rook_magic_test(void **state) {
     int i;
     for (i = 0; i < 64; i++) {
-        const magic_entry *m = &rook_magic_table[i];
-        bboard occupancy = m->mask, n = 0;
-        bboard rook = 1ul << i;
+        const struct magic_entry *m = &rook_magic_table[i];
+        uint64_t occupancy = m->mask, n = 0;
+        uint64_t rook = 1ul << i;
         do {
             assert_int_equal(expected_rook_attacks(rook, n),
                     rook_attacks(rook, n));

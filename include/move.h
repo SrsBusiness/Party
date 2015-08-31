@@ -1,18 +1,13 @@
+#ifndef MOVE_H
+#define MOVE_H
+
 #include "bitboard.h"
+#include "pqueue.h"
 
-extern const board_state initial_state;
+extern const struct board_state BOARD_INITIAL_STATE;
 
-void board_init(board_state *);
-void make(board_state *, move *);
-void unmake(board_state *, move *);
+void board_init(struct board_state *);
+void make(struct board_state *, struct move *);
+void unmake(struct board_state *, struct move *, struct board_flags *);
 
-void generate_pawn_moves(board_state *board, move *candidates,
-        int *move_index);
-void generate_single_pushes(board_state *board, move *candidates, 
-        int *move_index);
-void generate_double_pushes(board_state *board, move *candidates, 
-        int *move_index);
-void generate_pawn_captures(board_state *board, move *candidates, 
-        int *move_index);
-void generate_en_passant(board_state *board, move *candidates, 
-        int *move_index);
+#endif

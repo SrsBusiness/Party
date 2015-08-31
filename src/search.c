@@ -9,13 +9,6 @@
 #include "eval.h"
 #include "bboard_utils.h"
 
-void generate_pawn_moves(board_state *, move *, int *);
-void generate_single_pushes(board_state *, move *, int *);
-void generate_double_pushes(board_state *, move *, int *);
-void generate_pawn_captures(board_state *, move *, int *);
-void generate_en_passant(board_state *, move *, int *);
-
-
 static const uint8_t start_pos[64] = {
     ROOK, KNIGHT, BISHOP, QUEEN, KING, BISHOP, KNIGHT, ROOK,
     PAWN, PAWN, PAWN, PAWN, PAWN, PAWN, PAWN, PAWN, 
@@ -28,7 +21,7 @@ static const uint8_t start_pos[64] = {
 };
 
 /* dumb because it considers every possible branch */
-int dumb_search(board_state *board, int alpha, int beta, int depth) {
+int dumb_search(struct board_state *board, int alpha, int beta, int depth) {
     if (depth <= 0) {
         /* return quiescent search */
         return compute_material(board);
@@ -38,7 +31,7 @@ int dumb_search(board_state *board, int alpha, int beta, int depth) {
      * unattainable. In case of bugs, check for buffer overflows with
      * candidates
      **/
-    move candidates[128]; int move_index = 0;
+    struct move candidates[128]; int move_index = 0;
     int score; 
 
     /*
@@ -48,7 +41,7 @@ int dumb_search(board_state *board, int alpha, int beta, int depth) {
     
     //generate_pawn_moves(board, candidates, &move_index);
 
-    board_state altered;
+    struct board_state altered;
     
     /* iterate through each move */
     int i;

@@ -14,7 +14,7 @@ int main(int argc, char **argv) {
     
     int depth = atoi(argv[1]);
 
-    board_state pos = initial_state;
+    struct board_state pos = BOARD_INITIAL_STATE;
 
     #ifdef DEBUG
     clear_line();
@@ -28,4 +28,5 @@ int main(int argc, char **argv) {
     ZOBRIST_prng_init(seed);
     printf("int seed = 0x%X;\n", seed);
     print_literal_keys();
+    printf("Sizeof bb: %llu\n", sizeof(pos.bb));
 }

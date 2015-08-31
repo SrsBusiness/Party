@@ -1,7 +1,7 @@
 #include "rook.h"
 #include "magic.h"
 
-const magic_entry rook_magic_table[64] = {
+const struct magic_entry rook_magic_table[64] = {
     {rook_0, 0x101010101017e, 0x8000884000a230, 52},
     {rook_1, 0x202020202027c, 0x1040100120004002, 53},
     {rook_2, 0x404040404047a, 0x62000a0020803041, 53},
@@ -70,6 +70,6 @@ const magic_entry rook_magic_table[64] = {
 
 uint64_t rook_attacks(uint64_t rook, uint64_t occupancy) {
     int index = lsb(rook);
-    const magic_entry *m = &rook_magic_table[index];
+    const struct magic_entry *m = &rook_magic_table[index];
     return m->attack_table[((occupancy & m->mask) * m->magic) >> m->shift];
 }

@@ -31,7 +31,7 @@ static char *piece_chars[6] = {
     BROOK,
     BPAWN
 };
-void print_board(board_state *board, int row, int col) {
+void print_board(struct board_state *board, int row, int col) {
     int i, j;
     int color, piece, file, rank;
     char *graph;
