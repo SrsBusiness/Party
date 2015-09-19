@@ -69,6 +69,8 @@ const struct magic_entry rook_magic_table[64] = {
 };
 
 uint64_t rook_attacks(uint64_t rook, uint64_t occupancy) {
+    if (!rook)
+        return 0ul;
     int index = lsb(rook);
     const struct magic_entry *m = &rook_magic_table[index];
     return m->attack_table[((occupancy & m->mask) * m->magic) >> m->shift];

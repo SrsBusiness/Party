@@ -68,8 +68,10 @@ const struct magic_entry bishop_magic_table[64] = {
     {bishop_63, 0x40201008040200, 0x2062089200820200, 58},
 };
 
-uint64_t bishop_attacks(uint64_t rook, uint64_t occupancy) {
-    int index = lsb(rook);       
+uint64_t bishop_attacks(uint64_t bishop, uint64_t occupancy) {
+    if (!bishop)
+        return 0ul;
+    int index = lsb(bishop);       
     const struct magic_entry *m = &bishop_magic_table[index];
     return m->attack_table[((occupancy & m->mask) * m->magic) >> m->shift];
 }

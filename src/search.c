@@ -7,7 +7,7 @@
 #include "search.h"
 #include "move.h"
 #include "eval.h"
-#include "bboard_utils.h"
+//#include "bboard_utils.h"
 
 static const uint8_t start_pos[64] = {
     ROOK, KNIGHT, BISHOP, QUEEN, KING, BISHOP, KNIGHT, ROOK,

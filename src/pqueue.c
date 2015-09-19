@@ -2,6 +2,10 @@
 #include <stdio.h>
 #include "pqueue.h"
 
+#ifdef UNIT_TEST
+#include "unit_tests.h"
+#endif
+
 #define pqueue_right_child(x) (2 * (x + 1))
 #define pqueue_left_child(x) (2 * (x) + 1)
 #define pqueue_parent(x) (((x) - 1) / 2)
@@ -62,4 +66,8 @@ void *priority_queue_pop(struct priority_queue *pqueue) {
     }
     queue[current] = queue[pqueue->length];
     return return_val;
+}
+
+void priority_queue_destroy(struct priority_queue *pqueue) {
+    free(pqueue->queue);
 }

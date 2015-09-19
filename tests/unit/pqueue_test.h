@@ -19,6 +19,7 @@ void priority_queue_push_test() {
     assert_int_equal(0, (int64_t)p.queue[7].data);
     assert_int_equal(3, (int64_t)p.queue[8].data);
     assert_int_equal(2, (int64_t)p.queue[9].data);
+    priority_queue_destroy(&p);
 }
 
 void priority_queue_pop_test() {
@@ -35,4 +36,5 @@ void priority_queue_pop_test() {
         assert_int_equal(i, data);
     }
     assert_int_equal(0, p.length);
+    priority_queue_destroy(&p);
 }

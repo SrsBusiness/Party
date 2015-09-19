@@ -24,6 +24,7 @@ $(OBJ)/%.o: $(SRC)/%.c | $(OBJ)
 	$(CC) $(OBJFLAGS) $< -o $@
 
 .PHONY: tests
+test: OBJFLAGS += -DUNIT_TEST
 test: $(OBJECTS)
 	$(CC) $(BINFLAGS) -o $(UNIT)/tests $(OBJECTS) $(UNIT)/*.c -lcmocka
 	$(UNIT)/tests

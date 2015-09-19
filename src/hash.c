@@ -6,6 +6,10 @@
 #include "bitboard.h"
 #include "pawn.h"
 
+#ifdef UNIT_TEST
+#include "unit_tests.h"
+#endif
+
 uint64_t ZOBRIST_table_size;
 int32_t *ZOBRIST_transposition_table;
 
