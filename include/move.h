@@ -99,4 +99,10 @@ void generate_king_moves_white(struct board_state *board,
 
 void generate_king_moves_black(struct board_state *board,
         struct priority_queue *moves);
+
+void generate_castle_white(struct board_state *board,
+        struct priority_queue *moves);
+
+void generate_castle_black(struct board_state *board,
+        struct priority_queue *moves);
 #endif

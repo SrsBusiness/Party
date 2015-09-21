@@ -150,28 +150,32 @@ void unmake(struct board_state *board, struct move *m, struct board_flags *resto
     board->flags = *restore;
 }
 
-/* Checks to see if color is in check */
-int in_check(struct board_state *board, int color) {
+uint64_t all_attacks(struct board_state *board, int color) {
     uint64_t attacks;
     switch (color) {
         case WHITE:
-            attacks = b_pawn_any_attacks(board->bb[BLACK][PAWN]);
-            break;
-        case BLACK:
             attacks = w_pawn_any_attacks(board->bb[WHITE][PAWN]);
             break;
+        case BLACK:
+            attacks = b_pawn_any_attacks(board->bb[BLACK][PAWN]);
+            break;
     }
-    attacks |= knight_attacks(board->bb[!color][KNIGHT]) |
-        bishop_attacks(board->bb[!color][BISHOP], board->bb[WHITE][ALL] |
+    attacks |= knight_attacks(board->bb[color][KNIGHT]) |
+        bishop_attacks(board->bb[color][BISHOP], board->bb[WHITE][ALL] |
                 board->bb[BLACK][ALL]) |
-        bishop_attacks(board->bb[!color][QUEEN], board->bb[WHITE][ALL] |
+        bishop_attacks(board->bb[color][QUEEN], board->bb[WHITE][ALL] |
                 board->bb[BLACK][ALL]) |
-        rook_attacks(board->bb[!color][ROOK], board->bb[WHITE][ALL] |
+        rook_attacks(board->bb[color][ROOK], board->bb[WHITE][ALL] |
                 board->bb[BLACK][ALL]) |
-        rook_attacks(board->bb[!color][QUEEN], board->bb[WHITE][ALL] |
+        rook_attacks(board->bb[color][QUEEN], board->bb[WHITE][ALL] |
                 board->bb[BLACK][ALL]) |
-        king_attacks(board->bb[!color][KING]);
-    return !!(attacks & board->bb[color][KING]);
+        king_attacks(board->bb[color][KING]);
+    return attacks;
+}
+
+/* Checks to see if color is in check */
+int in_check(struct board_state *board, int color) {
+    return !!(all_attacks(board, !color) & board->bb[color][KING]);
 }
 
 /* move generation */
@@ -1006,5 +1010,123 @@ void generate_knight_moves_black(struct board_state *board,
             attacks ^= attack;
         }
         knights ^= knight;
+    }
+}
+
+void generate_king_moves_white(struct board_state *board,
+        struct priority_queue *moves) {
+    uint64_t king = board->bb[WHITE][KING];
+    uint64_t attacks = king_attacks(king) & ~board->bb[WHITE][ALL] & ~all_attacks(board, BLACK);
+    while (attacks) {
+        uint64_t attack = attacks & -attacks;
+        struct move *m = calloc(1, sizeof(struct move));
+        m->p_mover = KING;
+        m->s_mover = NO_PIECE;
+        int captured_piece = piece_on_square(board, BLACK, attack);
+        m->t_mover = captured_piece;
+        m->primary = king | attack;
+        m->tertiary = captured_piece == NO_PIECE ? 0 : attack;
+        m->flags.castle_q[0] = king == BITBOARD_E1 ? 0 : board->flags.castle_q[0];
+        m->flags.castle_q[1] = attack == BITBOARD_A8 ? 0 : board->flags.castle_q[1];
+        m->flags.castle_k[0] = king == BITBOARD_E1 ? 0 : board->flags.castle_k[0];
+        m->flags.castle_k[1] = attack == BITBOARD_H8 ? 0 : board->flags.castle_k[1];
+        m->flags.en_passant[0] = m->flags.en_passant[1] = 0;
+        /* No need to check legality */
+        priority_queue_push(moves, m, 0);
+        attacks ^= attack;
+    }
+}
+
+void generate_king_moves_black(struct board_state *board,
+        struct priority_queue *moves) {
+    uint64_t king = board->bb[BLACK][KING];
+    uint64_t attacks = king_attacks(king) & ~board->bb[BLACK][ALL] & ~all_attacks(board, WHITE);
+    while (attacks) {
+        uint64_t attack = attacks & -attacks;
+        struct move *m = calloc(1, sizeof(struct move));
+        m->p_mover = KING;
+        m->s_mover = NO_PIECE;
+        int captured_piece = piece_on_square(board, WHITE, attack);
+        m->t_mover = captured_piece;
+        m->primary = king | attack;
+        m->tertiary = captured_piece == NO_PIECE ? 0 : attack;
+        m->flags.castle_q[0] = attack == BITBOARD_A1 ? 0 : board->flags.castle_q[0];
+        m->flags.castle_q[1] = king == BITBOARD_E8 ? 0 : board->flags.castle_q[1];
+        m->flags.castle_k[0] = attack == BITBOARD_H1 ? 0 : board->flags.castle_k[0];
+        m->flags.castle_k[1] = king == BITBOARD_E8 ? 0 : board->flags.castle_k[1];
+        m->flags.en_passant[0] = m->flags.en_passant[1] = 0;
+        /* No need to check legality */
+        priority_queue_push(moves, m, 0);
+        attacks ^= attack;
+    }
+}
+
+void generate_castle_white(struct board_state *board,
+        struct priority_queue *moves) {
+    uint64_t enemy_attacks = all_attacks(board, BLACK);
+    if (board->flags.castle_q[WHITE] &
+            !((BITBOARD_E1 | BITBOARD_D1 | BITBOARD_C1) & (enemy_attacks | board->bb[WHITE][ALL]))) {
+        struct move *m = calloc(1, sizeof(struct move));
+        m->p_mover = KING;
+        m->s_mover = ROOK;
+        m->t_mover = NO_PIECE;
+        m->primary = BITBOARD_E1 | BITBOARD_C1;
+        m->secondary = BITBOARD_A1 | BITBOARD_D1;
+        m->flags.castle_q[0] = 0;
+        m->flags.castle_q[1] = board->flags.castle_q[1];
+        m->flags.castle_k[0] = 0;
+        m->flags.castle_k[1] = board->flags.castle_k[1];
+        m->flags.en_passant[0] = m->flags.en_passant[1] = 0;
+        priority_queue_push(moves, m, 0);
+    }
+    if (board->flags.castle_k[WHITE] &
+            !((BITBOARD_E1 | BITBOARD_F1 | BITBOARD_G1) & (enemy_attacks | board->bb[WHITE][ALL]))) {
+        struct move *m = calloc(1, sizeof(struct move));
+        m->p_mover = KING;
+        m->s_mover = ROOK;
+        m->t_mover = NO_PIECE;
+        m->primary = BITBOARD_E1 | BITBOARD_G1;
+        m->secondary = BITBOARD_H1 | BITBOARD_F1;
+        m->flags.castle_q[0] = 0;
+        m->flags.castle_q[1] = board->flags.castle_q[1];
+        m->flags.castle_k[0] = 0;
+        m->flags.castle_k[1] = board->flags.castle_k[1];
+        m->flags.en_passant[0] = m->flags.en_passant[1] = 0;
+        priority_queue_push(moves, m, 0);
+    }
+}
+
+void generate_castle_black(struct board_state *board,
+        struct priority_queue *moves) {
+    uint64_t enemy_attacks = all_attacks(board, WHITE);
+    if (board->flags.castle_q[BLACK] &
+            !((BITBOARD_E8 | BITBOARD_D8 | BITBOARD_C8) & (enemy_attacks | board->bb[BLACK][ALL]))) {
+        struct move *m = calloc(1, sizeof(struct move));
+        m->p_mover = KING;
+        m->s_mover = ROOK;
+        m->t_mover = NO_PIECE;
+        m->primary = BITBOARD_E8 | BITBOARD_C8;
+        m->secondary = BITBOARD_A8 | BITBOARD_D8;
+        m->flags.castle_q[0] = board->flags.castle_q[0];
+        m->flags.castle_q[1] = 0;
+        m->flags.castle_k[0] = board->flags.castle_k[0];
+        m->flags.castle_k[1] = 0;
+        m->flags.en_passant[0] = m->flags.en_passant[1] = 0;
+        priority_queue_push(moves, m, 0);
+    }
+    if (board->flags.castle_k[BLACK] &
+            !((BITBOARD_E8 | BITBOARD_F8 | BITBOARD_G8) & (enemy_attacks | board->bb[BLACK][ALL]))) {
+        struct move *m = calloc(1, sizeof(struct move));
+        m->p_mover = KING;
+        m->s_mover = ROOK;
+        m->t_mover = NO_PIECE;
+        m->primary = BITBOARD_E8 | BITBOARD_G8;
+        m->secondary = BITBOARD_H8 | BITBOARD_F8;
+        m->flags.castle_q[0] = board->flags.castle_q[0];
+        m->flags.castle_q[1] = 0;
+        m->flags.castle_k[0] = board->flags.castle_k[0];
+        m->flags.castle_k[1] = 0;
+        m->flags.en_passant[0] = m->flags.en_passant[1] = 0;
+        priority_queue_push(moves, m, 0);
     }
 }
