@@ -8,7 +8,7 @@ extern const struct board_state BOARD_INITIAL_STATE;
 
 void board_init(struct board_state *);
 void make(struct board_state *, struct move *);
-void unmake(struct board_state *, struct move *, struct board_flags *);
+void unmake(struct board_state *, struct move *);
 int in_check(struct board_state *board, int color);
 
 /* Move generation functions 
@@ -43,6 +43,9 @@ generate_pawn_west_captures_promotions_white(struct board_state *board,
 void generate_pawn_en_passant_white(struct board_state *board,
         struct priority_queue *moves);
 
+void generate_pawn_moves_white(struct board_state *board,
+        struct priority_queue *moves);
+
 /* Black */
 void generate_pawn_single_pushes_black(struct board_state *board,
         struct priority_queue *moves);
@@ -70,6 +73,9 @@ generate_pawn_west_captures_promotions_black(struct board_state *board,
 void generate_pawn_en_passant_black(struct board_state *board,
         struct priority_queue *moves);
 
+void generate_pawn_moves_black(struct board_state *board,
+        struct priority_queue *moves);
+
 void generate_bishop_moves_white(struct board_state *board,
         struct priority_queue *moves);
 
@@ -82,7 +88,7 @@ void generate_rook_moves_white(struct board_state *board,
 void generate_rook_moves_black(struct board_state *board,
         struct priority_queue *moves);
 
-void generate_queen_moves_black(struct board_state *board,
+void generate_queen_moves_white(struct board_state *board,
         struct priority_queue *moves);
 
 void generate_queen_moves_black(struct board_state *board,
@@ -104,5 +110,11 @@ void generate_castle_white(struct board_state *board,
         struct priority_queue *moves);
 
 void generate_castle_black(struct board_state *board,
+        struct priority_queue *moves);
+
+void generate_moves_white(struct board_state *board,
+        struct priority_queue *moves);
+
+void generate_moves_black(struct board_state *board,
         struct priority_queue *moves);
 #endif

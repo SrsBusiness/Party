@@ -7,6 +7,7 @@
 #include "rook.h"
 #include "knight.h"
 #include "king.h"
+#include "bboard_utils.h"
 
 #ifdef UNIT_TEST
 #include "unit_tests.h"
@@ -144,10 +145,9 @@ void make(struct board_state *board, struct move *m) {
 }
 
 /* unused */
-void unmake(struct board_state *board, struct move *m, struct board_flags *restore) {
+void unmake(struct board_state *board, struct move *m) {
     board->turn = !board->turn;
     bb_make(board, m);
-    board->flags = *restore;
 }
 
 uint64_t all_attacks(struct board_state *board, int color) {
@@ -160,16 +160,24 @@ uint64_t all_attacks(struct board_state *board, int color) {
             attacks = b_pawn_any_attacks(board->bb[BLACK][PAWN]);
             break;
     }
-    attacks |= knight_attacks(board->bb[color][KNIGHT]) |
-        bishop_attacks(board->bb[color][BISHOP], board->bb[WHITE][ALL] |
-                board->bb[BLACK][ALL]) |
-        bishop_attacks(board->bb[color][QUEEN], board->bb[WHITE][ALL] |
-                board->bb[BLACK][ALL]) |
-        rook_attacks(board->bb[color][ROOK], board->bb[WHITE][ALL] |
-                board->bb[BLACK][ALL]) |
-        rook_attacks(board->bb[color][QUEEN], board->bb[WHITE][ALL] |
-                board->bb[BLACK][ALL]) |
-        king_attacks(board->bb[color][KING]);
+    uint64_t debug = bishop_attacks(board->bb[color][BISHOP], board->bb[WHITE][ALL] | board->bb[BLACK][ALL]);
+   
+    /* Diagonal Attacks */
+    uint64_t diags = board->bb[color][BISHOP] | board->bb[color][QUEEN];
+    while (diags) {
+        uint64_t diag = diags & -diags;
+        attacks |= bishop_attacks(diag, board->bb[WHITE][ALL] | board->bb[BLACK][ALL]);
+        diags ^= diag;
+    }
+    /* Lateral Attacks */
+    uint64_t laterals = board->bb[color][ROOK] | board->bb[color][QUEEN];
+    while (laterals) {
+        uint64_t lateral = laterals & -laterals;
+        attacks |= rook_attacks(lateral, board->bb[WHITE][ALL] | board->bb[BLACK][ALL]);
+        laterals ^= lateral;
+    }
+    attacks |= (knight_attacks(board->bb[color][KNIGHT]) |
+        king_attacks(board->bb[color][KING]));
     return attacks;
 }
 
@@ -207,6 +215,8 @@ void generate_pawn_single_pushes_white(struct board_state *board,
         if (!in_check(&tmp, WHITE)) {
             /* TODO: Priority Computation */
             priority_queue_push(moves, m, 0);
+        } else {
+            free(m);
         }
         pawns ^= pawn;
     }
@@ -242,6 +252,8 @@ void generate_pawn_push_promotions_white(struct board_state *board,
             if (!in_check(&tmp, WHITE)) {
                 /* TODO: Priority Computation */
                 priority_queue_push(moves, m, 0);
+            } else {
+                free(m);
             }
         }
         pawns ^= pawn;
@@ -276,6 +288,8 @@ void generate_pawn_double_pushes_white(struct board_state *board,
         if (!in_check(&tmp, WHITE)) {
             /* TODO: Priority Computation */
             priority_queue_push(moves, m, 0);
+        } else {
+            free(m);
         }
         pawns ^= pawn;
     }
@@ -309,6 +323,8 @@ void generate_pawn_east_captures_white(struct board_state *board,
         if (!in_check(&tmp, WHITE)) {
             /* TODO: Priority Computation */
             priority_queue_push(moves, m, 0);
+        } else {
+            free(m);
         }
         pawns ^= pawn;
     }
@@ -342,6 +358,8 @@ void generate_pawn_west_captures_white(struct board_state *board,
         if (!in_check(&tmp, WHITE)) {
             /* TODO: Priority Computation */
             priority_queue_push(moves, m, 0);
+        } else {
+            free(m);
         }
         pawns ^= pawn;
     }
@@ -380,6 +398,8 @@ generate_pawn_east_captures_promotions_white(struct board_state *board,
             if (!in_check(&tmp, WHITE)) {
                 /* TODO: Priority Computation */
                 priority_queue_push(moves, m, 0);
+            } else {
+                free(m);
             }
         }
         pawns ^= pawn;
@@ -419,6 +439,8 @@ generate_pawn_west_captures_promotions_white(struct board_state *board,
             if (!in_check(&tmp, WHITE)) {
                 /* TODO: Priority Computation */
                 priority_queue_push(moves, m, 0);
+            } else {
+                free(m);
             }
         }
         pawns ^= pawn;
@@ -456,9 +478,23 @@ void generate_pawn_en_passant_white(struct board_state *board,
         if (!in_check(&tmp, WHITE)) {
             /* TODO: Priority Computation */
             priority_queue_push(moves, m, 0);
+        } else {
+            free(m);
         }
         pawns ^= pawn;
     }
+}
+
+void generate_pawn_moves_white(struct board_state *board,
+        struct priority_queue *moves) {
+    generate_pawn_single_pushes_white(board, moves);
+    generate_pawn_push_promotions_white(board, moves);
+    generate_pawn_double_pushes_white(board, moves);
+    generate_pawn_east_captures_white(board, moves);
+    generate_pawn_west_captures_white(board, moves);
+    generate_pawn_east_captures_promotions_white(board, moves);
+    generate_pawn_west_captures_promotions_white(board, moves);
+    generate_pawn_en_passant_white(board, moves);
 }
 
 /* Black */
@@ -489,6 +525,8 @@ void generate_pawn_single_pushes_black(struct board_state *board,
         if (!in_check(&tmp, BLACK)) {
             /* TODO: Priority Computation */
             priority_queue_push(moves, m, 0);
+        } else {
+            free(m);
         }
         pawns ^= pawn;
     }
@@ -524,6 +562,8 @@ void generate_pawn_push_promotions_black(struct board_state *board,
             if (!in_check(&tmp, BLACK)) {
                 /* TODO: Priority Computation */
                 priority_queue_push(moves, m, 0);
+            } else {
+                free(m);
             }
         }
         pawns ^= pawn;
@@ -558,6 +598,8 @@ void generate_pawn_double_pushes_black(struct board_state *board,
         if (!in_check(&tmp, BLACK)) {
             /* TODO: Priority Computation */
             priority_queue_push(moves, m, 0);
+        } else {
+            free(m);
         }
         pawns ^= pawn;
     }
@@ -591,6 +633,8 @@ void generate_pawn_east_captures_black(struct board_state *board,
         if (!in_check(&tmp, BLACK)) {
             /* TODO: Priority Computation */
             priority_queue_push(moves, m, 0);
+        } else {
+            free(m);
         }
         pawns ^= pawn;
     }
@@ -624,6 +668,8 @@ void generate_pawn_west_captures_black(struct board_state *board,
         if (!in_check(&tmp, BLACK)) {
             /* TODO: Priority Computation */
             priority_queue_push(moves, m, 0);
+        } else {
+            free(m);
         }
         pawns ^= pawn;
     }
@@ -662,6 +708,8 @@ generate_pawn_east_captures_promotions_black(struct board_state *board,
             if (!in_check(&tmp, BLACK)) {
                 /* TODO: Priority Computation */
                 priority_queue_push(moves, m, 0);
+            } else {
+                free(m);
             }
         }
         pawns ^= pawn;
@@ -701,6 +749,8 @@ generate_pawn_west_captures_promotions_black(struct board_state *board,
             if (!in_check(&tmp, BLACK)) {
                 /* TODO: Priority Computation */
                 priority_queue_push(moves, m, 0);
+            } else {
+                free(m);
             }
         }
         pawns ^= pawn;
@@ -738,9 +788,23 @@ void generate_pawn_en_passant_black(struct board_state *board,
         if (!in_check(&tmp, BLACK)) {
             /* TODO: Priority Computation */
             priority_queue_push(moves, m, 0);
+        } else {
+            free(m);
         }
         pawns ^= pawn;
     }
+}
+
+void generate_pawn_moves_black(struct board_state *board,
+        struct priority_queue *moves) {
+    generate_pawn_single_pushes_black(board, moves);
+    generate_pawn_push_promotions_black(board, moves);
+    generate_pawn_double_pushes_black(board, moves);
+    generate_pawn_east_captures_black(board, moves);
+    generate_pawn_west_captures_black(board, moves);
+    generate_pawn_east_captures_promotions_black(board, moves);
+    generate_pawn_west_captures_promotions_black(board, moves);
+    generate_pawn_en_passant_black(board, moves);
 }
 
 void generate_bishop_moves_white(struct board_state *board,
@@ -770,6 +834,8 @@ void generate_bishop_moves_white(struct board_state *board,
             make(&tmp, m);
             if (!in_check(&tmp, WHITE)) {
                 priority_queue_push(moves, m, 0);
+            } else {
+                free(m);
             }
             attacks ^= attack;
         }
@@ -804,6 +870,8 @@ void generate_bishop_moves_black(struct board_state *board,
             make(&tmp, m);
             if (!in_check(&tmp, BLACK)) {
                 priority_queue_push(moves, m, 0);
+            } else {
+                free(m);
             }
             attacks ^= attack;
         }
@@ -838,6 +906,8 @@ void generate_rook_moves_white(struct board_state *board,
             make(&tmp, m);
             if (!in_check(&tmp, WHITE)) {
                 priority_queue_push(moves, m, 0);
+            } else {
+                free(m);
             }
             attacks ^= attack;
         }
@@ -872,6 +942,8 @@ void generate_rook_moves_black(struct board_state *board,
             make(&tmp, m);
             if (!in_check(&tmp, BLACK)) {
                 priority_queue_push(moves, m, 0);
+            } else {
+                free(m);
             }
             attacks ^= attack;
         }
@@ -907,6 +979,8 @@ void generate_queen_moves_white(struct board_state *board,
             make(&tmp, m);
             if (!in_check(&tmp, WHITE)) {
                 priority_queue_push(moves, m, 0);
+            } else {
+                free(m);
             }
             attacks ^= attack;
         }
@@ -942,6 +1016,8 @@ void generate_queen_moves_black(struct board_state *board,
             make(&tmp, m);
             if (!in_check(&tmp, BLACK)) {
                 priority_queue_push(moves, m, 0);
+            } else {
+                free(m);
             }
             attacks ^= attack;
         }
@@ -974,6 +1050,8 @@ void generate_knight_moves_white(struct board_state *board,
             make(&tmp, m);
             if (!in_check(&tmp, WHITE)) {
                 priority_queue_push(moves, m, 0);
+            } else {
+                free(m);
             }
             attacks ^= attack;
         }
@@ -1006,6 +1084,8 @@ void generate_knight_moves_black(struct board_state *board,
             make(&tmp, m);
             if (!in_check(&tmp, BLACK)) {
                 priority_queue_push(moves, m, 0);
+            } else {
+                free(m);
             }
             attacks ^= attack;
         }
@@ -1064,8 +1144,12 @@ void generate_king_moves_black(struct board_state *board,
 void generate_castle_white(struct board_state *board,
         struct priority_queue *moves) {
     uint64_t enemy_attacks = all_attacks(board, BLACK);
+    /* Squares between king and rook must be unobstructed, king cannot
+     * castle through check
+     **/
     if (board->flags.castle_q[WHITE] &
-            !((BITBOARD_E1 | BITBOARD_D1 | BITBOARD_C1) & (enemy_attacks | board->bb[WHITE][ALL]))) {
+            !((BITBOARD_E1 | BITBOARD_D1 | BITBOARD_C1) & enemy_attacks) &
+            !((BITBOARD_D1 | BITBOARD_C1 | BITBOARD_B1) & (board->bb[WHITE][ALL] | board->bb[BLACK][ALL]))) {
         struct move *m = calloc(1, sizeof(struct move));
         m->p_mover = KING;
         m->s_mover = ROOK;
@@ -1080,7 +1164,8 @@ void generate_castle_white(struct board_state *board,
         priority_queue_push(moves, m, 0);
     }
     if (board->flags.castle_k[WHITE] &
-            !((BITBOARD_E1 | BITBOARD_F1 | BITBOARD_G1) & (enemy_attacks | board->bb[WHITE][ALL]))) {
+            !((BITBOARD_E1 | BITBOARD_F1 | BITBOARD_G1) & enemy_attacks) &
+            !((BITBOARD_F1 | BITBOARD_G1) & (board->bb[WHITE][ALL] | board->bb[BLACK][ALL]))) {
         struct move *m = calloc(1, sizeof(struct move));
         m->p_mover = KING;
         m->s_mover = ROOK;
@@ -1100,7 +1185,8 @@ void generate_castle_black(struct board_state *board,
         struct priority_queue *moves) {
     uint64_t enemy_attacks = all_attacks(board, WHITE);
     if (board->flags.castle_q[BLACK] &
-            !((BITBOARD_E8 | BITBOARD_D8 | BITBOARD_C8) & (enemy_attacks | board->bb[BLACK][ALL]))) {
+            !((BITBOARD_E8 | BITBOARD_D8 | BITBOARD_C8) & enemy_attacks) &
+            !((BITBOARD_D8 | BITBOARD_C8 | BITBOARD_B8) & (board->bb[WHITE][ALL] | board->bb[BLACK][ALL]))) {
         struct move *m = calloc(1, sizeof(struct move));
         m->p_mover = KING;
         m->s_mover = ROOK;
@@ -1115,7 +1201,8 @@ void generate_castle_black(struct board_state *board,
         priority_queue_push(moves, m, 0);
     }
     if (board->flags.castle_k[BLACK] &
-            !((BITBOARD_E8 | BITBOARD_F8 | BITBOARD_G8) & (enemy_attacks | board->bb[BLACK][ALL]))) {
+            !((BITBOARD_E8 | BITBOARD_F8 | BITBOARD_G8) & enemy_attacks) &
+            !((BITBOARD_F8 | BITBOARD_G8) & (board->bb[WHITE][ALL] | board->bb[BLACK][ALL]))) {
         struct move *m = calloc(1, sizeof(struct move));
         m->p_mover = KING;
         m->s_mover = ROOK;
@@ -1129,4 +1216,26 @@ void generate_castle_black(struct board_state *board,
         m->flags.en_passant[0] = m->flags.en_passant[1] = 0;
         priority_queue_push(moves, m, 0);
     }
+}
+
+void generate_moves_white(struct board_state *board,
+        struct priority_queue *moves) {
+    generate_king_moves_white(board, moves);
+    generate_queen_moves_white(board, moves);
+    generate_bishop_moves_white(board, moves);
+    generate_knight_moves_white(board, moves);
+    generate_rook_moves_white(board, moves);
+    generate_pawn_moves_white(board, moves);
+    generate_castle_white(board, moves);
+}
+
+void generate_moves_black(struct board_state *board,
+        struct priority_queue *moves) {
+    generate_king_moves_black(board, moves);
+    generate_queen_moves_black(board, moves);
+    generate_bishop_moves_black(board, moves);
+    generate_knight_moves_black(board, moves);
+    generate_rook_moves_black(board, moves);
+    generate_pawn_moves_black(board, moves);
+    generate_castle_black(board, moves);
 }

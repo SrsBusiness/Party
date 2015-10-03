@@ -11,10 +11,5 @@ uint32_t compute_material(struct board_state *pos) {
                 material_values[piece];
         }
     }
-    switch(pos->turn){
-        case WHITE:
-            return material[0] - material[1];
-        case BLACK:
-            return material[1] - material[0];
-    }
+    return 1000 * (material[0] - material[1]);
 }
