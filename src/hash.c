@@ -3,15 +3,19 @@
 #include <stdlib.h>
 #include <inttypes.h>
 #include <string.h>
+#include "hash.h"
 #include "bitboard.h"
 #include "pawn.h"
+#include "move.h"
+#include "minicurses.h"
 
 #ifdef UNIT_TEST
 #include "unit_tests.h"
 #endif
 
 uint64_t ZOBRIST_table_size;
-int32_t *ZOBRIST_transposition_table;
+struct transposition_entry *ZOBRIST_transposition_table;
+
 
 /* Zobrist Hashing */
 int seed = 0x4CF10177;
@@ -311,7 +315,7 @@ uint64_t ZOBRIST_piece_keys[2][6][64] = {
 };
 uint64_t ZOBRIST_castle_q_keys[2] = {0x8889DA61DE2EE4A, 0x3E66449A6AE0AA57};
 uint64_t ZOBRIST_castle_k_keys[2] = {0x501C6AB5E181ECB, 0x222A986A347B072B};
-uint64_t ZOBRIST_enpassant_keys[8] = {
+uint64_t ZOBRIST_en_passant_keys[8] = {
     0x6A15AA5C42D0F28D, 0x7E8302377823EAA2, 0x24046527F7A9ED5,
     0x7FF7211131CA892, 0x6EF03F8A1DF32307, 0x695D96F860371AE0,
     0x18FF59C67ACFF7B0, 0x605813BB71E37312
@@ -336,7 +340,7 @@ void ZOBRIST_prng_init(int seed) {
     ZOBRIST_castle_k_keys[0] = rand_int64();
     ZOBRIST_castle_k_keys[1] = rand_int64();
     for (int i = 0; i < 8; i++) {
-        ZOBRIST_enpassant_keys[i] = rand_int64();
+        ZOBRIST_en_passant_keys[i] = rand_int64();
     }
     ZOBRIST_turn_key = rand_int64();
 }
@@ -346,11 +350,11 @@ void ZOBRIST_rng_init() {
     fread(ZOBRIST_piece_keys, 1, sizeof(ZOBRIST_piece_keys), f);
     fread(ZOBRIST_castle_q_keys, 1, sizeof(ZOBRIST_castle_q_keys), f);
     fread(ZOBRIST_castle_k_keys, 1, sizeof(ZOBRIST_castle_k_keys), f);
-    fread(ZOBRIST_enpassant_keys, 1, sizeof(ZOBRIST_enpassant_keys), f);
+    fread(ZOBRIST_en_passant_keys, 1, sizeof(ZOBRIST_en_passant_keys), f);
     fread(&ZOBRIST_turn_key, 1, sizeof(ZOBRIST_turn_key), f);
 }
 
-uint64_t ZOBRIST_hash(struct board_state *board) {
+uint64_t ZOBRIST_hash(const struct board_state *board) {
     uint64_t hash = 0ul;
     if (board->turn == BLACK) {
         hash ^= ZOBRIST_turn_key;
@@ -375,18 +379,79 @@ uint64_t ZOBRIST_hash(struct board_state *board) {
         }
         /* En passant */
         for (int j = 0; j < 8; j++) {
-            if ((1ul << j) &bboard_to_fset(board->flags.en_passant[i])) {
-                hash ^= ZOBRIST_enpassant_keys[i];
+            if ((1ul << j) & board->flags.en_passant[i]) {
+                hash ^= ZOBRIST_en_passant_keys[i];
             }
         }
     }
     return hash;
 }
 
+/* This needs to be called before the move is made */
+uint64_t ZOBRIST_incremental_update(const struct board_state *board,
+        const struct move *m) {
+    uint64_t squares;
+    uint64_t new_hash = board->hash;
+    new_hash ^= ZOBRIST_turn_key;
+    /* Primary */ 
+    squares = m->primary;
+    while (squares) {
+        int index = lsb(squares);
+        new_hash ^= ZOBRIST_piece_keys[board->turn][m->p_mover][index];
+        squares &= squares - 1;
+    }
+
+    /* Secondary */ 
+    squares = m->secondary;
+    while (squares) {
+        int index = lsb(squares);
+        new_hash ^= ZOBRIST_piece_keys[board->turn][m->s_mover][index];
+        squares &= squares - 1;
+    }
+
+    /* Tertiary */ 
+    squares = m->tertiary;
+    while (squares) {
+        int index = lsb(squares);
+        new_hash ^= ZOBRIST_piece_keys[!board->turn][m->t_mover][index];
+        squares &= squares - 1;
+    }
+
+    /* Flags */
+    for (int i = 0; i < 2; i++) {
+        if (board->flags.castle_q[i] != m->flags.castle_q[i]) {
+            new_hash ^= ZOBRIST_castle_q_keys[i];
+        }
+        if (board->flags.castle_k[i] != m->flags.castle_k[i]) {
+            new_hash ^= ZOBRIST_castle_k_keys[i];
+        }
+        int index = lsb(board->flags.en_passant[i] ^ board->flags.en_passant[i]);
+        new_hash ^= ZOBRIST_en_passant_keys[index];
+    }
+    return new_hash;
+}
+
 void ZOBRIST_transposition_init(uint64_t table_size) {
     ZOBRIST_table_size = table_size;
-    ZOBRIST_transposition_table = malloc(sizeof(int32_t) * table_size);
-    memset(ZOBRIST_transposition_table, 0xFF, sizeof(int32_t) * table_size);
+    ZOBRIST_transposition_table = calloc(table_size, sizeof(struct transposition_entry));
+    for (uint64_t i = 0; i < ZOBRIST_table_size; i++) {
+        ZOBRIST_transposition_table[i].score = 0;
+    }
+}
+
+void set_transposition_score(uint64_t hash, int32_t score) {
+    ZOBRIST_transposition_table[hash % ZOBRIST_table_size].score = score;
+}
+
+int32_t get_transposition_score(uint64_t hash) {
+    return ZOBRIST_transposition_table[hash % ZOBRIST_table_size].score;
+}
+
+void print_transposition_table(int row, int col) {
+    move_cursor(row, col);
+    for (uint64_t i = 0; i < ZOBRIST_table_size; i++) {
+        printf("0x%lx : %d\n", i, ZOBRIST_transposition_table[i].score);
+    }
 }
 
 void print_literal_keys() {
@@ -413,9 +478,9 @@ void print_literal_keys() {
     printf("uint64_t ZOBRIST_castle_k_keys[2][2] = {0x%"PRIu64"X, 0x%"PRIu64"X};\n",
             ZOBRIST_castle_k_keys[0], ZOBRIST_castle_k_keys[1]);
 
-    printf("uint64_t ZOBRIST_enpassant_keys[8] = {\n");
+    printf("uint64_t ZOBRIST_en_passant_keys[8] = {\n");
     for (int i = 0; i < 8; i++) {
-        printf("    0x%"PRIu64"X,\n", ZOBRIST_enpassant_keys[i]);
+        printf("    0x%"PRIu64"X,\n", ZOBRIST_en_passant_keys[i]);
     }
     printf("};\n");
     printf("uint64_t ZOBRIST_turn_key = 0x%"PRIu64"X;\n", ZOBRIST_turn_key);

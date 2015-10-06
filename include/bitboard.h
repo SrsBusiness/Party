@@ -278,16 +278,11 @@ struct board_flags {
 struct board_state {
     //char board88[64];
     int turn;   /* 0 if white, 1 if black */
+    uint64_t hash;
     /* bitboards */
     uint64_t bb[2][7];
     struct board_flags flags;
 };
-
-/* 
- *  Mailbox works as follows.
- *  Most significant bit refers to color
- *  Other bits determine piece
- **/
 
 struct move {
     int p_mover, s_mover, t_mover;

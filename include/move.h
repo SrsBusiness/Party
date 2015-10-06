@@ -8,7 +8,7 @@ extern const struct board_state BOARD_INITIAL_STATE;
 
 void board_init(struct board_state *);
 void make(struct board_state *, struct move *);
-void unmake(struct board_state *, struct move *);
+void unmake(struct board_state *, struct move *, struct board_flags *old_flags, uint64_t old_hash);
 int in_check(struct board_state *board, int color);
 
 /* Move generation functions 

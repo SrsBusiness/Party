@@ -51,6 +51,7 @@ void normal_move_test(void **state) {
     struct board_state pos = BOARD_INITIAL_STATE;
     struct board_state expected = {
         BLACK,
+        0,
         {{
             BITBOARD_KING   & BITBOARD_WHITE,
             BITBOARD_QUEEN  & BITBOARD_WHITE,
@@ -83,6 +84,7 @@ void normal_move_test(void **state) {
 void capture_move_test(void **state) {
     struct board_state pos = {
         WHITE,
+        0,
         {{
             BITBOARD_KING   & BITBOARD_WHITE,
             BITBOARD_QUEEN  & BITBOARD_WHITE,
@@ -105,6 +107,7 @@ void capture_move_test(void **state) {
 
     struct board_state expected = {
         BLACK,
+        0,
         {{
             BITBOARD_KING   & BITBOARD_WHITE,
             BITBOARD_QUEEN  & BITBOARD_WHITE,
@@ -137,6 +140,7 @@ void capture_move_test(void **state) {
 void promotion_capture_move_test(void **state) {
     struct board_state pos = {
         WHITE,
+        0,
         {{
             BITBOARD_KING & BITBOARD_WHITE,
             0ul,
@@ -159,6 +163,7 @@ void promotion_capture_move_test(void **state) {
 
     struct board_state expected = {
         BLACK,
+        0,
         {{
             BITBOARD_KING & BITBOARD_WHITE,
             BITBOARD_H8,
@@ -190,6 +195,7 @@ void promotion_capture_move_test(void **state) {
 void in_check_test(void **state) {
     struct board_state check = {
         BLACK,
+        0,
         {{
             BITBOARD_KING & BITBOARD_WHITE,
             BITBOARD_H8,
@@ -211,6 +217,7 @@ void in_check_test(void **state) {
     };
     struct board_state safe = {
         BLACK,
+        0,
         {{
             BITBOARD_KING & BITBOARD_WHITE,
             BITBOARD_H7,
@@ -237,6 +244,7 @@ void in_check_test(void **state) {
 void generate_pawn_single_pushes_white_test(void **state) {
     struct board_state pos = {
         WHITE,
+        0,
         {{
             BITBOARD_KING & BITBOARD_WHITE,
             0ul,
@@ -275,6 +283,7 @@ void generate_pawn_single_pushes_white_test(void **state) {
 void generate_pawn_push_promotions_white_test(void **state) {
     struct board_state pos = {
         WHITE,
+        0,
         {{
             BITBOARD_KING & BITBOARD_WHITE,
             0ul,
@@ -347,6 +356,7 @@ void generate_pawn_push_promotions_white_test(void **state) {
 void generate_pawn_double_pushes_white_test(void **state) {
     struct board_state pos = {
         WHITE,
+        0,
         {{
             BITBOARD_KING & BITBOARD_WHITE,
             0ul,
@@ -384,6 +394,7 @@ void generate_pawn_double_pushes_white_test(void **state) {
 void generate_pawn_east_captures_white_test(void **state) {
     struct board_state pos = {
         WHITE,
+        0,
         {{
             BITBOARD_KING & BITBOARD_WHITE,
             0ul,
@@ -421,6 +432,7 @@ void generate_pawn_east_captures_white_test(void **state) {
 void generate_pawn_west_captures_white_test(void **state) {
     struct board_state pos = {
         WHITE,
+        0,
         {{
             BITBOARD_KING & BITBOARD_WHITE,
             0ul,
@@ -459,6 +471,7 @@ void
 generate_pawn_east_captures_promotions_white_test(void **state) {
     struct board_state pos = {
         WHITE,
+        0,
         {{
             BITBOARD_KING & BITBOARD_WHITE,
             0ul,
@@ -532,6 +545,7 @@ void
 generate_pawn_west_captures_promotions_white_test(void **state) {
     struct board_state pos = {
         WHITE,
+        0,
         {{
             BITBOARD_KING & BITBOARD_WHITE,
             0ul,
@@ -604,6 +618,7 @@ generate_pawn_west_captures_promotions_white_test(void **state) {
 void generate_pawn_en_passant_white_test(void **state) {
     struct board_state pos = {
         WHITE,
+        0,
         {{
             BITBOARD_KING & BITBOARD_WHITE,
             0ul,
@@ -642,6 +657,7 @@ void generate_pawn_en_passant_white_test(void **state) {
 void generate_pawn_single_pushes_black_test(void **state) {
     struct board_state pos = {
         BLACK,
+        0,
         {{
             BITBOARD_KING & BITBOARD_WHITE,
             0ul,
@@ -679,6 +695,7 @@ void generate_pawn_single_pushes_black_test(void **state) {
 void generate_pawn_push_promotions_black_test(void **state) {
     struct board_state pos = {
         BLACK,
+        0,
         {{
             BITBOARD_KING & BITBOARD_WHITE,
             0ul,
@@ -751,6 +768,7 @@ void generate_pawn_push_promotions_black_test(void **state) {
 void generate_pawn_double_pushes_black_test(void **state) {
     struct board_state pos = {
         BLACK,
+        0,
         {{
             BITBOARD_KING & BITBOARD_WHITE,
             0ul,
@@ -788,6 +806,7 @@ void generate_pawn_double_pushes_black_test(void **state) {
 void generate_pawn_east_captures_black_test(void **state) {
     struct board_state pos = {
         BLACK,
+        0,
         {{
             BITBOARD_KING & BITBOARD_WHITE,
             0ul,
@@ -825,6 +844,7 @@ void generate_pawn_east_captures_black_test(void **state) {
 void generate_pawn_west_captures_black_test(void **state) {
     struct board_state pos = {
         BLACK,
+        0,
         {{
             BITBOARD_KING & BITBOARD_WHITE,
             0ul,
@@ -863,6 +883,7 @@ void
 generate_pawn_east_captures_promotions_black_test(void **state) {
     struct board_state pos = {
         BLACK,
+        0,
         {{
             BITBOARD_KING & BITBOARD_WHITE,
             0ul,
@@ -936,6 +957,7 @@ void
 generate_pawn_west_captures_promotions_black_test(void **state) {
     struct board_state pos = {
         BLACK,
+        0,
         {{
             BITBOARD_KING & BITBOARD_WHITE,
             0ul,
@@ -1008,6 +1030,7 @@ generate_pawn_west_captures_promotions_black_test(void **state) {
 void generate_pawn_en_passant_black_test(void **state) {
     struct board_state pos = {
         BLACK,
+        0,
         {{
             BITBOARD_KING & BITBOARD_WHITE,
             0ul,
@@ -1045,6 +1068,7 @@ void generate_pawn_en_passant_black_test(void **state) {
 void generate_bishop_moves_obstruction_white_test(void **state) {
     struct board_state pos = {
         WHITE,
+        0,
         {{
             BITBOARD_KING & BITBOARD_WHITE,
             0ul,
@@ -1083,6 +1107,7 @@ void generate_bishop_moves_obstruction_white_test(void **state) {
 void generate_bishop_moves_capture_white_test(void **state) {
      struct board_state pos = {
         WHITE,
+        0,
         {{
             BITBOARD_KING & BITBOARD_WHITE,
             0ul,
@@ -1121,6 +1146,7 @@ void generate_bishop_moves_capture_white_test(void **state) {
 void generate_bishop_moves_obstruction_black_test(void **state) {
     struct board_state pos = {
         BLACK,
+        0,
         {{
             BITBOARD_KING & BITBOARD_WHITE,
             0ul,
@@ -1159,6 +1185,7 @@ void generate_bishop_moves_obstruction_black_test(void **state) {
 void generate_bishop_moves_capture_black_test(void **state) {
      struct board_state pos = {
         BLACK,
+        0,
         {{
             BITBOARD_KING & BITBOARD_WHITE,
             0ul,
@@ -1197,6 +1224,7 @@ void generate_bishop_moves_capture_black_test(void **state) {
 void generate_rook_moves_obstruction_white_test(void **state) {
     struct board_state pos = {
         WHITE,
+        0,
         {{
             BITBOARD_KING & BITBOARD_WHITE,
             0ul,
@@ -1235,6 +1263,7 @@ void generate_rook_moves_obstruction_white_test(void **state) {
 void generate_rook_moves_capture_white_test(void **state) {
      struct board_state pos = {
         WHITE,
+        0,
         {{
             BITBOARD_KING & BITBOARD_WHITE,
             0ul,
@@ -1275,6 +1304,7 @@ void generate_rook_moves_capture_white_test(void **state) {
 void generate_rook_moves_obstruction_black_test(void **state) {
     struct board_state pos = {
         BLACK,
+        0,
         {{
             BITBOARD_KING & BITBOARD_WHITE,
             0ul,
@@ -1313,6 +1343,7 @@ void generate_rook_moves_obstruction_black_test(void **state) {
 void generate_rook_moves_capture_black_test(void **state) {
      struct board_state pos = {
         BLACK,
+        0,
         {{
             BITBOARD_KING & BITBOARD_WHITE,
             0ul,

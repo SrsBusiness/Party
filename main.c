@@ -10,6 +10,10 @@
 #include "bboard_utils.h"
 #include "eval.h"
 
+#ifdef UNIT_TEST
+#include "unit_tests.h"
+#endif
+
 const uint64_t files[] = {
     BITBOARD_AFILE,
     BITBOARD_BFILE,
@@ -45,15 +49,20 @@ int main(int argc, char **argv) {
     }
     
     int depth = atoi(argv[1]);
-
+    
+    ZOBRIST_transposition_init(256);
     struct board_state pos = BOARD_INITIAL_STATE;
+    struct board_state empty;
+    memset(&empty, 0, sizeof(struct board_state));
     struct move best_move, user_move;
     char user_input[6] = {0};
     clear_all();
     while (1) {
-        clear_all();
         print_board(&pos, 1, 1);
+        move_cursor(12, 1);
+        printf("%lu nodes visited\n", nodes_visited);
         reset_attr();
+        //print_transposition_table(12, 1);
         uint64_t bb = 0;
         do {
             fgets(user_input, sizeof(user_input), stdin);
@@ -64,7 +73,7 @@ int main(int argc, char **argv) {
         clear_all();
         print_board(&pos, 1, 1);
         reset_attr();
-        search(&pos, BLACK, depth, &best_move);
+        search(&pos, depth, &best_move);
         make(&pos, &best_move);
     }
 }

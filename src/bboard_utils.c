@@ -33,8 +33,7 @@ static char *piece_chars[6] = {
 };
 void print_board(struct board_state *board, int row, int col) {
     int i, j;
-    int color, piece, file, rank;
-    char *graph;
+    int file, rank;
     /* bitboards */
     for(i = 0; i < 64; i++) {
         file = i % 8;

@@ -18,14 +18,15 @@ debug: OBJFLAGS += -DDEBUG
 debug: $(TARGET)
 
 $(TARGET): $(OBJECTS) | $(BIN)
-	$(CC) $(BINFLAGS) -o $@ main.c $(OBJECTS)
+	$(CC) $(BINFLAGS) -o $@ main.c $(OBJECTS) $(LINKFLAGS)
 
 $(OBJ)/%.o: $(SRC)/%.c | $(OBJ)
 	$(CC) $(OBJFLAGS) $< -o $@
 
 .PHONY: tests
 test: OBJFLAGS += -DUNIT_TEST
-test: $(OBJECTS)
+test: LINKFLAGS += -lcmocka
+test: $(OBJECTS) $(TARGET)
 	$(CC) $(BINFLAGS) -o $(UNIT)/tests $(OBJECTS) $(UNIT)/*.c -lcmocka
 	$(UNIT)/tests
 

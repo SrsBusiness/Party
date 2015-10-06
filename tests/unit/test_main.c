@@ -8,8 +8,10 @@
 #include "rook_test.h"
 #include "pqueue_test.h"
 #include "move_test.h"
+#include "hash_test.h"
 
 int main() {
+    ZOBRIST_transposition_init(1);
     const struct CMUnitTest tests[] = {
         /* bitboard tests */
         cmocka_unit_test(lsb_test),
@@ -162,6 +164,9 @@ int main() {
         cmocka_unit_test(generate_rook_moves_capture_white_test),
         cmocka_unit_test(generate_rook_moves_obstruction_black_test),
         cmocka_unit_test(generate_rook_moves_capture_black_test),
+
+        /* hash tests */
+        cmocka_unit_test(ZOBRIST_incremental_update_test),
     };
     return cmocka_run_group_tests(tests, NULL, NULL);
 }
