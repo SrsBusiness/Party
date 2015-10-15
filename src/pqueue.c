@@ -1,12 +1,13 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <assert.h>
 #include "pqueue.h"
 
 #ifdef UNIT_TEST
 #include "unit_tests.h"
 #endif
 
-#define pqueue_right_child(x) (2 * (x + 1))
+#define pqueue_right_child(x) (2 * ((x) + 1))
 #define pqueue_left_child(x) (2 * (x) + 1)
 #define pqueue_parent(x) (((x) - 1) / 2)
 
@@ -15,7 +16,7 @@ static void resize(struct priority_queue *pqueue, size_t length) {
     while (pqueue->capacity < length) {
         pqueue->capacity *= 2;
     }
-    void *new = realloc(pqueue->queue, pqueue->capacity);
+    void *new = realloc(pqueue->queue, sizeof(struct priority_queue_elem) * pqueue->capacity);
     if (!new) {
         fprintf(stderr, "Error extending Priority Queue\n");
         exit(1);
@@ -49,6 +50,7 @@ void *priority_queue_pop(struct priority_queue *pqueue) {
     
     struct priority_queue_elem *queue = pqueue->queue;
     void *return_val = queue[0].data;
+    //assert(return_val);
     pqueue->length--;
     size_t current = 0, child;
     /* While a child exists */

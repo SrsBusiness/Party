@@ -61,6 +61,7 @@ int main(int argc, char **argv) {
         print_board(&pos, 1, 1);
         move_cursor(12, 1);
         printf("%lu nodes visited\n", nodes_visited);
+        printf("score: %d\n", compute_material(&pos));
         reset_attr();
         //print_transposition_table(12, 1);
         uint64_t bb = 0;
@@ -69,6 +70,7 @@ int main(int argc, char **argv) {
             user_input[4] = 0;
         } while ((bb = algebraic_to_bitboard(user_input)) == 0 ||
                 find_matching_move(&pos, bb, &user_move) == 0);
+        //sleep(1);
         make(&pos, &user_move);
         clear_all();
         print_board(&pos, 1, 1);

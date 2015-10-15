@@ -2,7 +2,7 @@
 
 void priority_queue_push_test() {
     struct priority_queue p;
-    priority_queue_init(&p, 16);
+    priority_queue_init(&p, 1);
     int64_t i;
     for (i = 0; i < 10; i++) {
         priority_queue_push(&p, (void *)i, i);

@@ -27,7 +27,7 @@ $(OBJ)/%.o: $(SRC)/%.c | $(OBJ)
 test: OBJFLAGS += -DUNIT_TEST
 test: LINKFLAGS += -lcmocka
 test: $(OBJECTS) $(TARGET)
-	$(CC) $(BINFLAGS) -o $(UNIT)/tests $(OBJECTS) $(UNIT)/*.c -lcmocka
+	$(CC) $(BINFLAGS) -o $(UNIT)/tests $(OBJECTS) $(UNIT)/*.c $(LINKFLAGS)
 	$(UNIT)/tests
 
 .PHONY: clean
