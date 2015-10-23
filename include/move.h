@@ -17,104 +17,104 @@ int in_check(struct board_state *board, int color);
  *      Castling: trivial
  **/
 
-void generate_pawn_single_pushes_white(struct board_state *board,
+int generate_pawn_single_pushes_white(struct board_state *board,
         struct priority_queue *moves);
 
-void generate_pawn_push_promotions_white(struct board_state *board,
+int generate_pawn_push_promotions_white(struct board_state *board,
         struct priority_queue *moves);
 
-void generate_pawn_double_pushes_white(struct board_state *board,
+int generate_pawn_double_pushes_white(struct board_state *board,
         struct priority_queue *moves);
 
-void generate_pawn_east_captures_white(struct board_state *board,
+int generate_pawn_east_captures_white(struct board_state *board,
         struct priority_queue *moves);
 
-void generate_pawn_west_captures_white(struct board_state *board,
+int generate_pawn_west_captures_white(struct board_state *board,
         struct priority_queue *moves);
 
-void
+int
 generate_pawn_east_captures_promotions_white(struct board_state *board,
         struct priority_queue *moves);
 
-void
+int
 generate_pawn_west_captures_promotions_white(struct board_state *board,
         struct priority_queue *moves);
 
-void generate_pawn_en_passant_white(struct board_state *board,
+int generate_pawn_en_passant_white(struct board_state *board,
         struct priority_queue *moves);
 
-void generate_pawn_moves_white(struct board_state *board,
+int generate_pawn_moves_white(struct board_state *board,
         struct priority_queue *moves);
 
 /* Black */
-void generate_pawn_single_pushes_black(struct board_state *board,
+int generate_pawn_single_pushes_black(struct board_state *board,
         struct priority_queue *moves);
 
-void generate_pawn_push_promotions_black(struct board_state *board,
+int generate_pawn_push_promotions_black(struct board_state *board,
         struct priority_queue *moves);
 
-void generate_pawn_double_pushes_black(struct board_state *board,
+int generate_pawn_double_pushes_black(struct board_state *board,
         struct priority_queue *moves);
 
-void generate_pawn_east_captures_black(struct board_state *board,
+int generate_pawn_east_captures_black(struct board_state *board,
         struct priority_queue *moves);
 
-void generate_pawn_west_captures_black(struct board_state *board,
+int generate_pawn_west_captures_black(struct board_state *board,
         struct priority_queue *moves);
 
-void
+int
 generate_pawn_east_captures_promotions_black(struct board_state *board,
         struct priority_queue *moves);
 
-void
+int
 generate_pawn_west_captures_promotions_black(struct board_state *board,
         struct priority_queue *moves);
 
-void generate_pawn_en_passant_black(struct board_state *board,
+int generate_pawn_en_passant_black(struct board_state *board,
         struct priority_queue *moves);
 
-void generate_pawn_moves_black(struct board_state *board,
+int generate_pawn_moves_black(struct board_state *board,
         struct priority_queue *moves);
 
-void generate_bishop_moves_white(struct board_state *board,
+int generate_bishop_moves_white(struct board_state *board,
         struct priority_queue *moves);
 
-void generate_bishop_moves_black(struct board_state *board,
+int generate_bishop_moves_black(struct board_state *board,
         struct priority_queue *moves);
 
-void generate_rook_moves_white(struct board_state *board,
+int generate_rook_moves_white(struct board_state *board,
         struct priority_queue *moves);
 
-void generate_rook_moves_black(struct board_state *board,
+int generate_rook_moves_black(struct board_state *board,
         struct priority_queue *moves);
 
-void generate_queen_moves_white(struct board_state *board,
+int generate_queen_moves_white(struct board_state *board,
         struct priority_queue *moves);
 
-void generate_queen_moves_black(struct board_state *board,
+int generate_queen_moves_black(struct board_state *board,
         struct priority_queue *moves);
 
-void generate_knight_moves_white(struct board_state *board,
+int generate_knight_moves_white(struct board_state *board,
         struct priority_queue *moves);
 
-void generate_knight_moves_black(struct board_state *board,
+int generate_knight_moves_black(struct board_state *board,
         struct priority_queue *moves);
 
-void generate_king_moves_white(struct board_state *board,
+int generate_king_moves_white(struct board_state *board,
         struct priority_queue *moves);
 
-void generate_king_moves_black(struct board_state *board,
+int generate_king_moves_black(struct board_state *board,
         struct priority_queue *moves);
 
-void generate_castle_white(struct board_state *board,
+int generate_castle_white(struct board_state *board,
         struct priority_queue *moves);
 
-void generate_castle_black(struct board_state *board,
+int generate_castle_black(struct board_state *board,
         struct priority_queue *moves);
 
-void generate_moves_white(struct board_state *board,
+int generate_moves_white(struct board_state *board,
         struct priority_queue *moves);
 
-void generate_moves_black(struct board_state *board,
+int generate_moves_black(struct board_state *board,
         struct priority_queue *moves);
 #endif

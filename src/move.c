@@ -188,10 +188,52 @@ int in_check(struct board_state *board, int color) {
     return !!(all_attacks(board, !color) & board->bb[color][KING]);
 }
 
+int in_checkmate(struct board_state *board, int color) {
+    int move_count;
+    switch(color) {
+        case WHITE:
+            move_count = generate_moves_white(board, NULL);
+            break;
+        case BLACK:
+            move_count = generate_moves_black(board, NULL);
+            break;
+    }
+    /* If in check and no legal moves */
+    return in_check(board, color) && move_count == 0;
+}
+
+int in_stalemate(struct board_state *board, int color) {
+    int move_count;
+    switch(color) {
+        case WHITE:
+            move_count = generate_moves_white(board, NULL);
+            break;
+        case BLACK:
+            move_count = generate_moves_black(board, NULL);
+            break;
+    }
+    /* If not in check and no legal moves */
+    return !in_check(board, color) && move_count == 0;
+}
+
+int no_legal_moves(struct board_state *board, int color) {
+    int move_count;
+    switch(color) {
+        case WHITE:
+            move_count = generate_moves_white(board, NULL);
+            break;
+        case BLACK:
+            move_count = generate_moves_black(board, NULL);
+            break;
+    }
+    return move_count == 0;
+}
+
 /* move generation */
 /* Generate all single pawn pushes excluding promotions */
-void generate_pawn_single_pushes_white(struct board_state *board,
+int generate_pawn_single_pushes_white(struct board_state *board,
         struct priority_queue *moves) {
+    int move_count = 0;
     uint64_t pawns = w_pawns_able_to_push(board->bb[WHITE][PAWN],
             ~all_pieces(board)) & ~BITBOARD_RANK7;
     uint64_t pawn, move_mask;
@@ -204,6 +246,7 @@ void generate_pawn_single_pushes_white(struct board_state *board,
         m->s_mover = NO_PIECE;
         m->t_mover = NO_PIECE;
         m->primary = move_mask;
+        m->primary_src = pawn;
         /* Should we 0 the other masks? */
         m->flags.castle_q[0] = board->flags.castle_q[0];
         m->flags.castle_q[1] = board->flags.castle_q[1];
@@ -215,18 +258,25 @@ void generate_pawn_single_pushes_white(struct board_state *board,
         struct board_state tmp = *board;
         make(&tmp, m);
         if (!in_check(&tmp, WHITE)) {
+            move_count++;
             /* TODO: Priority Computation */
             int32_t score = get_transposition_score(tmp.hash);
-            priority_queue_push(moves, m, score);
+            if (moves) {
+                priority_queue_push(moves, m, score);
+            } else {
+                free(m);
+            }
         } else {
             free(m);
         }
         pawns ^= pawn;
     }
+    return move_count;
 }
 
-void generate_pawn_push_promotions_white(struct board_state *board,
+int generate_pawn_push_promotions_white(struct board_state *board,
         struct priority_queue *moves) {
+    int move_count = 0;
     uint64_t pawns = w_pawns_able_to_push(board->bb[WHITE][PAWN],
             ~all_pieces(board)) & BITBOARD_RANK7;
     uint64_t pawn, promote_mask;
@@ -242,6 +292,7 @@ void generate_pawn_push_promotions_white(struct board_state *board,
             m->t_mover = NO_PIECE;
             m->primary = pawn;
             m->secondary = promote_mask;
+            m->primary_src = pawn;
             /* Should we 0 the other masks? */
             m->flags.castle_q[0] = board->flags.castle_q[0];
             m->flags.castle_q[1] = board->flags.castle_q[1];
@@ -253,19 +304,26 @@ void generate_pawn_push_promotions_white(struct board_state *board,
             struct board_state tmp = *board;
             make(&tmp, m);
             if (!in_check(&tmp, WHITE)) {
+                move_count++;
                 /* TODO: Priority Computation */
                 int32_t score = get_transposition_score(tmp.hash);
-                priority_queue_push(moves, m, score);
+                if (moves) {
+                    priority_queue_push(moves, m, score);
+                } else {
+                    free(m);
+                }
             } else {
                 free(m);
             }
         }
         pawns ^= pawn;
     }
+    return move_count;
 }
 
-void generate_pawn_double_pushes_white(struct board_state *board,
+int generate_pawn_double_pushes_white(struct board_state *board,
         struct priority_queue *moves) {
+    int move_count = 0;
     uint64_t pawns = w_pawns_able_to_double_push(board->bb[WHITE][PAWN],
             ~all_pieces(board));
     uint64_t pawn, move_mask;
@@ -278,6 +336,7 @@ void generate_pawn_double_pushes_white(struct board_state *board,
         m->s_mover = NO_PIECE;
         m->t_mover = NO_PIECE;
         m->primary = move_mask;
+        m->primary_src = pawn;
         /* Should we 0 the other masks? */
         m->flags.castle_q[0] = board->flags.castle_q[0];
         m->flags.castle_q[1] = board->flags.castle_q[1];
@@ -290,18 +349,25 @@ void generate_pawn_double_pushes_white(struct board_state *board,
         struct board_state tmp = *board;
         make(&tmp, m);
         if (!in_check(&tmp, WHITE)) {
+            move_count++;
             /* TODO: Priority Computation */
             int32_t score = get_transposition_score(tmp.hash);
-            priority_queue_push(moves, m, score);
+            if (moves) {
+                priority_queue_push(moves, m, score);
+            } else {
+                free(m);
+            }
         } else {
             free(m);
         }
         pawns ^= pawn;
     }
+    return move_count;
 }
 
-void generate_pawn_east_captures_white(struct board_state *board,
+int generate_pawn_east_captures_white(struct board_state *board,
         struct priority_queue *moves) {
+    int move_count = 0;
     uint64_t pawns = w_pawns_able_to_capture_east(board->bb[WHITE][PAWN],
             board->bb[BLACK][ALL] ^ board->bb[BLACK][KING]) & ~BITBOARD_RANK7;
     uint64_t pawn, primary_mask, capture_square;
@@ -315,6 +381,7 @@ void generate_pawn_east_captures_white(struct board_state *board,
         m->t_mover = piece_on_square(board, BLACK, capture_square);
         m->primary = primary_mask;
         m->tertiary = capture_square;
+        m->primary_src = pawn;
         /* Should we 0 the other masks? */
         m->flags.castle_q[0] = board->flags.castle_q[0];
         m->flags.castle_q[1] = board->flags.castle_q[1];
@@ -326,18 +393,25 @@ void generate_pawn_east_captures_white(struct board_state *board,
         struct board_state tmp = *board;
         make(&tmp, m);
         if (!in_check(&tmp, WHITE)) {
+            move_count++;
             /* TODO: Priority Computation */
             int32_t score = get_transposition_score(tmp.hash);
-            priority_queue_push(moves, m, score);
+            if (moves) {
+                priority_queue_push(moves, m, score);
+            } else {
+                free(m);
+            }
         } else {
             free(m);
         }
         pawns ^= pawn;
     }
+    return move_count;
 }
 
-void generate_pawn_west_captures_white(struct board_state *board,
+int generate_pawn_west_captures_white(struct board_state *board,
         struct priority_queue *moves) {
+    int move_count = 0;
     uint64_t pawns = w_pawns_able_to_capture_west(board->bb[WHITE][PAWN],
             board->bb[BLACK][ALL] ^ board->bb[BLACK][KING]) & ~BITBOARD_RANK7;
     uint64_t pawn, primary_mask, capture_square;
@@ -351,6 +425,7 @@ void generate_pawn_west_captures_white(struct board_state *board,
         m->t_mover = piece_on_square(board, BLACK, capture_square);
         m->primary = primary_mask;
         m->tertiary = capture_square;
+        m->primary_src = pawn;
         /* Should we 0 the other masks? */
         m->flags.castle_q[0] = board->flags.castle_q[0];
         m->flags.castle_q[1] = board->flags.castle_q[1];
@@ -362,19 +437,26 @@ void generate_pawn_west_captures_white(struct board_state *board,
         struct board_state tmp = *board;
         make(&tmp, m);
         if (!in_check(&tmp, WHITE)) {
+            move_count++;
             /* TODO: Priority Computation */
             int32_t score = get_transposition_score(tmp.hash);
-            priority_queue_push(moves, m, score);
+            if (moves) {
+                priority_queue_push(moves, m, score);
+            } else {
+                free(m);
+            }
         } else {
             free(m);
         }
         pawns ^= pawn;
     }
+    return move_count;
 }
 
-void
+int
 generate_pawn_east_captures_promotions_white(struct board_state *board,
         struct priority_queue *moves) {
+    int move_count = 0;
     uint64_t pawns = w_pawns_able_to_capture_east(board->bb[WHITE][PAWN],
             board->bb[BLACK][ALL] ^ board->bb[BLACK][KING]) & BITBOARD_RANK7;
     uint64_t pawn, primary_mask, capture_square;
@@ -391,6 +473,7 @@ generate_pawn_east_captures_promotions_white(struct board_state *board,
             m->primary = primary_mask;
             m->secondary = capture_square;
             m->tertiary = capture_square;
+            m->primary_src = pawn;
             /* Should we 0 the other masks? */
             m->flags.castle_q[0] = board->flags.castle_q[0];
             m->flags.castle_k[0] = board->flags.castle_k[0];
@@ -403,20 +486,27 @@ generate_pawn_east_captures_promotions_white(struct board_state *board,
             struct board_state tmp = *board;
             make(&tmp, m);
             if (!in_check(&tmp, WHITE)) {
+                move_count++;
                 /* TODO: Priority Computation */
                 int32_t score = get_transposition_score(tmp.hash);
-                priority_queue_push(moves, m, score);
+                if (moves) {
+                    priority_queue_push(moves, m, score);
+                } else {
+                    free(m);
+                }
             } else {
                 free(m);
             }
         }
         pawns ^= pawn;
     }
+    return move_count;
 }
 
-void
+int
 generate_pawn_west_captures_promotions_white(struct board_state *board,
         struct priority_queue *moves) {
+    int move_count = 0;
     uint64_t pawns = w_pawns_able_to_capture_west(board->bb[WHITE][PAWN],
             board->bb[BLACK][ALL] ^ board->bb[BLACK][KING]) & BITBOARD_RANK7;
     uint64_t pawn, primary_mask, capture_square;
@@ -433,6 +523,7 @@ generate_pawn_west_captures_promotions_white(struct board_state *board,
             m->primary = primary_mask;
             m->secondary = capture_square;
             m->tertiary = capture_square;
+            m->primary_src = pawn;
             /* Should we 0 the other masks? */
             m->flags.castle_q[0] = board->flags.castle_q[0];
             m->flags.castle_k[0] = board->flags.castle_k[0];
@@ -445,21 +536,28 @@ generate_pawn_west_captures_promotions_white(struct board_state *board,
             struct board_state tmp = *board;
             make(&tmp, m);
             if (!in_check(&tmp, WHITE)) {
+                move_count++;
                 /* TODO: Priority Computation */
                 int32_t score = get_transposition_score(tmp.hash);
-                priority_queue_push(moves, m, score);
+                if (moves) {
+                    priority_queue_push(moves, m, score);
+                } else {
+                    free(m);
+                }
             } else {
                 free(m);
             }
         }
         pawns ^= pawn;
     }
+    return move_count;
 }
 
-void generate_pawn_en_passant_white(struct board_state *board,
+int generate_pawn_en_passant_white(struct board_state *board,
         struct priority_queue *moves) {
+    int move_count = 0;
     if (!board->flags.en_passant[BLACK])
-        return;
+        return move_count;
     /* Find en passant squares */
     uint64_t en_passant_square = fset_to_file_fill(board->flags.
             en_passant[BLACK]) & BITBOARD_RANK5;
@@ -475,6 +573,7 @@ void generate_pawn_en_passant_white(struct board_state *board,
         m->t_mover = PAWN;
         m->primary = pawn | en_passant_capture_square;
         m->tertiary = en_passant_square;
+        m->primary_src = pawn;
         m->flags.castle_q[0] = board->flags.castle_q[0];
         m->flags.castle_q[1] = board->flags.castle_q[1];
         m->flags.castle_k[0] = board->flags.castle_k[0];
@@ -485,31 +584,38 @@ void generate_pawn_en_passant_white(struct board_state *board,
         struct board_state tmp = *board;
         make(&tmp, m);
         if (!in_check(&tmp, WHITE)) {
+            move_count++;
             /* TODO: Priority Computation */
             int32_t score = get_transposition_score(tmp.hash);
-            priority_queue_push(moves, m, score);
+            if (moves) {
+                priority_queue_push(moves, m, score);
+            } else {
+                free(m);
+            }
         } else {
             free(m);
         }
         pawns ^= pawn;
     }
+    return move_count;
 }
 
-void generate_pawn_moves_white(struct board_state *board,
+int generate_pawn_moves_white(struct board_state *board,
         struct priority_queue *moves) {
-    generate_pawn_single_pushes_white(board, moves);
-    generate_pawn_push_promotions_white(board, moves);
-    generate_pawn_double_pushes_white(board, moves);
-    generate_pawn_east_captures_white(board, moves);
-    generate_pawn_west_captures_white(board, moves);
-    generate_pawn_east_captures_promotions_white(board, moves);
-    generate_pawn_west_captures_promotions_white(board, moves);
+    return generate_pawn_single_pushes_white(board, moves) +
+    generate_pawn_push_promotions_white(board, moves) +
+    generate_pawn_double_pushes_white(board, moves) +
+    generate_pawn_east_captures_white(board, moves) +
+    generate_pawn_west_captures_white(board, moves) +
+    generate_pawn_east_captures_promotions_white(board, moves) +
+    generate_pawn_west_captures_promotions_white(board, moves) +
     generate_pawn_en_passant_white(board, moves);
 }
 
 /* Black */
-void generate_pawn_single_pushes_black(struct board_state *board,
+int generate_pawn_single_pushes_black(struct board_state *board,
         struct priority_queue *moves) {
+    int move_count = 0;
     uint64_t pawns = b_pawns_able_to_push(board->bb[BLACK][PAWN],
             ~all_pieces(board)) & ~BITBOARD_RANK2;
     uint64_t pawn, move_mask;
@@ -522,6 +628,7 @@ void generate_pawn_single_pushes_black(struct board_state *board,
         m->s_mover = NO_PIECE;
         m->t_mover = NO_PIECE;
         m->primary = move_mask;
+        m->primary_src = pawn;
         /* Should we 0 the other masks? */
         m->flags.castle_q[0] = board->flags.castle_q[0];
         m->flags.castle_q[1] = board->flags.castle_q[1];
@@ -533,18 +640,25 @@ void generate_pawn_single_pushes_black(struct board_state *board,
         struct board_state tmp = *board;
         make(&tmp, m);
         if (!in_check(&tmp, BLACK)) {
+            move_count++;
             /* TODO: Priority Computation */
             int32_t score = get_transposition_score(tmp.hash);
-            priority_queue_push(moves, m, -score);
+            if (moves) {
+                priority_queue_push(moves, m, -score);
+            } else {
+                free(m);
+            }
         } else {
             free(m);
         }
         pawns ^= pawn;
     }
+    return move_count;
 }
 
-void generate_pawn_push_promotions_black(struct board_state *board,
+int generate_pawn_push_promotions_black(struct board_state *board,
         struct priority_queue *moves) {
+    int move_count = 0;
     uint64_t pawns = b_pawns_able_to_push(board->bb[BLACK][PAWN],
             ~all_pieces(board)) & BITBOARD_RANK2;
     uint64_t pawn, promote_mask;
@@ -560,6 +674,7 @@ void generate_pawn_push_promotions_black(struct board_state *board,
             m->t_mover = NO_PIECE;
             m->primary = pawn;
             m->secondary = promote_mask;
+            m->primary_src = pawn;
             /* Should we 0 the other masks? */
             m->flags.castle_q[0] = board->flags.castle_q[0];
             m->flags.castle_q[1] = board->flags.castle_q[1];
@@ -571,19 +686,26 @@ void generate_pawn_push_promotions_black(struct board_state *board,
             struct board_state tmp = *board;
             make(&tmp, m);
             if (!in_check(&tmp, BLACK)) {
+                move_count++;
                 /* TODO: Priority Computation */
                 int32_t score = get_transposition_score(tmp.hash);
-                priority_queue_push(moves, m, -score);
+                if (moves) {
+                    priority_queue_push(moves, m, -score);
+                } else {
+                    free(m);
+                }
             } else {
                 free(m);
             }
         }
         pawns ^= pawn;
     }
+    return move_count;
 }
 
-void generate_pawn_double_pushes_black(struct board_state *board,
+int generate_pawn_double_pushes_black(struct board_state *board,
         struct priority_queue *moves) {
+    int move_count = 0;
     uint64_t pawns = b_pawns_able_to_double_push(board->bb[BLACK][PAWN],
             ~all_pieces(board));
     uint64_t pawn, move_mask;
@@ -596,6 +718,7 @@ void generate_pawn_double_pushes_black(struct board_state *board,
         m->s_mover = NO_PIECE;
         m->t_mover = NO_PIECE;
         m->primary = move_mask;
+        m->primary_src = pawn;
         /* Should we 0 the other masks? */
         m->flags.castle_q[0] = board->flags.castle_q[0];
         m->flags.castle_q[1] = board->flags.castle_q[1];
@@ -608,18 +731,25 @@ void generate_pawn_double_pushes_black(struct board_state *board,
         struct board_state tmp = *board;
         make(&tmp, m);
         if (!in_check(&tmp, BLACK)) {
+            move_count++;
             /* TODO: Priority Computation */
             int32_t score = get_transposition_score(tmp.hash);
-            priority_queue_push(moves, m, -score);
+            if (moves) {
+                priority_queue_push(moves, m, -score);
+            } else {
+                free(m);
+            }
         } else {
             free(m);
         }
         pawns ^= pawn;
     }
+    return move_count;
 }
 
-void generate_pawn_east_captures_black(struct board_state *board,
+int generate_pawn_east_captures_black(struct board_state *board,
         struct priority_queue *moves) {
+    int move_count = 0;
     uint64_t pawns = b_pawns_able_to_capture_east(board->bb[BLACK][PAWN],
             board->bb[WHITE][ALL] ^ board->bb[WHITE][KING]) & ~BITBOARD_RANK2;
     uint64_t pawn, primary_mask, capture_square;
@@ -633,6 +763,7 @@ void generate_pawn_east_captures_black(struct board_state *board,
         m->t_mover = piece_on_square(board, WHITE, capture_square);
         m->primary = primary_mask;
         m->tertiary = capture_square;
+        m->primary_src = pawn;
         /* Should we 0 the other masks? */
         m->flags.castle_q[0] = board->flags.castle_q[0];
         m->flags.castle_q[1] = board->flags.castle_q[1];
@@ -644,18 +775,25 @@ void generate_pawn_east_captures_black(struct board_state *board,
         struct board_state tmp = *board;
         make(&tmp, m);
         if (!in_check(&tmp, BLACK)) {
+            move_count++;
             /* TODO: Priority Computation */
             int32_t score = get_transposition_score(tmp.hash);
-            priority_queue_push(moves, m, -score);
+            if (moves) {
+                priority_queue_push(moves, m, -score);
+            } else {
+                free(m);
+            }
         } else {
             free(m);
         }
         pawns ^= pawn;
     }
+    return move_count;
 }
 
-void generate_pawn_west_captures_black(struct board_state *board,
+int generate_pawn_west_captures_black(struct board_state *board,
         struct priority_queue *moves) {
+    int move_count = 0;
     uint64_t pawns = b_pawns_able_to_capture_west(board->bb[BLACK][PAWN],
             board->bb[WHITE][ALL] ^ board->bb[WHITE][KING]) & ~BITBOARD_RANK2;
     uint64_t pawn, primary_mask, capture_square;
@@ -669,6 +807,7 @@ void generate_pawn_west_captures_black(struct board_state *board,
         m->t_mover = piece_on_square(board, WHITE, capture_square);
         m->primary = primary_mask;
         m->tertiary = capture_square;
+        m->primary_src = pawn;
         /* Should we 0 the other masks? */
         m->flags.castle_q[0] = board->flags.castle_q[0];
         m->flags.castle_q[1] = board->flags.castle_q[1];
@@ -680,19 +819,26 @@ void generate_pawn_west_captures_black(struct board_state *board,
         struct board_state tmp = *board;
         make(&tmp, m);
         if (!in_check(&tmp, BLACK)) {
+            move_count++;
             /* TODO: Priority Computation */
             int32_t score = get_transposition_score(tmp.hash);
-            priority_queue_push(moves, m, -score);
+            if (moves) {
+                priority_queue_push(moves, m, -score);
+            } else {
+                free(m);
+            }
         } else {
             free(m);
         }
         pawns ^= pawn;
     }
+    return move_count;
 }
 
-void
+int
 generate_pawn_east_captures_promotions_black(struct board_state *board,
         struct priority_queue *moves) {
+    int move_count = 0;
     uint64_t pawns = b_pawns_able_to_capture_east(board->bb[BLACK][PAWN],
             board->bb[WHITE][ALL] ^ board->bb[WHITE][KING]) & BITBOARD_RANK2;
     uint64_t pawn, primary_mask, capture_square;
@@ -709,6 +855,7 @@ generate_pawn_east_captures_promotions_black(struct board_state *board,
             m->primary = primary_mask;
             m->secondary = capture_square;
             m->tertiary = capture_square;
+            m->primary_src = pawn;
             /* Should we 0 the other masks? */
             m->flags.castle_q[1] = board->flags.castle_q[1];
             m->flags.castle_k[1] = board->flags.castle_k[1];
@@ -721,20 +868,27 @@ generate_pawn_east_captures_promotions_black(struct board_state *board,
             struct board_state tmp = *board;
             make(&tmp, m);
             if (!in_check(&tmp, BLACK)) {
+                move_count++;
                 /* TODO: Priority Computation */
                 int32_t score = get_transposition_score(tmp.hash);
-                priority_queue_push(moves, m, -score);
+                if (moves) {
+                    priority_queue_push(moves, m, -score);
+                } else {
+                    free(m);
+                }
             } else {
                 free(m);
             }
         }
         pawns ^= pawn;
     }
+    return move_count;
 }
 
-void
+int
 generate_pawn_west_captures_promotions_black(struct board_state *board,
         struct priority_queue *moves) {
+    int move_count = 0;
     uint64_t pawns = b_pawns_able_to_capture_west(board->bb[BLACK][PAWN],
             board->bb[WHITE][ALL] ^ board->bb[WHITE][KING]) & BITBOARD_RANK2;
     uint64_t pawn, primary_mask, capture_square;
@@ -751,6 +905,7 @@ generate_pawn_west_captures_promotions_black(struct board_state *board,
             m->primary = primary_mask;
             m->secondary = capture_square;
             m->tertiary = capture_square;
+            m->primary_src = pawn;
             /* Should we 0 the other masks? */
             m->flags.castle_q[1] = board->flags.castle_q[1];
             m->flags.castle_k[1] = board->flags.castle_k[1];
@@ -763,21 +918,28 @@ generate_pawn_west_captures_promotions_black(struct board_state *board,
             struct board_state tmp = *board;
             make(&tmp, m);
             if (!in_check(&tmp, BLACK)) {
+                move_count++;
                 /* TODO: Priority Computation */
                 int32_t score = get_transposition_score(tmp.hash);
-                priority_queue_push(moves, m, -score);
+                if (moves) {
+                    priority_queue_push(moves, m, -score);
+                } else {
+                    free(m);
+                }
             } else {
                 free(m);
             }
         }
         pawns ^= pawn;
     }
+    return move_count;
 }
 
-void generate_pawn_en_passant_black(struct board_state *board,
+int generate_pawn_en_passant_black(struct board_state *board,
         struct priority_queue *moves) {
+    int move_count = 0;
     if (!board->flags.en_passant[WHITE])
-        return;
+        return move_count;
     /* Find en passant squares */
     uint64_t en_passant_square =
         fset_to_file_fill(board->flags.en_passant[WHITE]) & BITBOARD_RANK4;
@@ -793,6 +955,7 @@ void generate_pawn_en_passant_black(struct board_state *board,
         m->t_mover = PAWN;
         m->primary = pawn | en_passant_capture_square;
         m->tertiary = en_passant_square;
+        m->primary_src = pawn;
         m->flags.castle_q[0] = board->flags.castle_q[0];
         m->flags.castle_q[1] = board->flags.castle_q[1];
         m->flags.castle_k[0] = board->flags.castle_k[0];
@@ -803,30 +966,37 @@ void generate_pawn_en_passant_black(struct board_state *board,
         struct board_state tmp = *board;
         make(&tmp, m);
         if (!in_check(&tmp, BLACK)) {
+            move_count++;
             /* TODO: Priority Computation */
             int32_t score = get_transposition_score(tmp.hash);
-            priority_queue_push(moves, m, -score);
+            if (moves) {
+                priority_queue_push(moves, m, -score);
+            } else {
+                free(m);
+            }
         } else {
             free(m);
         }
         pawns ^= pawn;
     }
+    return move_count;
 }
 
-void generate_pawn_moves_black(struct board_state *board,
+int generate_pawn_moves_black(struct board_state *board,
         struct priority_queue *moves) {
-    generate_pawn_single_pushes_black(board, moves);
-    generate_pawn_push_promotions_black(board, moves);
-    generate_pawn_double_pushes_black(board, moves);
-    generate_pawn_east_captures_black(board, moves);
-    generate_pawn_west_captures_black(board, moves);
-    generate_pawn_east_captures_promotions_black(board, moves);
-    generate_pawn_west_captures_promotions_black(board, moves);
+    return generate_pawn_single_pushes_black(board, moves) +
+    generate_pawn_push_promotions_black(board, moves) +
+    generate_pawn_double_pushes_black(board, moves) +
+    generate_pawn_east_captures_black(board, moves) +
+    generate_pawn_west_captures_black(board, moves) +
+    generate_pawn_east_captures_promotions_black(board, moves) +
+    generate_pawn_west_captures_promotions_black(board, moves) +
     generate_pawn_en_passant_black(board, moves);
 }
 
-void generate_bishop_moves_white(struct board_state *board,
+int generate_bishop_moves_white(struct board_state *board,
         struct priority_queue *moves) {
+    int move_count = 0;
     uint64_t bishops = board->bb[WHITE][BISHOP];
     while (bishops) {
         uint64_t bishop = bishops & -bishops;
@@ -842,6 +1012,7 @@ void generate_bishop_moves_white(struct board_state *board,
             m->t_mover = captured_piece;
             m->primary = bishop | attack;
             m->tertiary = captured_piece == NO_PIECE ? 0 : attack;
+            m->primary_src = bishop;
             m->flags.castle_q[0] = board->flags.castle_q[0];
             m->flags.castle_q[1] = attack == BITBOARD_A8 ? 0 : board->flags.castle_q[1];
             m->flags.castle_k[0] = board->flags.castle_k[0];
@@ -851,8 +1022,13 @@ void generate_bishop_moves_white(struct board_state *board,
             struct board_state tmp = *board;
             make(&tmp, m);
             if (!in_check(&tmp, WHITE)) {
+                move_count++;
                 int32_t score = get_transposition_score(tmp.hash);
-                priority_queue_push(moves, m, score);
+                if (moves) {
+                    priority_queue_push(moves, m, score);
+                } else {
+                    free(m);
+                }
             } else {
                 free(m);
             }
@@ -860,10 +1036,12 @@ void generate_bishop_moves_white(struct board_state *board,
         }
         bishops ^= bishop;
     }
+    return move_count;
 }
 
-void generate_bishop_moves_black(struct board_state *board,
+int generate_bishop_moves_black(struct board_state *board,
         struct priority_queue *moves) {
+    int move_count = 0;
     uint64_t bishops = board->bb[BLACK][BISHOP];
     while (bishops) {
         uint64_t bishop = bishops & -bishops;
@@ -879,6 +1057,7 @@ void generate_bishop_moves_black(struct board_state *board,
             m->t_mover = captured_piece;
             m->primary = bishop | attack;
             m->tertiary = captured_piece == NO_PIECE ? 0 : attack;
+            m->primary_src = bishop;
             m->flags.castle_q[0] = attack == BITBOARD_A1 ? 0 : board->flags.castle_q[0];
             m->flags.castle_q[1] = board->flags.castle_q[1];
             m->flags.castle_k[0] = attack == BITBOARD_H1 ? 0 : board->flags.castle_k[0];
@@ -888,8 +1067,13 @@ void generate_bishop_moves_black(struct board_state *board,
             struct board_state tmp = *board;
             make(&tmp, m);
             if (!in_check(&tmp, BLACK)) {
+                move_count++;
                 int32_t score = get_transposition_score(tmp.hash);
-                priority_queue_push(moves, m, -score);
+                if (moves) {
+                    priority_queue_push(moves, m, -score);
+                } else {
+                    free(m);
+                }
             } else {
                 free(m);
             }
@@ -897,10 +1081,12 @@ void generate_bishop_moves_black(struct board_state *board,
         }
         bishops ^= bishop;
     }
+    return move_count;
 }
 
-void generate_rook_moves_white(struct board_state *board,
+int generate_rook_moves_white(struct board_state *board,
         struct priority_queue *moves) {
+    int move_count = 0;
     uint64_t rooks = board->bb[WHITE][ROOK];
     while (rooks) {
         uint64_t rook = rooks & -rooks;
@@ -916,6 +1102,7 @@ void generate_rook_moves_white(struct board_state *board,
             m->t_mover = captured_piece;
             m->primary = rook | attack;
             m->tertiary = captured_piece == NO_PIECE ? 0 : attack;
+            m->primary_src = rook;
             m->flags.castle_q[0] = rook == BITBOARD_A1 ? 0 : board->flags.castle_q[0];
             m->flags.castle_q[1] = attack == BITBOARD_A8 ? 0 : board->flags.castle_q[1];
             m->flags.castle_k[0] = rook == BITBOARD_H1 ? 0 : board->flags.castle_k[0];
@@ -925,8 +1112,13 @@ void generate_rook_moves_white(struct board_state *board,
             struct board_state tmp = *board;
             make(&tmp, m);
             if (!in_check(&tmp, WHITE)) {
+                move_count++;
                 int32_t score = get_transposition_score(tmp.hash);
-                priority_queue_push(moves, m, score);
+                if (moves) {
+                    priority_queue_push(moves, m, score);
+                } else {
+                    free(m);
+                }
             } else {
                 free(m);
             }
@@ -934,10 +1126,12 @@ void generate_rook_moves_white(struct board_state *board,
         }
         rooks ^= rook;
     }
+    return move_count;
 }
 
-void generate_rook_moves_black(struct board_state *board,
+int generate_rook_moves_black(struct board_state *board,
         struct priority_queue *moves) {
+    int move_count = 0;
     uint64_t rooks = board->bb[BLACK][ROOK];
     while (rooks) {
         uint64_t rook = rooks & -rooks;
@@ -953,6 +1147,7 @@ void generate_rook_moves_black(struct board_state *board,
             m->t_mover = captured_piece;
             m->primary = rook | attack;
             m->tertiary = captured_piece == NO_PIECE ? 0 : attack;
+            m->primary_src = rook;
             m->flags.castle_q[0] = attack == BITBOARD_A1 ? 0 : board->flags.castle_q[0];
             m->flags.castle_q[1] = rook == BITBOARD_A8 ? 0 : board->flags.castle_q[1];
             m->flags.castle_k[0] = attack == BITBOARD_H1 ? 0 : board->flags.castle_k[0];
@@ -962,8 +1157,13 @@ void generate_rook_moves_black(struct board_state *board,
             struct board_state tmp = *board;
             make(&tmp, m);
             if (!in_check(&tmp, BLACK)) {
+                move_count++;
                 int32_t score = get_transposition_score(tmp.hash);
-                priority_queue_push(moves, m, -score);
+                if (moves) { 
+                    priority_queue_push(moves, m, -score);
+                } else {
+                    free(m);
+                }
             } else {
                 free(m);
             }
@@ -971,10 +1171,12 @@ void generate_rook_moves_black(struct board_state *board,
         }
         rooks ^= rook;
     }
+    return move_count;
 }
 
-void generate_queen_moves_white(struct board_state *board,
+int generate_queen_moves_white(struct board_state *board,
         struct priority_queue *moves) {
+    int move_count = 0;
     uint64_t queens = board->bb[WHITE][QUEEN];
     while (queens) {
         uint64_t queen = queens & -queens;
@@ -991,6 +1193,7 @@ void generate_queen_moves_white(struct board_state *board,
             m->t_mover = captured_piece;
             m->primary = queen | attack;
             m->tertiary = captured_piece == NO_PIECE ? 0 : attack;
+            m->primary_src = queen;
             m->flags.castle_q[0] = board->flags.castle_q[0];
             m->flags.castle_q[1] = attack == BITBOARD_A8 ? 0 : board->flags.castle_q[1];
             m->flags.castle_k[0] = board->flags.castle_k[0];
@@ -1000,8 +1203,13 @@ void generate_queen_moves_white(struct board_state *board,
             struct board_state tmp = *board;
             make(&tmp, m);
             if (!in_check(&tmp, WHITE)) {
+                move_count++;
                 int32_t score = get_transposition_score(tmp.hash);
-                priority_queue_push(moves, m, score);
+                if (moves) {
+                    priority_queue_push(moves, m, score);
+                } else {
+                    free(m);
+                }
             } else {
                 free(m);
             }
@@ -1009,10 +1217,12 @@ void generate_queen_moves_white(struct board_state *board,
         }
         queens ^= queen;
     }
+    return move_count;
 }
 
-void generate_queen_moves_black(struct board_state *board,
+int generate_queen_moves_black(struct board_state *board,
         struct priority_queue *moves) {
+    int move_count = 0;
     uint64_t queens = board->bb[BLACK][QUEEN];
     while (queens) {
         uint64_t queen = queens & -queens;
@@ -1029,6 +1239,7 @@ void generate_queen_moves_black(struct board_state *board,
             m->t_mover = captured_piece;
             m->primary = queen | attack;
             m->tertiary = captured_piece == NO_PIECE ? 0 : attack;
+            m->primary_src = queen;
             m->flags.castle_q[0] = attack == BITBOARD_A1 ? 0 : board->flags.castle_q[0];
             m->flags.castle_q[1] = board->flags.castle_q[1];
             m->flags.castle_k[0] = attack == BITBOARD_H1 ? 0 : board->flags.castle_k[0];
@@ -1038,8 +1249,13 @@ void generate_queen_moves_black(struct board_state *board,
             struct board_state tmp = *board;
             make(&tmp, m);
             if (!in_check(&tmp, BLACK)) {
+                move_count++;
                 int32_t score = get_transposition_score(tmp.hash);
-                priority_queue_push(moves, m, -score);
+                if (moves) {
+                    priority_queue_push(moves, m, -score);
+                } else {
+                    free(m);
+                }
             } else {
                 free(m);
             }
@@ -1047,10 +1263,12 @@ void generate_queen_moves_black(struct board_state *board,
         }
         queens ^= queen;
     }
+    return move_count;
 }
 
-void generate_knight_moves_white(struct board_state *board,
+int generate_knight_moves_white(struct board_state *board,
         struct priority_queue *moves) {
+    int move_count = 0;
     uint64_t knights = board->bb[WHITE][KNIGHT];
     while (knights) {
         uint64_t knight = knights & -knights;
@@ -1064,6 +1282,7 @@ void generate_knight_moves_white(struct board_state *board,
             m->t_mover = captured_piece;
             m->primary = knight | attack;
             m->tertiary = captured_piece == NO_PIECE ? 0 : attack;
+            m->primary_src = knight;
             m->flags.castle_q[0] = board->flags.castle_q[0];
             m->flags.castle_q[1] = attack == BITBOARD_A8 ? 0 : board->flags.castle_q[1];
             m->flags.castle_k[0] = board->flags.castle_k[0];
@@ -1073,8 +1292,13 @@ void generate_knight_moves_white(struct board_state *board,
             struct board_state tmp = *board;
             make(&tmp, m);
             if (!in_check(&tmp, WHITE)) {
+                move_count++;
                 int32_t score = get_transposition_score(tmp.hash);
-                priority_queue_push(moves, m, score);
+                if (moves) {
+                    priority_queue_push(moves, m, score);
+                } else {
+                    free(m);
+                }
             } else {
                 free(m);
             }
@@ -1082,10 +1306,12 @@ void generate_knight_moves_white(struct board_state *board,
         }
         knights ^= knight;
     }
+    return move_count;
 }
 
-void generate_knight_moves_black(struct board_state *board,
+int generate_knight_moves_black(struct board_state *board,
         struct priority_queue *moves) {
+    int move_count = 0;
     uint64_t knights = board->bb[BLACK][KNIGHT];
     while (knights) {
         uint64_t knight = knights & -knights;
@@ -1099,6 +1325,7 @@ void generate_knight_moves_black(struct board_state *board,
             m->t_mover = captured_piece;
             m->primary = knight | attack;
             m->tertiary = captured_piece == NO_PIECE ? 0 : attack;
+            m->primary_src = knight;
             m->flags.castle_q[0] = attack == BITBOARD_A1 ? 0 : board->flags.castle_q[0];
             m->flags.castle_q[1] = board->flags.castle_q[1];
             m->flags.castle_k[0] = attack == BITBOARD_H1 ? 0 : board->flags.castle_k[0];
@@ -1108,8 +1335,13 @@ void generate_knight_moves_black(struct board_state *board,
             struct board_state tmp = *board;
             make(&tmp, m);
             if (!in_check(&tmp, BLACK)) {
+                move_count++;
                 int32_t score = get_transposition_score(tmp.hash);
-                priority_queue_push(moves, m, -score);
+                if (moves) {
+                    priority_queue_push(moves, m, -score);
+                } else {
+                    free(m);
+                }
             } else {
                 free(m);
             }
@@ -1117,10 +1349,12 @@ void generate_knight_moves_black(struct board_state *board,
         }
         knights ^= knight;
     }
+    return move_count;
 }
 
-void generate_king_moves_white(struct board_state *board,
+int generate_king_moves_white(struct board_state *board,
         struct priority_queue *moves) {
+    int move_count = 0;
     uint64_t king = board->bb[WHITE][KING];
     uint64_t attacks = king_attacks(king) & ~board->bb[WHITE][ALL] & ~all_attacks(board, BLACK);
     while (attacks) {
@@ -1132,22 +1366,29 @@ void generate_king_moves_white(struct board_state *board,
         m->t_mover = captured_piece;
         m->primary = king | attack;
         m->tertiary = captured_piece == NO_PIECE ? 0 : attack;
+        m->primary_src = king;
         m->flags.castle_q[0] = king == BITBOARD_E1 ? 0 : board->flags.castle_q[0];
         m->flags.castle_q[1] = attack == BITBOARD_A8 ? 0 : board->flags.castle_q[1];
         m->flags.castle_k[0] = king == BITBOARD_E1 ? 0 : board->flags.castle_k[0];
         m->flags.castle_k[1] = attack == BITBOARD_H8 ? 0 : board->flags.castle_k[1];
         m->flags.en_passant[0] = m->flags.en_passant[1] = 0;
-        /* No need to check legality */
-        struct board_state tmp = *board;
-        make(&tmp, m);
-        int32_t score = get_transposition_score(tmp.hash);
-        priority_queue_push(moves, m, score);
+        move_count++;
+        if (moves) {
+            struct board_state tmp = *board;
+            make(&tmp, m);
+            int32_t score = get_transposition_score(tmp.hash);
+            priority_queue_push(moves, m, score);
+        } else {
+            free(m);
+        }
         attacks ^= attack;
     }
+    return move_count;
 }
 
-void generate_king_moves_black(struct board_state *board,
+int generate_king_moves_black(struct board_state *board,
         struct priority_queue *moves) {
+    int move_count = 0;
     uint64_t king = board->bb[BLACK][KING];
     uint64_t attacks = king_attacks(king) & ~board->bb[BLACK][ALL] & ~all_attacks(board, WHITE);
     while (attacks) {
@@ -1159,22 +1400,30 @@ void generate_king_moves_black(struct board_state *board,
         m->t_mover = captured_piece;
         m->primary = king | attack;
         m->tertiary = captured_piece == NO_PIECE ? 0 : attack;
+        m->primary_src = king;
         m->flags.castle_q[0] = attack == BITBOARD_A1 ? 0 : board->flags.castle_q[0];
         m->flags.castle_q[1] = king == BITBOARD_E8 ? 0 : board->flags.castle_q[1];
         m->flags.castle_k[0] = attack == BITBOARD_H1 ? 0 : board->flags.castle_k[0];
         m->flags.castle_k[1] = king == BITBOARD_E8 ? 0 : board->flags.castle_k[1];
         m->flags.en_passant[0] = m->flags.en_passant[1] = 0;
-        /* No need to check legality */
-        struct board_state tmp = *board;
-        make(&tmp, m);
-        int32_t score = get_transposition_score(tmp.hash);
-        priority_queue_push(moves, m, -score);
+        move_count++;
+        if (moves) {
+            /* No need to check legality */
+            struct board_state tmp = *board;
+            make(&tmp, m);
+            int32_t score = get_transposition_score(tmp.hash);
+            priority_queue_push(moves, m, -score);
+        } else {
+            free(m);
+        }
         attacks ^= attack;
     }
+    return move_count;
 }
 
-void generate_castle_white(struct board_state *board,
+int generate_castle_white(struct board_state *board,
         struct priority_queue *moves) {
+    int move_count = 0;
     uint64_t enemy_attacks = all_attacks(board, BLACK);
     /* Squares between king and rook must be unobstructed, king cannot
      * castle through check
@@ -1188,15 +1437,21 @@ void generate_castle_white(struct board_state *board,
         m->t_mover = NO_PIECE;
         m->primary = BITBOARD_E1 | BITBOARD_C1;
         m->secondary = BITBOARD_A1 | BITBOARD_D1;
+        m->primary_src = BITBOARD_E1;
         m->flags.castle_q[0] = 0;
         m->flags.castle_q[1] = board->flags.castle_q[1];
         m->flags.castle_k[0] = 0;
         m->flags.castle_k[1] = board->flags.castle_k[1];
         m->flags.en_passant[0] = m->flags.en_passant[1] = 0;
-        struct board_state tmp = *board;
-        make(&tmp, m);
-        int32_t score = get_transposition_score(tmp.hash);
-        priority_queue_push(moves, m, score);
+        move_count++;
+        if (moves) {
+            struct board_state tmp = *board;
+            make(&tmp, m);
+            int32_t score = get_transposition_score(tmp.hash);
+            priority_queue_push(moves, m, score);
+        } else {
+            free(m);
+        }
     }
     if (board->flags.castle_k[WHITE] &
             !((BITBOARD_E1 | BITBOARD_F1 | BITBOARD_G1) & enemy_attacks) &
@@ -1207,20 +1462,28 @@ void generate_castle_white(struct board_state *board,
         m->t_mover = NO_PIECE;
         m->primary = BITBOARD_E1 | BITBOARD_G1;
         m->secondary = BITBOARD_H1 | BITBOARD_F1;
+        m->primary_src = BITBOARD_E1;
         m->flags.castle_q[0] = 0;
         m->flags.castle_q[1] = board->flags.castle_q[1];
         m->flags.castle_k[0] = 0;
         m->flags.castle_k[1] = board->flags.castle_k[1];
         m->flags.en_passant[0] = m->flags.en_passant[1] = 0;
-        struct board_state tmp = *board;
-        make(&tmp, m);
-        int32_t score = get_transposition_score(tmp.hash);
-        priority_queue_push(moves, m, score);
+        move_count++;
+        if (moves) {
+            struct board_state tmp = *board;
+            make(&tmp, m);
+            int32_t score = get_transposition_score(tmp.hash);
+            priority_queue_push(moves, m, score);
+        } else {
+            free(m);
+        }
     }
+    return move_count;
 }
 
-void generate_castle_black(struct board_state *board,
+int generate_castle_black(struct board_state *board,
         struct priority_queue *moves) {
+    int move_count = 0;
     uint64_t enemy_attacks = all_attacks(board, WHITE);
     if (board->flags.castle_q[BLACK] &
             !((BITBOARD_E8 | BITBOARD_D8 | BITBOARD_C8) & enemy_attacks) &
@@ -1231,15 +1494,21 @@ void generate_castle_black(struct board_state *board,
         m->t_mover = NO_PIECE;
         m->primary = BITBOARD_E8 | BITBOARD_C8;
         m->secondary = BITBOARD_A8 | BITBOARD_D8;
+        m->primary_src = BITBOARD_E8;
         m->flags.castle_q[0] = board->flags.castle_q[0];
         m->flags.castle_q[1] = 0;
         m->flags.castle_k[0] = board->flags.castle_k[0];
         m->flags.castle_k[1] = 0;
         m->flags.en_passant[0] = m->flags.en_passant[1] = 0;
-        struct board_state tmp = *board;
-        make(&tmp, m);
-        int32_t score = get_transposition_score(tmp.hash);
-        priority_queue_push(moves, m, -score);
+        move_count++;
+        if (moves) {
+            struct board_state tmp = *board;
+            make(&tmp, m);
+            int32_t score = get_transposition_score(tmp.hash);
+            priority_queue_push(moves, m, -score);
+        } else {
+            free(m);
+        }
     }
     if (board->flags.castle_k[BLACK] &
             !((BITBOARD_E8 | BITBOARD_F8 | BITBOARD_G8) & enemy_attacks) &
@@ -1250,36 +1519,43 @@ void generate_castle_black(struct board_state *board,
         m->t_mover = NO_PIECE;
         m->primary = BITBOARD_E8 | BITBOARD_G8;
         m->secondary = BITBOARD_H8 | BITBOARD_F8;
+        m->primary_src = BITBOARD_E8;
         m->flags.castle_q[0] = board->flags.castle_q[0];
         m->flags.castle_q[1] = 0;
         m->flags.castle_k[0] = board->flags.castle_k[0];
         m->flags.castle_k[1] = 0;
         m->flags.en_passant[0] = m->flags.en_passant[1] = 0;
-        struct board_state tmp = *board;
-        make(&tmp, m);
-        int32_t score = get_transposition_score(tmp.hash);
-        priority_queue_push(moves, m, -score);
+        move_count++;
+        if (moves) {
+            struct board_state tmp = *board;
+            make(&tmp, m);
+            int32_t score = get_transposition_score(tmp.hash);
+            priority_queue_push(moves, m, -score);
+        } else {
+            free(m);
+        }
     }
+    return move_count;
 }
 
-void generate_moves_white(struct board_state *board,
+int generate_moves_white(struct board_state *board,
         struct priority_queue *moves) {
-    generate_king_moves_white(board, moves);
-    generate_queen_moves_white(board, moves);
-    generate_bishop_moves_white(board, moves);
-    generate_knight_moves_white(board, moves);
-    generate_rook_moves_white(board, moves);
-    generate_pawn_moves_white(board, moves);
+    return generate_king_moves_white(board, moves) +
+    generate_queen_moves_white(board, moves) +
+    generate_bishop_moves_white(board, moves) +
+    generate_knight_moves_white(board, moves) +
+    generate_rook_moves_white(board, moves) +
+    generate_pawn_moves_white(board, moves) +
     generate_castle_white(board, moves);
 }
 
-void generate_moves_black(struct board_state *board,
+int generate_moves_black(struct board_state *board,
         struct priority_queue *moves) {
-    generate_king_moves_black(board, moves);
-    generate_queen_moves_black(board, moves);
-    generate_bishop_moves_black(board, moves);
-    generate_knight_moves_black(board, moves);
-    generate_rook_moves_black(board, moves);
-    generate_pawn_moves_black(board, moves);
+    return generate_king_moves_black(board, moves) +
+    generate_queen_moves_black(board, moves) +
+    generate_bishop_moves_black(board, moves) +
+    generate_knight_moves_black(board, moves) +
+    generate_rook_moves_black(board, moves) +
+    generate_pawn_moves_black(board, moves) +
     generate_castle_black(board, moves);
 }

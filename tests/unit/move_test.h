@@ -43,6 +43,7 @@ void assert_move_equal(struct move *a, struct move *b) {
     assert_int_equal(a->primary, b->primary);
     assert_int_equal(a->secondary, b->secondary);
     assert_int_equal(a->tertiary, b->tertiary);
+    assert_int_equal(a->primary_src, b->primary_src);
     assert_board_flags_equal(&a->flags, &b->flags);
 }
 
@@ -73,7 +74,7 @@ void normal_move_test(void **state) {
     };
     struct move e2e3 = {
         PAWN, NO_PIECE, NO_PIECE,
-        BITBOARD_E3 | BITBOARD_E2, 0, 0,
+        BITBOARD_E3 | BITBOARD_E2, 0, 0, BITBOARD_E2,
         {{1, 1}, {1, 1}, {0, 0}}
     };
     make(&pos, &e2e3);
@@ -130,7 +131,7 @@ void capture_move_test(void **state) {
 
     struct move e4d5 = {
         PAWN, NO_PIECE, PAWN,
-        BITBOARD_E4 | BITBOARD_D5, 0, BITBOARD_D5,
+        BITBOARD_E4 | BITBOARD_D5, 0, BITBOARD_D5, BITBOARD_E4,
         {{1, 1}, {1, 1}, {0, 0}}
     };
     make(&pos, &e4d5);
@@ -185,7 +186,7 @@ void promotion_capture_move_test(void **state) {
     };
     struct move g7h8 = {
         PAWN, QUEEN, ROOK,
-        BITBOARD_G7, BITBOARD_H8, BITBOARD_H8,
+        BITBOARD_G7, BITBOARD_H8, BITBOARD_H8, BITBOARD_G7,
         {{0, 0}, {0, 0}, {0, 0}}
     };
     make(&pos, &g7h8);
@@ -266,11 +267,12 @@ void generate_pawn_single_pushes_white_test(void **state) {
     };
     struct priority_queue pq;
     priority_queue_init(&pq, 16);
-    generate_pawn_single_pushes_white(&pos, &pq);
+    int move_count = generate_pawn_single_pushes_white(&pos, &pq);
+    assert_int_equal(1, move_count);
     assert_int_equal(1, pq.length);
     struct move expected_move = {
         PAWN, NO_PIECE, NO_PIECE,
-        BITBOARD_E2 | BITBOARD_E3, 0, 0,
+        BITBOARD_E2 | BITBOARD_E3, 0, 0, BITBOARD_E2,
         {{0, 0}, {0, 0}, {0, 0}}
     };
     struct move *single_push = priority_queue_pop(&pq);
@@ -307,22 +309,22 @@ void generate_pawn_push_promotions_white_test(void **state) {
     struct move expected_moves[4] = {
         {
             PAWN, QUEEN, NO_PIECE,
-            BITBOARD_A7, BITBOARD_A8, 0,
+            BITBOARD_A7, BITBOARD_A8, 0, BITBOARD_A7,
             {{0, 0}, {0, 0}, {0, 0}}
         },
         {
             PAWN, BISHOP, NO_PIECE,
-            BITBOARD_A7, BITBOARD_A8, 0,
+            BITBOARD_A7, BITBOARD_A8, 0, BITBOARD_A7,
             {{0, 0}, {0, 0}, {0, 0}}
         },
         {
             PAWN, KNIGHT, NO_PIECE,
-            BITBOARD_A7, BITBOARD_A8, 0,
+            BITBOARD_A7, BITBOARD_A8, 0, BITBOARD_A7,
             {{0, 0}, {0, 0}, {0, 0}}
         },
         {
             PAWN, ROOK, NO_PIECE,
-            BITBOARD_A7, BITBOARD_A8, 0,
+            BITBOARD_A7, BITBOARD_A8, 0, BITBOARD_A7,
             {{0, 0}, {0, 0}, {0, 0}}
         },
     };
@@ -333,7 +335,8 @@ void generate_pawn_push_promotions_white_test(void **state) {
 
     struct priority_queue pq;
     priority_queue_init(&pq, 16);
-    generate_pawn_push_promotions_white(&pos, &pq);
+    int move_count = generate_pawn_push_promotions_white(&pos, &pq);
+    assert_int_equal(4, move_count);
     assert_int_equal(4, pq.length);
 
     /* Check each move for equality with expected moves */
@@ -378,11 +381,12 @@ void generate_pawn_double_pushes_white_test(void **state) {
     };
     struct priority_queue pq;
     priority_queue_init(&pq, 16);
-    generate_pawn_double_pushes_white(&pos, &pq);
+    int move_count = generate_pawn_double_pushes_white(&pos, &pq);
+    assert_int_equal(1, move_count);
     assert_int_equal(1, pq.length);
     struct move expected_move = {
         PAWN, NO_PIECE, NO_PIECE,
-        BITBOARD_E2 | BITBOARD_E4, 0, 0,
+        BITBOARD_E2 | BITBOARD_E4, 0, 0, BITBOARD_E2,
         {{0, 0}, {0, 0}, {FILE_SET_EFILE, 0}}
     };
     struct move *single_push = priority_queue_pop(&pq);
@@ -416,11 +420,12 @@ void generate_pawn_east_captures_white_test(void **state) {
     };
     struct priority_queue pq;
     priority_queue_init(&pq, 16);
-    generate_pawn_east_captures_white(&pos, &pq);
+    int move_count = generate_pawn_east_captures_white(&pos, &pq);
+    assert_int_equal(1, move_count);
     assert_int_equal(1, pq.length);
     struct move expected_move = {
         PAWN, NO_PIECE, PAWN,
-        BITBOARD_E4 | BITBOARD_F5, 0, BITBOARD_F5,
+        BITBOARD_E4 | BITBOARD_F5, 0, BITBOARD_F5, BITBOARD_E4,
         {{0, 0}, {0, 0}, {0, 0}}
     };
     struct move *single_push = priority_queue_pop(&pq);
@@ -454,11 +459,12 @@ void generate_pawn_west_captures_white_test(void **state) {
     };
     struct priority_queue pq;
     priority_queue_init(&pq, 16);
-    generate_pawn_west_captures_white(&pos, &pq);
+    int move_count = generate_pawn_west_captures_white(&pos, &pq);
+    assert_int_equal(1, move_count);
     assert_int_equal(1, pq.length);
     struct move expected_move = {
         PAWN, NO_PIECE, PAWN,
-        BITBOARD_E4 | BITBOARD_D5, 0, BITBOARD_D5,
+        BITBOARD_E4 | BITBOARD_D5, 0, BITBOARD_D5, BITBOARD_E4,
         {{0, 0}, {0, 0}, {0, 0}}
     };
     struct move *single_push = priority_queue_pop(&pq);
@@ -495,22 +501,22 @@ generate_pawn_east_captures_promotions_white_test(void **state) {
     struct move expected_moves[4] = {
         {
             PAWN, QUEEN, KNIGHT,
-            BITBOARD_A7, BITBOARD_B8, BITBOARD_B8,
+            BITBOARD_A7, BITBOARD_B8, BITBOARD_B8, BITBOARD_A7,
             {{0, 0}, {0, 0}, {0, 0}}
         },
         {
             PAWN, BISHOP, KNIGHT,
-            BITBOARD_A7, BITBOARD_B8, BITBOARD_B8,
+            BITBOARD_A7, BITBOARD_B8, BITBOARD_B8, BITBOARD_A7,
             {{0, 0}, {0, 0}, {0, 0}}
         },
         {
             PAWN, KNIGHT, KNIGHT,
-            BITBOARD_A7, BITBOARD_B8, BITBOARD_B8,
+            BITBOARD_A7, BITBOARD_B8, BITBOARD_B8, BITBOARD_A7,
             {{0, 0}, {0, 0}, {0, 0}}
         },
         {
             PAWN, ROOK, KNIGHT,
-            BITBOARD_A7, BITBOARD_B8, BITBOARD_B8,
+            BITBOARD_A7, BITBOARD_B8, BITBOARD_B8, BITBOARD_A7,
             {{0, 0}, {0, 0}, {0, 0}}
         },
     };
@@ -521,7 +527,8 @@ generate_pawn_east_captures_promotions_white_test(void **state) {
 
     struct priority_queue pq;
     priority_queue_init(&pq, 16);
-    generate_pawn_east_captures_promotions_white(&pos, &pq);
+    int move_count = generate_pawn_east_captures_promotions_white(&pos, &pq);
+    assert_int_equal(4, move_count);
     assert_int_equal(4, pq.length);
 
     /* Check each move for equality with expected moves */
@@ -569,22 +576,22 @@ generate_pawn_west_captures_promotions_white_test(void **state) {
     struct move expected_moves[4] = {
         {
             PAWN, QUEEN, KNIGHT,
-            BITBOARD_C7, BITBOARD_B8, BITBOARD_B8,
+            BITBOARD_C7, BITBOARD_B8, BITBOARD_B8, BITBOARD_C7,
             {{0, 0}, {0, 0}, {0, 0}}
         },
         {
             PAWN, BISHOP, KNIGHT,
-            BITBOARD_C7, BITBOARD_B8, BITBOARD_B8,
+            BITBOARD_C7, BITBOARD_B8, BITBOARD_B8, BITBOARD_C7,
             {{0, 0}, {0, 0}, {0, 0}}
         },
         {
             PAWN, KNIGHT, KNIGHT,
-            BITBOARD_C7, BITBOARD_B8, BITBOARD_B8,
+            BITBOARD_C7, BITBOARD_B8, BITBOARD_B8, BITBOARD_C7,
             {{0, 0}, {0, 0}, {0, 0}}
         },
         {
             PAWN, ROOK, KNIGHT,
-            BITBOARD_C7, BITBOARD_B8, BITBOARD_B8,
+            BITBOARD_C7, BITBOARD_B8, BITBOARD_B8, BITBOARD_C7,
             {{0, 0}, {0, 0}, {0, 0}}
         },
     };
@@ -595,7 +602,8 @@ generate_pawn_west_captures_promotions_white_test(void **state) {
 
     struct priority_queue pq;
     priority_queue_init(&pq, 16);
-    generate_pawn_west_captures_promotions_white(&pos, &pq);
+    int move_count = generate_pawn_west_captures_promotions_white(&pos, &pq);
+    assert_int_equal(4, move_count);
     assert_int_equal(4, pq.length);
 
     /* Check each move for equality with expected moves */
@@ -640,11 +648,12 @@ void generate_pawn_en_passant_white_test(void **state) {
     };
     struct priority_queue pq;
     priority_queue_init(&pq, 16);
-    generate_pawn_en_passant_white(&pos, &pq);
+    int move_count = generate_pawn_en_passant_white(&pos, &pq);
+    assert_int_equal(1, move_count);
     assert_int_equal(1, pq.length);
     struct move expected_move = {
         PAWN, NO_PIECE, PAWN,
-        BITBOARD_E5 | BITBOARD_D6, 0, BITBOARD_D5,
+        BITBOARD_E5 | BITBOARD_D6, 0, BITBOARD_D5, BITBOARD_E5,
         {{0, 0}, {0, 0}, {0, 0}}
     };
     struct move *single_push = priority_queue_pop(&pq);
@@ -679,11 +688,12 @@ void generate_pawn_single_pushes_black_test(void **state) {
     };
     struct priority_queue pq;
     priority_queue_init(&pq, 16);
-    generate_pawn_single_pushes_black(&pos, &pq);
+    int move_count = generate_pawn_single_pushes_black(&pos, &pq);
+    assert_int_equal(1, move_count);
     assert_int_equal(1, pq.length);
     struct move expected_move = {
         PAWN, NO_PIECE, NO_PIECE,
-        BITBOARD_E7 | BITBOARD_E6, 0, 0,
+        BITBOARD_E7 | BITBOARD_E6, 0, 0, BITBOARD_E7,
         {{0, 0}, {0, 0}, {0, 0}}
     };
     struct move *single_push = priority_queue_pop(&pq);
@@ -719,22 +729,22 @@ void generate_pawn_push_promotions_black_test(void **state) {
     struct move expected_moves[4] = {
         {
             PAWN, QUEEN, NO_PIECE,
-            BITBOARD_A2, BITBOARD_A1, 0,
+            BITBOARD_A2, BITBOARD_A1, 0, BITBOARD_A2,
             {{0, 0}, {0, 0}, {0, 0}}
         },
         {
             PAWN, BISHOP, NO_PIECE,
-            BITBOARD_A2, BITBOARD_A1, 0,
+            BITBOARD_A2, BITBOARD_A1, 0, BITBOARD_A2,
             {{0, 0}, {0, 0}, {0, 0}}
         },
         {
             PAWN, KNIGHT, NO_PIECE,
-            BITBOARD_A2, BITBOARD_A1, 0,
+            BITBOARD_A2, BITBOARD_A1, 0, BITBOARD_A2,
             {{0, 0}, {0, 0}, {0, 0}}
         },
         {
             PAWN, ROOK, NO_PIECE,
-            BITBOARD_A2, BITBOARD_A1, 0,
+            BITBOARD_A2, BITBOARD_A1, 0, BITBOARD_A2,
             {{0, 0}, {0, 0}, {0, 0}}
         },
     };
@@ -745,7 +755,8 @@ void generate_pawn_push_promotions_black_test(void **state) {
 
     struct priority_queue pq;
     priority_queue_init(&pq, 16);
-    generate_pawn_push_promotions_black(&pos, &pq);
+    int move_count = generate_pawn_push_promotions_black(&pos, &pq);
+    assert_int_equal(4, move_count);
     assert_int_equal(4, pq.length);
 
     /* Check each move for equality with expected moves */
@@ -790,11 +801,12 @@ void generate_pawn_double_pushes_black_test(void **state) {
     };
     struct priority_queue pq;
     priority_queue_init(&pq, 16);
-    generate_pawn_double_pushes_black(&pos, &pq);
+    int move_count = generate_pawn_double_pushes_black(&pos, &pq);
+    assert_int_equal(1, move_count);
     assert_int_equal(1, pq.length);
     struct move expected_move = {
         PAWN, NO_PIECE, NO_PIECE,
-        BITBOARD_E7 | BITBOARD_E5, 0, 0,
+        BITBOARD_E7 | BITBOARD_E5, 0, 0, BITBOARD_E7,
         {{0, 0}, {0, 0}, {0, FILE_SET_EFILE}}
     };
     struct move *single_push = priority_queue_pop(&pq);
@@ -828,11 +840,12 @@ void generate_pawn_east_captures_black_test(void **state) {
     };
     struct priority_queue pq;
     priority_queue_init(&pq, 16);
-    generate_pawn_east_captures_black(&pos, &pq);
+    int move_count = generate_pawn_east_captures_black(&pos, &pq);
+    assert_int_equal(1, move_count);
     assert_int_equal(1, pq.length);
     struct move expected_move = {
         PAWN, NO_PIECE, PAWN,
-        BITBOARD_D5 | BITBOARD_E4, 0, BITBOARD_E4,
+        BITBOARD_D5 | BITBOARD_E4, 0, BITBOARD_E4, BITBOARD_D5,
         {{0, 0}, {0, 0}, {0, 0}}
     };
     struct move *single_push = priority_queue_pop(&pq);
@@ -866,11 +879,12 @@ void generate_pawn_west_captures_black_test(void **state) {
     };
     struct priority_queue pq;
     priority_queue_init(&pq, 16);
-    generate_pawn_west_captures_black(&pos, &pq);
+    int move_count = generate_pawn_west_captures_black(&pos, &pq);
+    assert_int_equal(1, move_count);
     assert_int_equal(1, pq.length);
     struct move expected_move = {
         PAWN, NO_PIECE, PAWN,
-        BITBOARD_F5 | BITBOARD_E4, 0, BITBOARD_E4,
+        BITBOARD_F5 | BITBOARD_E4, 0, BITBOARD_E4, BITBOARD_F5,
         {{0, 0}, {0, 0}, {0, 0}}
     };
     struct move *single_push = priority_queue_pop(&pq);
@@ -907,22 +921,22 @@ generate_pawn_east_captures_promotions_black_test(void **state) {
     struct move expected_moves[4] = {
         {
             PAWN, QUEEN, KNIGHT,
-            BITBOARD_A2, BITBOARD_B1, BITBOARD_B1,
+            BITBOARD_A2, BITBOARD_B1, BITBOARD_B1, BITBOARD_A2,
             {{0, 0}, {0, 0}, {0, 0}}
         },
         {
             PAWN, BISHOP, KNIGHT,
-            BITBOARD_A2, BITBOARD_B1, BITBOARD_B1,
+            BITBOARD_A2, BITBOARD_B1, BITBOARD_B1, BITBOARD_A2,
             {{0, 0}, {0, 0}, {0, 0}}
         },
         {
             PAWN, KNIGHT, KNIGHT,
-            BITBOARD_A2, BITBOARD_B1, BITBOARD_B1,
+            BITBOARD_A2, BITBOARD_B1, BITBOARD_B1, BITBOARD_A2,
             {{0, 0}, {0, 0}, {0, 0}}
         },
         {
             PAWN, ROOK, KNIGHT,
-            BITBOARD_A2, BITBOARD_B1, BITBOARD_B1,
+            BITBOARD_A2, BITBOARD_B1, BITBOARD_B1, BITBOARD_A2,
             {{0, 0}, {0, 0}, {0, 0}}
         },
     };
@@ -933,7 +947,8 @@ generate_pawn_east_captures_promotions_black_test(void **state) {
 
     struct priority_queue pq;
     priority_queue_init(&pq, 16);
-    generate_pawn_east_captures_promotions_black(&pos, &pq);
+    int move_count = generate_pawn_east_captures_promotions_black(&pos, &pq);
+    assert_int_equal(4, move_count);
     assert_int_equal(4, pq.length);
 
     /* Check each move for equality with expected moves */
@@ -981,22 +996,22 @@ generate_pawn_west_captures_promotions_black_test(void **state) {
     struct move expected_moves[4] = {
         {
             PAWN, QUEEN, KNIGHT,
-            BITBOARD_C2, BITBOARD_B1, BITBOARD_B1,
+            BITBOARD_C2, BITBOARD_B1, BITBOARD_B1, BITBOARD_C2,
             {{0, 0}, {0, 0}, {0, 0}}
         },
         {
             PAWN, BISHOP, KNIGHT,
-            BITBOARD_C2, BITBOARD_B1, BITBOARD_B1,
+            BITBOARD_C2, BITBOARD_B1, BITBOARD_B1, BITBOARD_C2,
             {{0, 0}, {0, 0}, {0, 0}}
         },
         {
             PAWN, KNIGHT, KNIGHT,
-            BITBOARD_C2, BITBOARD_B1, BITBOARD_B1,
+            BITBOARD_C2, BITBOARD_B1, BITBOARD_B1, BITBOARD_C2,
             {{0, 0}, {0, 0}, {0, 0}}
         },
         {
             PAWN, ROOK, KNIGHT,
-            BITBOARD_C2, BITBOARD_B1, BITBOARD_B1,
+            BITBOARD_C2, BITBOARD_B1, BITBOARD_B1, BITBOARD_C2,
             {{0, 0}, {0, 0}, {0, 0}}
         },
     };
@@ -1007,7 +1022,8 @@ generate_pawn_west_captures_promotions_black_test(void **state) {
 
     struct priority_queue pq;
     priority_queue_init(&pq, 16);
-    generate_pawn_west_captures_promotions_black(&pos, &pq);
+    int move_count = generate_pawn_west_captures_promotions_black(&pos, &pq);
+    assert_int_equal(4, move_count);
     assert_int_equal(4, pq.length);
 
     /* Check each move for equality with expected moves */
@@ -1052,11 +1068,12 @@ void generate_pawn_en_passant_black_test(void **state) {
     };
     struct priority_queue pq;
     priority_queue_init(&pq, 16);
-    generate_pawn_en_passant_black(&pos, &pq);
+    int move_count = generate_pawn_en_passant_black(&pos, &pq);
+    assert_int_equal(1, move_count);
     assert_int_equal(1, pq.length);
     struct move expected_move = {
         PAWN, NO_PIECE, PAWN,
-        BITBOARD_E4 | BITBOARD_D3, 0, BITBOARD_D4,
+        BITBOARD_E4 | BITBOARD_D3, 0, BITBOARD_D4, BITBOARD_E4,
         {{0, 0}, {0, 0}, {0, 0}}
     };
     struct move *single_push = priority_queue_pop(&pq);
@@ -1091,11 +1108,12 @@ void generate_bishop_moves_obstruction_white_test(void **state) {
     };
     struct priority_queue pq;
     priority_queue_init(&pq, 16);
-    generate_bishop_moves_white(&pos, &pq);
+    int move_count = generate_bishop_moves_white(&pos, &pq);
+    assert_int_equal(1, move_count);
     assert_int_equal(1, pq.length);
     struct move expected_move = {
         BISHOP, NO_PIECE, NO_PIECE,
-        BITBOARD_E4 | BITBOARD_F5, 0, 0,
+        BITBOARD_E4 | BITBOARD_F5, 0, 0, BITBOARD_E4,
         {{0, 0}, {0, 0}, {0, 0}}
     };
     struct move *single_push = priority_queue_pop(&pq);
@@ -1130,11 +1148,12 @@ void generate_bishop_moves_capture_white_test(void **state) {
     };
     struct priority_queue pq;
     priority_queue_init(&pq, 16);
-    generate_bishop_moves_white(&pos, &pq);
+    int move_count = generate_bishop_moves_white(&pos, &pq);
+    assert_int_equal(1, move_count);
     assert_int_equal(1, pq.length);
     struct move expected_move = {
         BISHOP, NO_PIECE, ROOK,
-        BITBOARD_G7 | BITBOARD_H8, 0, BITBOARD_H8,
+        BITBOARD_G7 | BITBOARD_H8, 0, BITBOARD_H8, BITBOARD_G7,
         {{0, 0}, {0, 0}, {0, 0}}
     };
     struct move *single_push = priority_queue_pop(&pq);
@@ -1169,11 +1188,12 @@ void generate_bishop_moves_obstruction_black_test(void **state) {
     };
     struct priority_queue pq;
     priority_queue_init(&pq, 16);
-    generate_bishop_moves_black(&pos, &pq);
+    int move_count = generate_bishop_moves_black(&pos, &pq);
+    assert_int_equal(1, move_count);
     assert_int_equal(1, pq.length);
     struct move expected_move = {
         BISHOP, NO_PIECE, NO_PIECE,
-        BITBOARD_D4 | BITBOARD_E5, 0, 0,
+        BITBOARD_D4 | BITBOARD_E5, 0, 0, BITBOARD_D4,
         {{0, 0}, {0, 0}, {0, 0}}
     };
     struct move *single_push = priority_queue_pop(&pq);
@@ -1208,11 +1228,12 @@ void generate_bishop_moves_capture_black_test(void **state) {
     };
     struct priority_queue pq;
     priority_queue_init(&pq, 16);
-    generate_bishop_moves_black(&pos, &pq);
+    int move_count = generate_bishop_moves_black(&pos, &pq);
+    assert_int_equal(1, move_count);
     assert_int_equal(1, pq.length);
     struct move expected_move = {
         BISHOP, NO_PIECE, ROOK,
-        BITBOARD_G2 | BITBOARD_H1, 0, BITBOARD_H1,
+        BITBOARD_G2 | BITBOARD_H1, 0, BITBOARD_H1, BITBOARD_G2,
         {{0, 0}, {0, 0}, {0, 0}}
     };
     struct move *single_push = priority_queue_pop(&pq);
@@ -1247,11 +1268,12 @@ void generate_rook_moves_obstruction_white_test(void **state) {
     };
     struct priority_queue pq;
     priority_queue_init(&pq, 16);
-    generate_rook_moves_white(&pos, &pq);
+    int move_count = generate_rook_moves_white(&pos, &pq);
+    assert_int_equal(1, move_count);
     assert_int_equal(1, pq.length);
     struct move expected_move = {
         ROOK, NO_PIECE, NO_PIECE,
-        BITBOARD_E4 | BITBOARD_E5, 0, 0,
+        BITBOARD_E4 | BITBOARD_E5, 0, 0, BITBOARD_E4,
         {{0, 0}, {0, 0}, {0, 0}}
     };
     struct move *single_push = priority_queue_pop(&pq);
@@ -1286,11 +1308,12 @@ void generate_rook_moves_capture_white_test(void **state) {
     };
     struct priority_queue pq;
     priority_queue_init(&pq, 16);
-    generate_rook_moves_white(&pos, &pq);
+    int move_count = generate_rook_moves_white(&pos, &pq);
+    assert_int_equal(1, move_count);
     assert_int_equal(1, pq.length);
     struct move expected_move = {
         ROOK, NO_PIECE, ROOK,
-        BITBOARD_H7 | BITBOARD_H8, 0, BITBOARD_H8,
+        BITBOARD_H7 | BITBOARD_H8, 0, BITBOARD_H8, BITBOARD_H7,
         {{0, 0}, {0, 0}, {0, 0}}
     };
     struct move *single_push = priority_queue_pop(&pq);
@@ -1327,11 +1350,12 @@ void generate_rook_moves_obstruction_black_test(void **state) {
     };
     struct priority_queue pq;
     priority_queue_init(&pq, 16);
-    generate_rook_moves_black(&pos, &pq);
+    int move_count = generate_rook_moves_black(&pos, &pq);
+    assert_int_equal(1, move_count);
     assert_int_equal(1, pq.length);
     struct move expected_move = {
         ROOK, NO_PIECE, NO_PIECE,
-        BITBOARD_D4 | BITBOARD_D5, 0, 0,
+        BITBOARD_D4 | BITBOARD_D5, 0, 0, BITBOARD_D4,
         {{0, 0}, {0, 0}, {0, 0}}
     };
     struct move *single_push = priority_queue_pop(&pq);
@@ -1366,11 +1390,12 @@ void generate_rook_moves_capture_black_test(void **state) {
     };
     struct priority_queue pq;
     priority_queue_init(&pq, 16);
-    generate_rook_moves_black(&pos, &pq);
+    int move_count = generate_rook_moves_black(&pos, &pq);
+    assert_int_equal(1, move_count);
     assert_int_equal(1, pq.length);
     struct move expected_move = {
         ROOK, NO_PIECE, ROOK,
-        BITBOARD_H2 | BITBOARD_H1, 0, BITBOARD_H1,
+        BITBOARD_H2 | BITBOARD_H1, 0, BITBOARD_H1, BITBOARD_H2,
         {{0, 0}, {0, 0}, {0, 0}}
     };
     struct move *single_push = priority_queue_pop(&pq);
@@ -1380,4 +1405,175 @@ void generate_rook_moves_capture_black_test(void **state) {
 }
 
 /* TODO: test queen move generation */
+
+void generate_queen_moves_obstruction_white_test(void **state) {
+    struct board_state pos = {
+        WHITE,
+        0,
+        {{
+            BITBOARD_KING & BITBOARD_WHITE,
+            BITBOARD_E4,
+            0ul,
+            0ul,
+            0ul,
+            BITBOARD_D3 | BITBOARD_D4 | BITBOARD_D5 | BITBOARD_E3 |
+                BITBOARD_F3 | BITBOARD_F4 | BITBOARD_E5 | BITBOARD_G6,
+            (BITBOARD_KING & BITBOARD_WHITE) | BITBOARD_D3 | BITBOARD_D4 |
+                BITBOARD_D5 | BITBOARD_E3 | BITBOARD_F3 | BITBOARD_F4 | 
+                BITBOARD_E5 | BITBOARD_G6 | BITBOARD_E4
+        }, {
+            BITBOARD_KING & BITBOARD_BLACK,
+            0ul,
+            0ul,
+            0ul,
+            0ul,
+            0ul,
+            BITBOARD_KING & BITBOARD_BLACK
+        }},
+        {{0, 0}, {0, 0}, {0, 0}}
+    };
+    struct priority_queue pq;
+    priority_queue_init(&pq, 16);
+    int move_count = generate_queen_moves_white(&pos, &pq);
+    assert_int_equal(1, move_count);
+    assert_int_equal(1, pq.length);
+    struct move expected_move = {
+        QUEEN, NO_PIECE, NO_PIECE,
+        BITBOARD_E4 | BITBOARD_F5, 0, 0, BITBOARD_E4,
+        {{0, 0}, {0, 0}, {0, 0}}
+    };
+    struct move *single_push = priority_queue_pop(&pq);
+    assert_move_equal(&expected_move, single_push);
+    test_free(single_push);
+    priority_queue_destroy(&pq);
+}
+
+void generate_queen_moves_capture_white_test(void **state) {
+     struct board_state pos = {
+        WHITE,
+        0,
+        {{
+            BITBOARD_KING & BITBOARD_WHITE,
+            BITBOARD_G7,
+            0ul,
+            BITBOARD_F8 | BITBOARD_G8,
+            0ul,
+            BITBOARD_F6 | BITBOARD_F7 | BITBOARD_G6 | BITBOARD_H6 |
+                BITBOARD_H7,
+            (BITBOARD_KING & BITBOARD_WHITE) | BITBOARD_F6 | BITBOARD_F7 |
+                BITBOARD_G6 | BITBOARD_H6 | BITBOARD_H7 | BITBOARD_F8 |
+                BITBOARD_G8 | BITBOARD_G7
+
+        }, {
+            BITBOARD_KING & BITBOARD_BLACK,
+            0ul,
+            0ul,
+            0ul,
+            BITBOARD_H8,
+            0ul,
+            (BITBOARD_KING & BITBOARD_BLACK) | BITBOARD_H8
+        }},
+        {{0, 0}, {0, 1}, {0, 0}}
+    };
+    struct priority_queue pq;
+    priority_queue_init(&pq, 16);
+    int move_count = generate_queen_moves_white(&pos, &pq);
+    assert_int_equal(1, move_count);
+    assert_int_equal(1, pq.length);
+    struct move expected_move = {
+        QUEEN, NO_PIECE, ROOK,
+        BITBOARD_G7 | BITBOARD_H8, 0, BITBOARD_H8, BITBOARD_G7,
+        {{0, 0}, {0, 0}, {0, 0}}
+    };
+    struct move *single_push = priority_queue_pop(&pq);
+    assert_move_equal(&expected_move, single_push);
+    test_free(single_push);
+    priority_queue_destroy(&pq);
+}
+
+void generate_queen_moves_obstruction_black_test(void **state) {
+    struct board_state pos = {
+        BLACK,
+        0,
+        {{
+            BITBOARD_KING & BITBOARD_WHITE,
+            0ul,
+            0ul,
+            0ul,
+            0ul,
+            0ul,
+            BITBOARD_KING & BITBOARD_WHITE
+        }, {
+            BITBOARD_KING & BITBOARD_BLACK,
+            BITBOARD_D4,
+            0ul,
+            0ul,
+            0ul,
+            BITBOARD_C3 | BITBOARD_C4 | BITBOARD_C5 | BITBOARD_D3 |
+                BITBOARD_E3 | BITBOARD_E4 | BITBOARD_D5 | BITBOARD_F6,
+            (BITBOARD_KING & BITBOARD_BLACK) | BITBOARD_C3 | BITBOARD_C4 |
+                BITBOARD_C5 | BITBOARD_D3 | BITBOARD_E3 | BITBOARD_E4 |
+                BITBOARD_D5 | BITBOARD_F6 | BITBOARD_D4
+        }},
+        {{0, 0}, {0, 0}, {0, 0}}
+    };
+    struct priority_queue pq;
+    priority_queue_init(&pq, 16);
+    int move_count = generate_queen_moves_black(&pos, &pq);
+    assert_int_equal(1, move_count);
+    assert_int_equal(1, pq.length);
+    struct move expected_move = {
+        QUEEN, NO_PIECE, NO_PIECE,
+        BITBOARD_D4 | BITBOARD_E5, 0, 0, BITBOARD_D4,
+        {{0, 0}, {0, 0}, {0, 0}}
+    };
+    struct move *single_push = priority_queue_pop(&pq);
+    assert_move_equal(&expected_move, single_push);
+    test_free(single_push);
+    priority_queue_destroy(&pq);
+}
+
+void generate_queen_moves_capture_black_test(void **state) {
+     struct board_state pos = {
+        BLACK,
+        0,
+        {{
+            BITBOARD_KING & BITBOARD_WHITE,
+            0ul,
+            0ul,
+            0ul,
+            BITBOARD_H1,
+            0ul,
+            (BITBOARD_KING & BITBOARD_WHITE) | BITBOARD_H1
+        }, {
+            BITBOARD_KING & BITBOARD_BLACK,
+            BITBOARD_G2,
+            0ul,
+            BITBOARD_F1 | BITBOARD_G1,
+            0ul,
+            BITBOARD_F3 | BITBOARD_G3 | BITBOARD_H3 | BITBOARD_F2 |
+                BITBOARD_H2,
+            (BITBOARD_KING & BITBOARD_BLACK) | BITBOARD_G2 | BITBOARD_F1 |
+                BITBOARD_G1 | BITBOARD_F3 | BITBOARD_G3 | BITBOARD_H3 |
+                BITBOARD_F2 | BITBOARD_H2
+        }},
+        {{0, 0}, {1, 0}, {0, 0}}
+    };
+    struct priority_queue pq;
+    priority_queue_init(&pq, 16);
+    int move_count = generate_queen_moves_black(&pos, &pq);
+    assert_int_equal(1, move_count);
+    assert_int_equal(1, pq.length);
+    struct move expected_move = {
+        QUEEN, NO_PIECE, ROOK,
+        BITBOARD_G2 | BITBOARD_H1, 0, BITBOARD_H1, BITBOARD_G2,
+        {{0, 0}, {0, 0}, {0, 0}}
+    };
+    struct move *single_push = priority_queue_pop(&pq);
+    assert_move_equal(&expected_move, single_push);
+    test_free(single_push);
+    priority_queue_destroy(&pq);
+}
+
 /* TODO: test knight move generation */
+/* TODO: test king move generation */

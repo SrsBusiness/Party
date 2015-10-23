@@ -99,7 +99,8 @@ CLEANUP:
     return final_score;
 }
 
-void search(struct board_state *board, int depth, struct move *best_move) {
+int search(struct board_state *board, int depth, struct move *best_move) {
+    int status = NORMAL_MOVE;
     int32_t min_max;
     struct priority_queue move_list;
     struct board_flags save = board->flags;
@@ -107,14 +108,21 @@ void search(struct board_state *board, int depth, struct move *best_move) {
     struct move *m;
     priority_queue_init(&move_list, 64);
     nodes_visited = 0;
+    int move_count;
     switch(board->turn) {
         case WHITE:
             min_max = -INT32_MAX;
-            generate_moves_white(board, &move_list);
-
+            move_count = generate_moves_white(board, &move_list);
+            if (move_count == 0) {
+                if (in_check(board, WHITE)) {
+                    status = CHECKMATE;
+                } else {
+                    status = STALEMATE;
+                }
+            }
             while ((m = priority_queue_pop(&move_list)) != NULL) {
                 make(board, m);
-                int32_t score = min(board, -INT32_MAX, INT32_MAX, depth - 1);
+                int32_t score = min(board, SCORE_MIN, SCORE_MAX, depth - 1);
                 if (score > min_max) {
                     min_max = score;
                     *best_move = *m;
@@ -125,10 +133,17 @@ void search(struct board_state *board, int depth, struct move *best_move) {
             break;
         case BLACK:
             min_max = INT32_MAX; /* for symmetry */
-            generate_moves_black(board, &move_list);
+            move_count = generate_moves_black(board, &move_list);
+            if (move_count == 0) {
+                if (in_check(board, BLACK)) {
+                    status = CHECKMATE;
+                } else {
+                    status = STALEMATE;
+                }
+            }
             while ((m = priority_queue_pop(&move_list)) != NULL) {
                 make(board, m);
-                int32_t score = max(board, -INT32_MAX, INT32_MAX, depth - 1);
+                int32_t score = max(board, SCORE_MIN, SCORE_MAX, depth - 1);
                 if (score < min_max) {
                     min_max = score;
                     *best_move = *m;
@@ -139,4 +154,26 @@ void search(struct board_state *board, int depth, struct move *best_move) {
             break;
     }
     priority_queue_destroy(&move_list);
+    return status;
+}
+
+int board_status(struct board_state *board) {
+    int move_count;
+    switch(board->turn) {
+        case WHITE:
+            move_count = generate_moves_white(board, NULL);
+            break;
+        case BLACK:
+            move_count = generate_moves_black(board, NULL);
+            break;
+    }
+    if (move_count == 0) {
+        if (in_check(board, board->turn)) {
+            return CHECKMATE;
+        } else {
+            return STALEMATE;
+        }
+    } else {
+        return NORMAL_MOVE;
+    }
 }

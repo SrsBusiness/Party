@@ -164,7 +164,10 @@ int main() {
         cmocka_unit_test(generate_rook_moves_capture_white_test),
         cmocka_unit_test(generate_rook_moves_obstruction_black_test),
         cmocka_unit_test(generate_rook_moves_capture_black_test),
-
+        cmocka_unit_test(generate_queen_moves_obstruction_white_test),
+        cmocka_unit_test(generate_queen_moves_capture_white_test),
+        cmocka_unit_test(generate_queen_moves_obstruction_black_test),
+        cmocka_unit_test(generate_queen_moves_capture_black_test),
         /* hash tests */
         cmocka_unit_test(ZOBRIST_incremental_update_test),
     };

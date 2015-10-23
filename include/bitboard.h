@@ -287,6 +287,7 @@ struct board_state {
 struct move {
     int p_mover, s_mover, t_mover;
     uint64_t primary, secondary, tertiary;
+    uint64_t primary_src; /* to disambiguate the src/dest square */
     struct board_flags flags;
 };
 
