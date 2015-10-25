@@ -34,20 +34,25 @@ static char *piece_chars[6] = {
 void print_board(struct board_state *board, int row, int col) {
     int i, j;
     int file, rank;
-    /* bitboards */
-    for(i = 0; i < 64; i++) {
+    for (i = 0; i < 8; i++) {
+        move_cursor(7 - i + row, col);
+        putchar('1' + i);
+        move_cursor(row + 8, col + 2 * (1 + i));
+        putchar('a' + i);
+    }
+    for (i = 0; i < 64; i++) {
         file = i % 8;
         rank = i / 8;
         if((rank + file) % 2)
             cyan_bg();
         else
             purple_bg();
-        move_cursor(7 - (i / 8) + row, ((i & 7) << 1) + col);
+        move_cursor(7 - (i / 8) + row, ((i & 7) << 1) + col + 2);
         printf("  ");
     }
     uint64_t current;
      
-    for(i = WHITE; i <= BLACK; i++) {
+    for (i = WHITE; i <= BLACK; i++) {
         for(j = KING; j <= PAWN; j++) {
             current = board->bb[i][j]; 
             while(current) {
@@ -62,7 +67,7 @@ void print_board(struct board_state *board, int row, int col) {
                     black_font();
                 else
                     white_font();
-                move_cursor(7 - (square / 8) + row, ((square & 7) << 1) + col);
+                move_cursor(7 - (square / 8) + row, ((square & 7) << 1) + col + 2);
                 printf("%s ", piece_chars[j]);
                 current ^= (current & -current);
             }

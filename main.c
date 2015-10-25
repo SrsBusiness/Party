@@ -161,13 +161,16 @@ int main(int argc, char **argv) {
         print_board(&pos, 1, 1);
         reset_attr();
         status = search(&pos, depth, &best_move);
+        move_cursor(12, 1);
         switch(status) {
             case CHECKMATE:
                 printf("Checkmate\n");
+                fprintf(f, "\n");
                 return 0;
                 break;
             case STALEMATE:
                 printf("Stalemate\n");
+                fprintf(f, "\n");
                 return 0;
                 break;
             case NORMAL_MOVE:
