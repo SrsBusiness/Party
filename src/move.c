@@ -1293,8 +1293,8 @@ int generate_knight_moves_white(struct board_state *board,
             make(&tmp, m);
             if (!in_check(&tmp, WHITE)) {
                 move_count++;
-                int32_t score = get_transposition_score(tmp.hash);
                 if (moves) {
+                    int32_t score = get_transposition_score(tmp.hash);
                     priority_queue_push(moves, m, score);
                 } else {
                     free(m);
@@ -1336,8 +1336,8 @@ int generate_knight_moves_black(struct board_state *board,
             make(&tmp, m);
             if (!in_check(&tmp, BLACK)) {
                 move_count++;
-                int32_t score = get_transposition_score(tmp.hash);
                 if (moves) {
+                    int32_t score = get_transposition_score(tmp.hash);
                     priority_queue_push(moves, m, -score);
                 } else {
                     free(m);
@@ -1356,7 +1356,7 @@ int generate_king_moves_white(struct board_state *board,
         struct priority_queue *moves) {
     int move_count = 0;
     uint64_t king = board->bb[WHITE][KING];
-    uint64_t attacks = king_attacks(king) & ~board->bb[WHITE][ALL] & ~all_attacks(board, BLACK);
+    uint64_t attacks = king_attacks(king) & ~board->bb[WHITE][ALL];
     while (attacks) {
         uint64_t attack = attacks & -attacks;
         struct move *m = calloc(1, sizeof(struct move));
@@ -1372,12 +1372,16 @@ int generate_king_moves_white(struct board_state *board,
         m->flags.castle_k[0] = king == BITBOARD_E1 ? 0 : board->flags.castle_k[0];
         m->flags.castle_k[1] = attack == BITBOARD_H8 ? 0 : board->flags.castle_k[1];
         m->flags.en_passant[0] = m->flags.en_passant[1] = 0;
-        move_count++;
-        if (moves) {
-            struct board_state tmp = *board;
-            make(&tmp, m);
-            int32_t score = get_transposition_score(tmp.hash);
-            priority_queue_push(moves, m, score);
+        struct board_state tmp = *board;
+        make(&tmp, m);
+        if (!in_check(&tmp, WHITE)) {
+            move_count++;
+            if (moves) {
+                int32_t score = get_transposition_score(tmp.hash);
+                priority_queue_push(moves, m, score);
+            } else {
+                free(m);
+            }
         } else {
             free(m);
         }
@@ -1390,7 +1394,7 @@ int generate_king_moves_black(struct board_state *board,
         struct priority_queue *moves) {
     int move_count = 0;
     uint64_t king = board->bb[BLACK][KING];
-    uint64_t attacks = king_attacks(king) & ~board->bb[BLACK][ALL] & ~all_attacks(board, WHITE);
+    uint64_t attacks = king_attacks(king) & ~board->bb[BLACK][ALL];
     while (attacks) {
         uint64_t attack = attacks & -attacks;
         struct move *m = calloc(1, sizeof(struct move));
@@ -1406,13 +1410,16 @@ int generate_king_moves_black(struct board_state *board,
         m->flags.castle_k[0] = attack == BITBOARD_H1 ? 0 : board->flags.castle_k[0];
         m->flags.castle_k[1] = king == BITBOARD_E8 ? 0 : board->flags.castle_k[1];
         m->flags.en_passant[0] = m->flags.en_passant[1] = 0;
-        move_count++;
-        if (moves) {
-            /* No need to check legality */
-            struct board_state tmp = *board;
-            make(&tmp, m);
-            int32_t score = get_transposition_score(tmp.hash);
-            priority_queue_push(moves, m, -score);
+        struct board_state tmp = *board;
+        make(&tmp, m);
+        if (!in_check(&tmp, BLACK)) {
+            move_count++;
+            if (moves) {
+                int32_t score = get_transposition_score(tmp.hash);
+                priority_queue_push(moves, m, -score);
+            } else {
+                free(m);
+            }
         } else {
             free(m);
         }

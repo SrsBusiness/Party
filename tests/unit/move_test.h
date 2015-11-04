@@ -1,5 +1,6 @@
 #include <string.h>
 #include "move.h"
+#include "bboard_utils.h"
 
 /*
 *    _________________________________________________________________________
@@ -240,6 +241,68 @@ void in_check_test(void **state) {
     };
     assert_int_equal(1, in_check(&check, BLACK));
     assert_int_equal(0, in_check(&safe, BLACK));
+}
+
+void rook_check_test(void **state) {
+    struct board_state check = {
+        BLACK,
+        0,
+        {{
+            BITBOARD_G1,
+            0ul,
+            0ul,
+            BITBOARD_E2,
+            BITBOARD_F7,
+            BITBOARD_H3 | BITBOARD_G4 | BITBOARD_D5 | BITBOARD_C4 | BITBOARD_A4,
+            BITBOARD_G1 | BITBOARD_E2 | BITBOARD_F7 | BITBOARD_H3 | BITBOARD_G4 | BITBOARD_D5 | BITBOARD_C4 | BITBOARD_A4,
+        }, {
+            BITBOARD_D7,
+            0ul,
+            0ul,
+            0ul,
+            BITBOARD_H8 | BITBOARD_B8,
+            BITBOARD_H7 | BITBOARD_A7,
+            BITBOARD_D7 | BITBOARD_H8 | BITBOARD_B8 | BITBOARD_H7 | BITBOARD_A7,
+        }},
+        {{0, 0}, {0, 0}, {0, 0}}
+    };
+    assert_int_equal(1, in_check(&check, BLACK));
+    //serialize_board(&check);
+}
+
+void multiple_check_test(void **state) {
+    struct board_state check = {
+        BLACK,
+        0,
+        {{
+            BITBOARD_F1,
+            BITBOARD_H5,
+            BITBOARD_D3,
+            0ul,
+            0ul,
+            BITBOARD_A2 | BITBOARD_D2 | BITBOARD_D4 | BITBOARD_F2 | BITBOARD_G3,
+            BITBOARD_F1 | BITBOARD_H5 | BITBOARD_D3 | BITBOARD_A2 | BITBOARD_D2 | BITBOARD_D4 | BITBOARD_F2 | BITBOARD_G3,
+        }, {
+            BITBOARD_H3,
+            BITBOARD_B4,
+            BITBOARD_F6,
+            0ul,
+            BITBOARD_A8,
+            BITBOARD_A7 | BITBOARD_B7 | BITBOARD_C7 | BITBOARD_E7,
+            BITBOARD_H3 | BITBOARD_B4 | BITBOARD_F6 | BITBOARD_A8 | BITBOARD_A7 | BITBOARD_B7 | BITBOARD_C7 | BITBOARD_E7,
+        }},
+        {{0, 0}, {0, 0}, {0, 0}}
+    };
+    assert_int_equal(1, in_check(&check, BLACK));
+    struct priority_queue pq;
+    priority_queue_init(&pq, 16);
+    int move_count = generate_moves_black(&check, &pq);
+    assert_int_equal(1, move_count);
+    assert_int_equal(1, pq.length);
+    struct move *m = priority_queue_pop(&pq);
+    test_free(m);
+    priority_queue_destroy(&pq);
+    //serialize_board(&check);
 }
 
 void generate_pawn_single_pushes_white_test(void **state) {

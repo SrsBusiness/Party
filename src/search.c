@@ -10,6 +10,12 @@
 #include "eval.h"
 #include "hash.h"
 #include "bboard_utils.h"
+
+#ifdef UNIT_TEST
+#include "unit_tests.h"
+#endif
+
+
 //
 /* alpha is lower-bound, beta upper-bound */
 /* alpha is the best that black can do, but that is dependent on white's
@@ -29,7 +35,16 @@ int32_t min(struct board_state *board, int32_t alpha, int32_t beta, int depth_le
     int32_t final_score;
     struct priority_queue move_list;
     priority_queue_init(&move_list, 64); /* Arbitrary capacity */
-    generate_moves_black(board, &move_list);
+    int move_count = generate_moves_black(board, &move_list);
+
+    /* Check for stalemate/checkmate */
+    if (move_count == 0) {
+        if (in_check(board, BLACK)) { /* checkmate */
+            final_score = SCORE_MAX; 
+        } else { /* stalemate */
+            final_score = 0;
+        }
+    }
     struct move *m;
     struct board_flags save = board->flags;
     uint64_t old_hash = board->hash;
@@ -72,7 +87,17 @@ int32_t max(struct board_state *board, int32_t alpha, int32_t beta, int depth_le
     int32_t final_score;
     struct priority_queue move_list;
     priority_queue_init(&move_list, 64);
-    generate_moves_white(board, &move_list);
+    int move_count = generate_moves_white(board, &move_list);
+    
+    /* Check for stalemate/checkmate */
+    if (move_count == 0) {
+        if (in_check(board, WHITE)) { /* checkmate */
+            final_score = SCORE_MIN; 
+        } else { /* stalemate */
+            final_score = 0;
+        }
+    }
+
     struct move *m;
     struct board_flags save = board->flags;
     uint64_t old_hash = board->hash;

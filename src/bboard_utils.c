@@ -76,3 +76,17 @@ void print_board(struct board_state *board, int row, int col) {
     move_cursor(row + 8, 0);
     reset_attr();
 }
+
+void serialize_board(struct board_state *b) {
+    printf("*********Board State**********\n");
+    printf("Turn: %d\n", b->turn);
+    printf("Hash: %lX\n", b->hash);
+    for (int i = 0; i < 2; i++) {
+        for (int j = 0; j < 7; j++) {
+            printf("0x%lX\n", b->bb[i][j]);
+        }
+    }
+    printf("Castle q flags: %d, %d\n", b->flags.castle_q[0], b->flags.castle_q[1]);
+    printf("Castle k flags: %d, %d\n", b->flags.castle_k[0], b->flags.castle_k[1]);
+    printf("En Passant flags: %d, %d\n", b->flags.en_passant[0], b->flags.en_passant[1]);
+}

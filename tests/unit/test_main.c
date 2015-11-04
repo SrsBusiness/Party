@@ -2,6 +2,7 @@
 #include <stddef.h>
 #include <setjmp.h>
 #include <cmocka.h>
+#include <stdio.h>
 #include "bitboard_test.h"
 #include "pawn_test.h"
 #include "bishop_test.h"
@@ -9,6 +10,7 @@
 #include "pqueue_test.h"
 #include "move_test.h"
 #include "hash_test.h"
+#include "search_test.h"
 
 int main() {
     ZOBRIST_transposition_init(1);
@@ -140,6 +142,8 @@ int main() {
         cmocka_unit_test(capture_move_test),
         cmocka_unit_test(promotion_capture_move_test),
         cmocka_unit_test(in_check_test),
+        cmocka_unit_test(rook_check_test),
+        cmocka_unit_test(multiple_check_test),
         cmocka_unit_test(generate_pawn_single_pushes_white_test),
         cmocka_unit_test(generate_pawn_push_promotions_white_test),
         cmocka_unit_test(generate_pawn_double_pushes_white_test),
@@ -170,6 +174,9 @@ int main() {
         cmocka_unit_test(generate_queen_moves_capture_black_test),
         /* hash tests */
         cmocka_unit_test(ZOBRIST_incremental_update_test),
+
+        /* search tests */
+        cmocka_unit_test(search_check_test),
     };
     return cmocka_run_group_tests(tests, NULL, NULL);
 }
