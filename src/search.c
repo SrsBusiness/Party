@@ -182,6 +182,20 @@ int search(struct board_state *board, int depth, struct move *best_move) {
     return status;
 }
 
+/* iterative deepening */
+int id_search(struct board_state *board, int depth, struct move *best_move) {
+    int status = board_status(board);
+    if (status != NORMAL_MOVE) {
+        return status;
+    }
+    for (int i = 1; i < depth; i++) {
+        search(board, i, best_move); 
+    }
+    return status;
+}
+
+
+
 int board_status(struct board_state *board) {
     int move_count;
     switch(board->turn) {

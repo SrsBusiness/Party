@@ -164,7 +164,7 @@ int main(int argc, char **argv) {
         move_cursor(13, 1);
         serialize_board(&pos);
         reset_attr();
-        status = search(&pos, depth, &best_move);
+        status = id_search(&pos, depth, &best_move);
         move_cursor(12, 1);
         switch(status) {
             case CHECKMATE:

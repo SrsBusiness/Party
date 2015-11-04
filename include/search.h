@@ -14,4 +14,5 @@ int board_status(struct board_state *);
 int32_t min(struct board_state *, int32_t alpha, int32_t beta, int depth_left);
 int32_t max(struct board_state *, int32_t alpha, int32_t beta, int depth_left);
 int search(struct board_state *board, int depth, struct move *best_move);
+int id_search(struct board_state *board, int depth, struct move *best_move);
 #endif
