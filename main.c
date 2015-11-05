@@ -103,11 +103,11 @@ const char *bb_to_square[] = {
     "h8"
 };
 
-uint64_t algebraic_to_bitboard(const char *move, uint64_t *source);
+uint64_t algebraic_to_bitboard(const char *move, uint64_t *source, int *promote);
 void move_to_algebraic(const struct move *m, char *str);
 
 int find_matching_move(struct board_state *board, uint64_t user_move,
-        uint64_t src, struct move *m);
+        uint64_t src, int promote, struct move *m);
 
 int main(int argc, char **argv) {
     if (argc < 3) {
@@ -124,7 +124,7 @@ int main(int argc, char **argv) {
     struct board_state empty;
     memset(&empty, 0, sizeof(struct board_state));
     struct move best_move, user_move;
-    char user_input[6] = {0};
+    char user_input[7] = {0};
     char move_str[6] = {0};
     clear_all();
     int turn_count = 1;
@@ -150,11 +150,13 @@ int main(int argc, char **argv) {
         //print_transposition_table(12, 1);
         uint64_t bb = 0;
         uint64_t source;
+        int promote;
         do {
             fgets(user_input, sizeof(user_input), stdin);
-            user_input[4] = 0;
-        } while ((bb = algebraic_to_bitboard(user_input, &source)) == 0 ||
-                find_matching_move(&pos, bb, source, &user_move) == 0);
+            user_input[strlen(user_input) - 1] = 0;
+        } while ((bb = algebraic_to_bitboard(user_input, &source,
+                        &promote)) == 0 ||
+                find_matching_move(&pos, bb, source, promote, &user_move) == 0);
         //sleep(1);
         make(&pos, &user_move);
         move_to_algebraic(&user_move, move_str);
@@ -189,9 +191,12 @@ int main(int argc, char **argv) {
     fclose(f);
 }
 
-uint64_t algebraic_to_bitboard(const char *move, uint64_t *source) {
+uint64_t algebraic_to_bitboard(const char *move, uint64_t *source, int *promote) {
     size_t len = strlen(move);
-    if (len != 4)
+    if (len < 4 || len > 5)
+        return 0ul;
+    if (len == 5 && move[4] != 'q' && move[4] != 'b' && move[4] != 'n' &&
+            move[4] != 'r')
         return 0ul;
     if (move[0] < 'a' || move[0] > 'h' ||
             move[2] < 'a' || move[2] > 'h' ||
@@ -201,17 +206,58 @@ uint64_t algebraic_to_bitboard(const char *move, uint64_t *source) {
     uint64_t src = files[move[0] - 'a'] & ranks[move[1] - '1'];
     uint64_t dest = files[move[2] - 'a'] & ranks[move[3] - '1'];
     *source = src;
+    if (len == 5) { /* promotion */
+        switch(move[4]) {
+            case 'q':
+                *promote = QUEEN;
+                break;
+            case 'b':
+                *promote = BISHOP;
+                break;
+            case 'n':
+                *promote = KNIGHT;
+                break;
+            case 'r':
+                *promote = ROOK;
+                break;
+        }
+    } else {
+        *promote = NO_PIECE;
+    }
     return src | dest;
 }
 
 void move_to_algebraic(const struct move *m, char *str) {
     uint64_t src = m->primary_src;
-    uint64_t dest = m->primary_src ^ m->primary;
+    uint64_t dest;
+    if (m->p_mover == PAWN && m->s_mover != NO_PIECE)
+        dest = m->secondary;
+    else
+        dest = m->primary_src ^ m->primary;
     snprintf(str, 6, "%s%s", bb_to_square[lsb(src)], bb_to_square[lsb(dest)]);
+    /* promotion */
+    if (m->p_mover == PAWN && m->s_mover != NO_PIECE) {
+        char p;
+        switch(m->s_mover) {
+            case QUEEN:
+                p = 'q';
+                break;
+            case BISHOP:
+                p = 'b';
+                break;
+            case KNIGHT:
+                p = 'n';
+                break;
+            case ROOK:
+                p = 'r';
+                break;
+        }
+        snprintf(str + 4, 2, "%c", p); 
+    }
 }
 
 int find_matching_move(struct board_state *board, uint64_t user_move,
-        uint64_t src, struct move *m) {
+        uint64_t src, int promote, struct move *m) {
     int success = 0;
     struct priority_queue move_list;
     priority_queue_init(&move_list, 64);
@@ -225,9 +271,17 @@ int find_matching_move(struct board_state *board, uint64_t user_move,
     }
     struct move *next;
     while ((next = priority_queue_pop(&move_list)) != NULL) {
-        if (next->primary == user_move && next->primary_src == src) {
-            *m = *next;
-            success = 1;
+        if (promote == NO_PIECE) {
+            if (next->primary == user_move && next->primary_src == src) {
+                *m = *next;
+                success = 1;
+            }
+        } else {
+            if ((next->primary | next->secondary) == user_move &&
+                    next->primary_src == src && next->s_mover == promote) {
+                *m = *next;
+                success = 1;
+            }
         }
         free(next);
     }
