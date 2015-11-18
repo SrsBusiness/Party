@@ -74,6 +74,7 @@ void print_board(struct board_state *board, int row, int col) {
         }
     }
     move_cursor(row + 8, 0);
+    fflush(stdout);
     reset_attr();
 }
 

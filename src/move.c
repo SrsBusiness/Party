@@ -88,22 +88,22 @@ const struct board_state BOARD_INITIAL_STATE = {
     WHITE,
     ZOBRIST_initial_hash,
     {{
-        BITBOARD_KING   & BITBOARD_WHITE,
-        BITBOARD_QUEEN  & BITBOARD_WHITE,
-        BITBOARD_BISHOP & BITBOARD_WHITE,
-        BITBOARD_KNIGHT & BITBOARD_WHITE,
-        BITBOARD_ROOK   & BITBOARD_WHITE,
-        BITBOARD_PAWN   & BITBOARD_WHITE,
-        BITBOARD_WHITE
-    }, {
-        BITBOARD_KING   & BITBOARD_BLACK,
-        BITBOARD_QUEEN  & BITBOARD_BLACK,
-        BITBOARD_BISHOP & BITBOARD_BLACK,
-        BITBOARD_KNIGHT & BITBOARD_BLACK,
-        BITBOARD_ROOK   & BITBOARD_BLACK,
-        BITBOARD_PAWN   & BITBOARD_BLACK,
-        BITBOARD_BLACK
-    }},
+         BITBOARD_KING   & BITBOARD_WHITE,
+         BITBOARD_QUEEN  & BITBOARD_WHITE,
+         BITBOARD_BISHOP & BITBOARD_WHITE,
+         BITBOARD_KNIGHT & BITBOARD_WHITE,
+         BITBOARD_ROOK   & BITBOARD_WHITE,
+         BITBOARD_PAWN   & BITBOARD_WHITE,
+         BITBOARD_WHITE
+     }, {
+         BITBOARD_KING   & BITBOARD_BLACK,
+         BITBOARD_QUEEN  & BITBOARD_BLACK,
+         BITBOARD_BISHOP & BITBOARD_BLACK,
+         BITBOARD_KNIGHT & BITBOARD_BLACK,
+         BITBOARD_ROOK   & BITBOARD_BLACK,
+         BITBOARD_PAWN   & BITBOARD_BLACK,
+         BITBOARD_BLACK
+     }},
     {{1, 1}, {1, 1}, {0, 0}}
 };
 
@@ -130,7 +130,7 @@ void bb_make(struct board_state *board, struct move *m) {
         board->bb[board->turn][m->s_mover] ^= m->secondary;
         board->bb[board->turn][ALL] ^= m->secondary;
     }
-    
+
     /* tertiary mover */
     if (m->t_mover != NO_PIECE) {
         board->bb[!board->turn][m->t_mover] ^= m->tertiary;
@@ -179,7 +179,7 @@ uint64_t all_attacks(struct board_state *board, int color) {
         laterals ^= lateral;
     }
     attacks |= (knight_attacks(board->bb[color][KNIGHT]) |
-        king_attacks(board->bb[color][KING]));
+            king_attacks(board->bb[color][KING]));
     return attacks;
 }
 
@@ -260,8 +260,9 @@ int generate_pawn_single_pushes_white(struct board_state *board,
         if (!in_check(&tmp, WHITE)) {
             move_count++;
             /* TODO: Priority Computation */
-            int32_t score = get_transposition_score(tmp.hash);
             if (moves) {
+                int32_t score = get_transposition_score(tmp.hash);
+                score = score == -1 ? 0 : score;
                 priority_queue_push(moves, m, score);
             } else {
                 free(m);
@@ -306,8 +307,9 @@ int generate_pawn_push_promotions_white(struct board_state *board,
             if (!in_check(&tmp, WHITE)) {
                 move_count++;
                 /* TODO: Priority Computation */
-                int32_t score = get_transposition_score(tmp.hash);
                 if (moves) {
+                    int32_t score = get_transposition_score(tmp.hash);
+                    score = score == -1 ? 0 : score;
                     priority_queue_push(moves, m, score);
                 } else {
                     free(m);
@@ -351,8 +353,9 @@ int generate_pawn_double_pushes_white(struct board_state *board,
         if (!in_check(&tmp, WHITE)) {
             move_count++;
             /* TODO: Priority Computation */
-            int32_t score = get_transposition_score(tmp.hash);
             if (moves) {
+                int32_t score = get_transposition_score(tmp.hash);
+                score = score == -1 ? 0 : score;
                 priority_queue_push(moves, m, score);
             } else {
                 free(m);
@@ -395,8 +398,9 @@ int generate_pawn_east_captures_white(struct board_state *board,
         if (!in_check(&tmp, WHITE)) {
             move_count++;
             /* TODO: Priority Computation */
-            int32_t score = get_transposition_score(tmp.hash);
             if (moves) {
+                int32_t score = get_transposition_score(tmp.hash);
+                score = score == -1 ? 0 : score;
                 priority_queue_push(moves, m, score);
             } else {
                 free(m);
@@ -439,8 +443,9 @@ int generate_pawn_west_captures_white(struct board_state *board,
         if (!in_check(&tmp, WHITE)) {
             move_count++;
             /* TODO: Priority Computation */
-            int32_t score = get_transposition_score(tmp.hash);
             if (moves) {
+                int32_t score = get_transposition_score(tmp.hash);
+                score = score == -1 ? 0 : score;
                 priority_queue_push(moves, m, score);
             } else {
                 free(m);
@@ -488,8 +493,9 @@ generate_pawn_east_captures_promotions_white(struct board_state *board,
             if (!in_check(&tmp, WHITE)) {
                 move_count++;
                 /* TODO: Priority Computation */
-                int32_t score = get_transposition_score(tmp.hash);
                 if (moves) {
+                    int32_t score = get_transposition_score(tmp.hash);
+                    score = score == -1 ? 0 : score;
                     priority_queue_push(moves, m, score);
                 } else {
                     free(m);
@@ -538,8 +544,9 @@ generate_pawn_west_captures_promotions_white(struct board_state *board,
             if (!in_check(&tmp, WHITE)) {
                 move_count++;
                 /* TODO: Priority Computation */
-                int32_t score = get_transposition_score(tmp.hash);
                 if (moves) {
+                    int32_t score = get_transposition_score(tmp.hash);
+                    score = score == -1 ? 0 : score;
                     priority_queue_push(moves, m, score);
                 } else {
                     free(m);
@@ -586,8 +593,10 @@ int generate_pawn_en_passant_white(struct board_state *board,
         if (!in_check(&tmp, WHITE)) {
             move_count++;
             /* TODO: Priority Computation */
-            int32_t score = get_transposition_score(tmp.hash);
             if (moves) {
+                //int32_t score = get_transposition_score(tmp.hash);
+                int32_t score = 0;
+                score = score == -1 ? 0 : score;
                 priority_queue_push(moves, m, score);
             } else {
                 free(m);
@@ -603,13 +612,13 @@ int generate_pawn_en_passant_white(struct board_state *board,
 int generate_pawn_moves_white(struct board_state *board,
         struct priority_queue *moves) {
     return generate_pawn_single_pushes_white(board, moves) +
-    generate_pawn_push_promotions_white(board, moves) +
-    generate_pawn_double_pushes_white(board, moves) +
-    generate_pawn_east_captures_white(board, moves) +
-    generate_pawn_west_captures_white(board, moves) +
-    generate_pawn_east_captures_promotions_white(board, moves) +
-    generate_pawn_west_captures_promotions_white(board, moves) +
-    generate_pawn_en_passant_white(board, moves);
+        generate_pawn_push_promotions_white(board, moves) +
+        generate_pawn_double_pushes_white(board, moves) +
+        generate_pawn_east_captures_white(board, moves) +
+        generate_pawn_west_captures_white(board, moves) +
+        generate_pawn_east_captures_promotions_white(board, moves) +
+        generate_pawn_west_captures_promotions_white(board, moves) +
+        generate_pawn_en_passant_white(board, moves);
 }
 
 /* Black */
@@ -642,8 +651,9 @@ int generate_pawn_single_pushes_black(struct board_state *board,
         if (!in_check(&tmp, BLACK)) {
             move_count++;
             /* TODO: Priority Computation */
-            int32_t score = get_transposition_score(tmp.hash);
             if (moves) {
+                int32_t score = get_transposition_score(tmp.hash);
+                score = score == -1 ? 0 : score;
                 priority_queue_push(moves, m, -score);
             } else {
                 free(m);
@@ -688,8 +698,9 @@ int generate_pawn_push_promotions_black(struct board_state *board,
             if (!in_check(&tmp, BLACK)) {
                 move_count++;
                 /* TODO: Priority Computation */
-                int32_t score = get_transposition_score(tmp.hash);
                 if (moves) {
+                    int32_t score = get_transposition_score(tmp.hash);
+                    score = score == -1 ? 0 : score;
                     priority_queue_push(moves, m, -score);
                 } else {
                     free(m);
@@ -733,8 +744,9 @@ int generate_pawn_double_pushes_black(struct board_state *board,
         if (!in_check(&tmp, BLACK)) {
             move_count++;
             /* TODO: Priority Computation */
-            int32_t score = get_transposition_score(tmp.hash);
             if (moves) {
+                int32_t score = get_transposition_score(tmp.hash);
+                score = score == -1 ? 0 : score;
                 priority_queue_push(moves, m, -score);
             } else {
                 free(m);
@@ -777,8 +789,9 @@ int generate_pawn_east_captures_black(struct board_state *board,
         if (!in_check(&tmp, BLACK)) {
             move_count++;
             /* TODO: Priority Computation */
-            int32_t score = get_transposition_score(tmp.hash);
             if (moves) {
+                int32_t score = get_transposition_score(tmp.hash);
+                score = score == -1 ? 0 : score;
                 priority_queue_push(moves, m, -score);
             } else {
                 free(m);
@@ -821,8 +834,9 @@ int generate_pawn_west_captures_black(struct board_state *board,
         if (!in_check(&tmp, BLACK)) {
             move_count++;
             /* TODO: Priority Computation */
-            int32_t score = get_transposition_score(tmp.hash);
             if (moves) {
+                int32_t score = get_transposition_score(tmp.hash);
+                score = score == -1 ? 0 : score;
                 priority_queue_push(moves, m, -score);
             } else {
                 free(m);
@@ -870,8 +884,9 @@ generate_pawn_east_captures_promotions_black(struct board_state *board,
             if (!in_check(&tmp, BLACK)) {
                 move_count++;
                 /* TODO: Priority Computation */
-                int32_t score = get_transposition_score(tmp.hash);
                 if (moves) {
+                    int32_t score = get_transposition_score(tmp.hash);
+                    score = score == -1 ? 0 : score;
                     priority_queue_push(moves, m, -score);
                 } else {
                     free(m);
@@ -920,8 +935,9 @@ generate_pawn_west_captures_promotions_black(struct board_state *board,
             if (!in_check(&tmp, BLACK)) {
                 move_count++;
                 /* TODO: Priority Computation */
-                int32_t score = get_transposition_score(tmp.hash);
                 if (moves) {
+                    int32_t score = get_transposition_score(tmp.hash);
+                    score = score == -1 ? 0 : score;
                     priority_queue_push(moves, m, -score);
                 } else {
                     free(m);
@@ -968,8 +984,9 @@ int generate_pawn_en_passant_black(struct board_state *board,
         if (!in_check(&tmp, BLACK)) {
             move_count++;
             /* TODO: Priority Computation */
-            int32_t score = get_transposition_score(tmp.hash);
             if (moves) {
+                int32_t score = get_transposition_score(tmp.hash);
+                score = score == -1 ? 0 : score;
                 priority_queue_push(moves, m, -score);
             } else {
                 free(m);
@@ -985,13 +1002,13 @@ int generate_pawn_en_passant_black(struct board_state *board,
 int generate_pawn_moves_black(struct board_state *board,
         struct priority_queue *moves) {
     return generate_pawn_single_pushes_black(board, moves) +
-    generate_pawn_push_promotions_black(board, moves) +
-    generate_pawn_double_pushes_black(board, moves) +
-    generate_pawn_east_captures_black(board, moves) +
-    generate_pawn_west_captures_black(board, moves) +
-    generate_pawn_east_captures_promotions_black(board, moves) +
-    generate_pawn_west_captures_promotions_black(board, moves) +
-    generate_pawn_en_passant_black(board, moves);
+        generate_pawn_push_promotions_black(board, moves) +
+        generate_pawn_double_pushes_black(board, moves) +
+        generate_pawn_east_captures_black(board, moves) +
+        generate_pawn_west_captures_black(board, moves) +
+        generate_pawn_east_captures_promotions_black(board, moves) +
+        generate_pawn_west_captures_promotions_black(board, moves) +
+        generate_pawn_en_passant_black(board, moves);
 }
 
 int generate_bishop_moves_white(struct board_state *board,
@@ -1023,8 +1040,9 @@ int generate_bishop_moves_white(struct board_state *board,
             make(&tmp, m);
             if (!in_check(&tmp, WHITE)) {
                 move_count++;
-                int32_t score = get_transposition_score(tmp.hash);
                 if (moves) {
+                    int32_t score = get_transposition_score(tmp.hash);
+                    score = score == -1 ? 0 : score;
                     priority_queue_push(moves, m, score);
                 } else {
                     free(m);
@@ -1068,8 +1086,9 @@ int generate_bishop_moves_black(struct board_state *board,
             make(&tmp, m);
             if (!in_check(&tmp, BLACK)) {
                 move_count++;
-                int32_t score = get_transposition_score(tmp.hash);
                 if (moves) {
+                    int32_t score = get_transposition_score(tmp.hash);
+                    score = score == -1 ? 0 : score;
                     priority_queue_push(moves, m, -score);
                 } else {
                     free(m);
@@ -1113,8 +1132,9 @@ int generate_rook_moves_white(struct board_state *board,
             make(&tmp, m);
             if (!in_check(&tmp, WHITE)) {
                 move_count++;
-                int32_t score = get_transposition_score(tmp.hash);
                 if (moves) {
+                    int32_t score = get_transposition_score(tmp.hash);
+                    score = score == -1 ? 0 : score;
                     priority_queue_push(moves, m, score);
                 } else {
                     free(m);
@@ -1158,8 +1178,9 @@ int generate_rook_moves_black(struct board_state *board,
             make(&tmp, m);
             if (!in_check(&tmp, BLACK)) {
                 move_count++;
-                int32_t score = get_transposition_score(tmp.hash);
                 if (moves) { 
+                    int32_t score = get_transposition_score(tmp.hash);
+                    score = score == -1 ? 0 : score;
                     priority_queue_push(moves, m, -score);
                 } else {
                     free(m);
@@ -1182,7 +1203,7 @@ int generate_queen_moves_white(struct board_state *board,
         uint64_t queen = queens & -queens;
         uint64_t attacks = 
             (bishop_attacks(queen, board->bb[WHITE][ALL] | board->bb[BLACK][ALL]) |
-            rook_attacks(queen, board->bb[WHITE][ALL] | board->bb[BLACK][ALL])) &
+             rook_attacks(queen, board->bb[WHITE][ALL] | board->bb[BLACK][ALL])) &
             ~board->bb[WHITE][ALL]; /* Exclude allies */
         while (attacks) {
             uint64_t attack = attacks & -attacks;
@@ -1204,8 +1225,9 @@ int generate_queen_moves_white(struct board_state *board,
             make(&tmp, m);
             if (!in_check(&tmp, WHITE)) {
                 move_count++;
-                int32_t score = get_transposition_score(tmp.hash);
                 if (moves) {
+                    int32_t score = get_transposition_score(tmp.hash);
+                    score = score == -1 ? 0 : score;
                     priority_queue_push(moves, m, score);
                 } else {
                     free(m);
@@ -1228,7 +1250,7 @@ int generate_queen_moves_black(struct board_state *board,
         uint64_t queen = queens & -queens;
         uint64_t attacks = 
             (bishop_attacks(queen, board->bb[WHITE][ALL] | board->bb[BLACK][ALL]) |
-            rook_attacks(queen, board->bb[WHITE][ALL] | board->bb[BLACK][ALL])) &
+             rook_attacks(queen, board->bb[WHITE][ALL] | board->bb[BLACK][ALL])) &
             ~board->bb[BLACK][ALL]; /* Exclude allies */
         while (attacks) {
             uint64_t attack = attacks & -attacks;
@@ -1250,8 +1272,9 @@ int generate_queen_moves_black(struct board_state *board,
             make(&tmp, m);
             if (!in_check(&tmp, BLACK)) {
                 move_count++;
-                int32_t score = get_transposition_score(tmp.hash);
                 if (moves) {
+                    int32_t score = get_transposition_score(tmp.hash);
+                    score = score == -1 ? 0 : score;
                     priority_queue_push(moves, m, -score);
                 } else {
                     free(m);
@@ -1295,6 +1318,7 @@ int generate_knight_moves_white(struct board_state *board,
                 move_count++;
                 if (moves) {
                     int32_t score = get_transposition_score(tmp.hash);
+                    score = score == -1 ? 0 : score;
                     priority_queue_push(moves, m, score);
                 } else {
                     free(m);
@@ -1338,6 +1362,7 @@ int generate_knight_moves_black(struct board_state *board,
                 move_count++;
                 if (moves) {
                     int32_t score = get_transposition_score(tmp.hash);
+                    score = score == -1 ? 0 : score;
                     priority_queue_push(moves, m, -score);
                 } else {
                     free(m);
@@ -1378,6 +1403,7 @@ int generate_king_moves_white(struct board_state *board,
             move_count++;
             if (moves) {
                 int32_t score = get_transposition_score(tmp.hash);
+                score = score == -1 ? 0 : score;
                 priority_queue_push(moves, m, score);
             } else {
                 free(m);
@@ -1416,6 +1442,7 @@ int generate_king_moves_black(struct board_state *board,
             move_count++;
             if (moves) {
                 int32_t score = get_transposition_score(tmp.hash);
+                score = score == -1 ? 0 : score;
                 priority_queue_push(moves, m, -score);
             } else {
                 free(m);
@@ -1455,6 +1482,7 @@ int generate_castle_white(struct board_state *board,
             struct board_state tmp = *board;
             make(&tmp, m);
             int32_t score = get_transposition_score(tmp.hash);
+            score = score == -1 ? 0 : score;
             priority_queue_push(moves, m, score);
         } else {
             free(m);
@@ -1480,6 +1508,7 @@ int generate_castle_white(struct board_state *board,
             struct board_state tmp = *board;
             make(&tmp, m);
             int32_t score = get_transposition_score(tmp.hash);
+            score = score == -1 ? 0 : score;
             priority_queue_push(moves, m, score);
         } else {
             free(m);
@@ -1512,6 +1541,7 @@ int generate_castle_black(struct board_state *board,
             struct board_state tmp = *board;
             make(&tmp, m);
             int32_t score = get_transposition_score(tmp.hash);
+            score = score == -1 ? 0 : score;
             priority_queue_push(moves, m, -score);
         } else {
             free(m);
@@ -1537,6 +1567,7 @@ int generate_castle_black(struct board_state *board,
             struct board_state tmp = *board;
             make(&tmp, m);
             int32_t score = get_transposition_score(tmp.hash);
+            score = score == -1 ? 0 : score;
             priority_queue_push(moves, m, -score);
         } else {
             free(m);
@@ -1548,21 +1579,21 @@ int generate_castle_black(struct board_state *board,
 int generate_moves_white(struct board_state *board,
         struct priority_queue *moves) {
     return generate_king_moves_white(board, moves) +
-    generate_queen_moves_white(board, moves) +
-    generate_bishop_moves_white(board, moves) +
-    generate_knight_moves_white(board, moves) +
-    generate_rook_moves_white(board, moves) +
-    generate_pawn_moves_white(board, moves) +
-    generate_castle_white(board, moves);
+        generate_queen_moves_white(board, moves) +
+        generate_bishop_moves_white(board, moves) +
+        generate_knight_moves_white(board, moves) +
+        generate_rook_moves_white(board, moves) +
+        generate_pawn_moves_white(board, moves) +
+        generate_castle_white(board, moves);
 }
 
 int generate_moves_black(struct board_state *board,
         struct priority_queue *moves) {
     return generate_king_moves_black(board, moves) +
-    generate_queen_moves_black(board, moves) +
-    generate_bishop_moves_black(board, moves) +
-    generate_knight_moves_black(board, moves) +
-    generate_rook_moves_black(board, moves) +
-    generate_pawn_moves_black(board, moves) +
-    generate_castle_black(board, moves);
+        generate_queen_moves_black(board, moves) +
+        generate_bishop_moves_black(board, moves) +
+        generate_knight_moves_black(board, moves) +
+        generate_rook_moves_black(board, moves) +
+        generate_pawn_moves_black(board, moves) +
+        generate_castle_black(board, moves);
 }

@@ -59,17 +59,16 @@ int32_t min(struct board_state *board, int32_t alpha, int32_t beta, int depth_le
          **/
         if (score <= alpha) {
             final_score = alpha;
-            goto CLEANUP;
+            break;
         }
         /* If this score is lower than the upper bound, then we need to update
          * the best white can hope for
          **/
         if (score < beta) {
             beta = score;
+            final_score = beta;
         }
     }
-    final_score = beta;
-CLEANUP:
     while ((m = priority_queue_pop(&move_list)) != NULL) {
         free(m);
     }
@@ -108,14 +107,13 @@ int32_t max(struct board_state *board, int32_t alpha, int32_t beta, int depth_le
         free(m);
         if (score >= beta) {
             final_score = beta;
-            goto CLEANUP;
+            break;
         }
         if (score > alpha) {
             alpha = score;
+            final_score = alpha;
         }
     }
-    final_score = alpha;
-CLEANUP:
     while ((m = priority_queue_pop(&move_list)) != NULL) {
         free(m);
     }
@@ -188,7 +186,7 @@ int id_search(struct board_state *board, int depth, struct move *best_move) {
     if (status != NORMAL_MOVE) {
         return status;
     }
-    for (int i = 1; i < depth; i++) {
+    for (int i = 1; i <= depth; i++) {
         search(board, i, best_move); 
     }
     return status;

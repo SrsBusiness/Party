@@ -435,7 +435,7 @@ void ZOBRIST_transposition_init(uint64_t table_size) {
     ZOBRIST_table_size = table_size;
     ZOBRIST_transposition_table = calloc(table_size, sizeof(struct transposition_entry));
     for (uint64_t i = 0; i < ZOBRIST_table_size; i++) {
-        ZOBRIST_transposition_table[i].score = 0;
+        ZOBRIST_transposition_table[i].score = -1;
     }
 }
 

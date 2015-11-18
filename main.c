@@ -132,8 +132,8 @@ int main(int argc, char **argv) {
         print_board(&pos, 1, 1);
         move_cursor(12, 1);
         printf("%lu nodes visited\n", nodes_visited);
+        move_cursor(14, 1);
         printf("score: %d\n", compute_material(&pos));
-        move_cursor(13, 1);
         serialize_board(&pos);
         int status = board_status(&pos);
         switch(status) {
@@ -163,11 +163,9 @@ int main(int argc, char **argv) {
         fprintf(f, "%d. %s ", turn_count, move_str);
         clear_all();
         print_board(&pos, 1, 1);
-        move_cursor(13, 1);
-        serialize_board(&pos);
         reset_attr();
         status = id_search(&pos, depth, &best_move);
-        move_cursor(12, 1);
+        move_cursor(13, 1);
         switch(status) {
             case CHECKMATE:
                 printf("Checkmate\n");
