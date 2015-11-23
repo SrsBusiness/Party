@@ -87,7 +87,7 @@ int32_t max(struct board_state *board, int32_t alpha, int32_t beta, int depth_le
     struct priority_queue move_list;
     priority_queue_init(&move_list, 64);
     int move_count = generate_moves_white(board, &move_list);
-    
+
     /* Check for stalemate/checkmate */
     if (move_count == 0) {
         if (in_check(board, WHITE)) { /* checkmate */
@@ -121,6 +121,36 @@ int32_t max(struct board_state *board, int32_t alpha, int32_t beta, int depth_le
     set_transposition_score(old_hash, final_score);
     return final_score;
 }
+
+int32_t quiescent_min(struct board_state *board, int32_t alpha, int32_t beta) {
+
+}
+
+int32_t quiescent_max(struct board_state *board, int32_t alpha, int32_t beta) {
+    nodes_visited++;
+    int32_t stand_pat = compute_material();
+    if( stand_pat >= beta)
+        return beta;
+    if( alpha < stand_pat )
+        alpha = stand_pat;
+    int32_t final_score;
+    struct priority_queue move_list;
+    priority_queue_init(&move_list, 64);
+    int move_count = generate_moves_white(board, &move_list);
+
+    until( every_capture_has_been_examined )  {
+        MakeCapture();
+        score = quiescent_min(board, alpha, beta);
+        TakeBackMove();
+
+        if( score >= beta )
+            return beta;
+        if( score > alpha )
+            alpha = score;
+    }
+    return alpha;
+}
+
 
 int search(struct board_state *board, int depth, struct move *best_move) {
     int status = NORMAL_MOVE;
