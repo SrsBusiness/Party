@@ -30,9 +30,10 @@ uint64_t nodes_visited = 0;
 int32_t min(struct board_state *board, int32_t alpha, int32_t beta, int depth_left) {
     nodes_visited++;
     if (depth_left == 0) {
-        return compute_material(board);
+        return quiescent_min(board, alpha, beta);
+        //return compute_material(board);
     }
-    int32_t final_score;
+    int32_t final_score = beta;
     struct priority_queue move_list;
     priority_queue_init(&move_list, 64); /* Arbitrary capacity */
     int move_count = generate_moves_black(board, &move_list);
@@ -81,9 +82,10 @@ int32_t min(struct board_state *board, int32_t alpha, int32_t beta, int depth_le
 int32_t max(struct board_state *board, int32_t alpha, int32_t beta, int depth_left) {
     nodes_visited++;
     if (depth_left == 0) {
-        return compute_material(board);
+        return quiescent_max(board, alpha, beta);
+        //return compute_material(board);
     }
-    int32_t final_score;
+    int32_t final_score = alpha;
     struct priority_queue move_list;
     priority_queue_init(&move_list, 64);
     int move_count = generate_moves_white(board, &move_list);
@@ -123,32 +125,89 @@ int32_t max(struct board_state *board, int32_t alpha, int32_t beta, int depth_le
 }
 
 int32_t quiescent_min(struct board_state *board, int32_t alpha, int32_t beta) {
-
+    //print_board(board, 1, 1);
+    nodes_visited++;
+    int32_t stand_pat = compute_material(board);
+    if (stand_pat <= alpha) {
+        return alpha;
+    }
+    if (stand_pat < beta) {
+        beta = stand_pat;
+    }
+    int32_t final_score = beta;
+    struct priority_queue move_list;
+    priority_queue_init(&move_list, 64);
+    int move_count = generate_moves_black(board, &move_list);
+    
+    struct move *m;
+    struct board_flags save = board->flags;
+    uint64_t old_hash = board->hash;
+    while ((m = priority_queue_pop(&move_list)) != NULL)  {
+        /* if capture */
+        if (m->t_mover != NO_PIECE) {
+            make(board, m);
+            int32_t score = quiescent_max(board, alpha, beta);
+            unmake(board, m, &save, old_hash);
+            if (score <= alpha) {
+                final_score = alpha;
+                break;
+            }
+            if (score < beta) {
+                beta = score;
+                final_score = beta;
+            }
+        }
+        free(m);
+    }
+    while ((m = priority_queue_pop(&move_list)) != NULL) {
+        free(m);
+    }
+    priority_queue_destroy(&move_list);
+    set_transposition_score(old_hash, final_score);
+    return final_score;
 }
 
 int32_t quiescent_max(struct board_state *board, int32_t alpha, int32_t beta) {
+    //print_board(board, 1, 1);
     nodes_visited++;
-    int32_t stand_pat = compute_material();
-    if( stand_pat >= beta)
+    int32_t stand_pat = compute_material(board);
+    if (stand_pat >= beta) {
         return beta;
-    if( alpha < stand_pat )
+    }
+    if (stand_pat > alpha) {
         alpha = stand_pat;
-    int32_t final_score;
+    }
+    int32_t final_score = alpha;
     struct priority_queue move_list;
     priority_queue_init(&move_list, 64);
     int move_count = generate_moves_white(board, &move_list);
-
-    until( every_capture_has_been_examined )  {
-        MakeCapture();
-        score = quiescent_min(board, alpha, beta);
-        TakeBackMove();
-
-        if( score >= beta )
-            return beta;
-        if( score > alpha )
-            alpha = score;
+    
+    struct move *m;
+    struct board_flags save = board->flags;
+    uint64_t old_hash = board->hash;
+    while ((m = priority_queue_pop(&move_list)) != NULL)  {
+        /* if capture */
+        if (m->t_mover != NO_PIECE) {
+            make(board, m);
+            int score = quiescent_min(board, alpha, beta);
+            unmake(board, m, &save, old_hash);
+            if (score >= beta) {
+                final_score = beta;
+                break;
+            }
+            if (score > alpha) {
+                alpha = score;
+                final_score = alpha;
+            }
+        }
+        free(m);
     }
-    return alpha;
+    while ((m = priority_queue_pop(&move_list)) != NULL) {
+        free(m);
+    }
+    priority_queue_destroy(&move_list);
+    set_transposition_score(old_hash, final_score);
+    return final_score;
 }
 
 
