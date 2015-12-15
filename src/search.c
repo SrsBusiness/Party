@@ -10,10 +10,12 @@
 #include "eval.h"
 #include "hash.h"
 #include "bboard_utils.h"
+#include "clock.h"
 
 #ifdef UNIT_TEST
 #include "unit_tests.h"
 #endif
+
 
 
 //
@@ -28,6 +30,7 @@
 uint64_t nodes_visited = 0;
 
 int32_t min(struct board_state *board, int32_t alpha, int32_t beta, int depth_left) {
+    uint64_t elapsed = 0, tsc = RDTSC(); /* Profiling */
     nodes_visited++;
     if (depth_left == 0) {
         return quiescent_min(board, alpha, beta);
@@ -51,7 +54,9 @@ int32_t min(struct board_state *board, int32_t alpha, int32_t beta, int depth_le
     uint64_t old_hash = board->hash;
     while ((m = priority_queue_pop(&move_list)) != NULL) {
         make(board, m);
+        elapsed += tsc_elapsed(tsc, RDTSC()); /* Profiling */
         int32_t score = max(board, alpha, beta, depth_left - 1);
+        tsc = RDTSC(); /* Profiling */
         unmake(board, m, &save, old_hash);
         free(m);
         /* If this score is lower/equal to alpha, then this position is already
@@ -75,11 +80,14 @@ int32_t min(struct board_state *board, int32_t alpha, int32_t beta, int depth_le
     }
     priority_queue_destroy(&move_list);
     set_transposition_score(old_hash, final_score);
+    elapsed += tsc_elapsed(tsc, RDTSC()); /* Profiling */
+    fprintf(stderr, "%s: %lu\n", __FUNCTION__, elapsed);
     return final_score;
 }
 
 /* White is trying to maximize the score */
 int32_t max(struct board_state *board, int32_t alpha, int32_t beta, int depth_left) {
+    uint64_t elapsed = 0, tsc = RDTSC(); /* Profiling */
     nodes_visited++;
     if (depth_left == 0) {
         return quiescent_max(board, alpha, beta);
@@ -104,7 +112,9 @@ int32_t max(struct board_state *board, int32_t alpha, int32_t beta, int depth_le
     uint64_t old_hash = board->hash;
     while ((m = priority_queue_pop(&move_list)) != NULL) {
         make(board, m);
+        elapsed += tsc_elapsed(tsc, RDTSC()); /* Profiling */
         int32_t score = min(board, alpha, beta, depth_left - 1);
+        tsc = RDTSC(); /* Profiling */
         unmake(board, m, &save, old_hash);
         free(m);
         if (score >= beta) {
@@ -121,24 +131,41 @@ int32_t max(struct board_state *board, int32_t alpha, int32_t beta, int depth_le
     }
     priority_queue_destroy(&move_list);
     set_transposition_score(old_hash, final_score);
+    elapsed += tsc_elapsed(tsc, RDTSC()); /* Profiling */
+    fprintf(stderr, "%s: %lu\n", __FUNCTION__, elapsed);
     return final_score;
 }
 
 int32_t quiescent_min(struct board_state *board, int32_t alpha, int32_t beta) {
     //print_board(board, 1, 1);
+    uint64_t elapsed = 0, tsc = RDTSC();
     nodes_visited++;
     int32_t stand_pat = compute_material(board);
-    if (stand_pat <= alpha) {
-        return alpha;
-    }
-    if (stand_pat < beta) {
-        beta = stand_pat;
+    //int32_t stand_pat = 0;
+    if (!in_check(board, BLACK)) { /* No pruning when in check */
+        if (stand_pat <= alpha) {
+            elapsed += tsc_elapsed(tsc, RDTSC());
+            fprintf(stderr, "%s: %lu\n", __FUNCTION__, elapsed);
+            return alpha;
+        }
+        if (stand_pat < beta) {
+            beta = stand_pat;
+        }
     }
     int32_t final_score = beta;
     struct priority_queue move_list;
     priority_queue_init(&move_list, 64);
     int move_count = generate_moves_black(board, &move_list);
-    
+
+    /* Check for stalemate/checkmate */
+    if (move_count == 0) {
+        if (in_check(board, BLACK)) { /* checkmate */
+            final_score = SCORE_MAX; 
+        } else { /* stalemate */
+            final_score = 0;
+        }
+    }
+
     struct move *m;
     struct board_flags save = board->flags;
     uint64_t old_hash = board->hash;
@@ -146,7 +173,9 @@ int32_t quiescent_min(struct board_state *board, int32_t alpha, int32_t beta) {
         /* if capture */
         if (m->t_mover != NO_PIECE) {
             make(board, m);
+            elapsed += tsc_elapsed(tsc, RDTSC());
             int32_t score = quiescent_max(board, alpha, beta);
+            tsc = RDTSC();
             unmake(board, m, &save, old_hash);
             if (score <= alpha) {
                 final_score = alpha;
@@ -164,14 +193,20 @@ int32_t quiescent_min(struct board_state *board, int32_t alpha, int32_t beta) {
     }
     priority_queue_destroy(&move_list);
     set_transposition_score(old_hash, final_score);
+    elapsed += tsc_elapsed(tsc, RDTSC());
+    fprintf(stderr, "%s: %lu\n", __FUNCTION__, elapsed);
     return final_score;
 }
 
 int32_t quiescent_max(struct board_state *board, int32_t alpha, int32_t beta) {
     //print_board(board, 1, 1);
+    uint64_t elapsed = 0, tsc = RDTSC();
     nodes_visited++;
     int32_t stand_pat = compute_material(board);
+    //int32_t stand_pat = 0;
     if (stand_pat >= beta) {
+        elapsed += tsc_elapsed(tsc, RDTSC());
+        fprintf(stderr, "%s: %lu\n", __FUNCTION__, elapsed);
         return beta;
     }
     if (stand_pat > alpha) {
@@ -181,6 +216,15 @@ int32_t quiescent_max(struct board_state *board, int32_t alpha, int32_t beta) {
     struct priority_queue move_list;
     priority_queue_init(&move_list, 64);
     int move_count = generate_moves_white(board, &move_list);
+
+    /* Check for stalemate/checkmate */
+    if (move_count == 0) {
+        if (in_check(board, BLACK)) { /* checkmate */
+            final_score = SCORE_MIN; 
+        } else { /* stalemate */
+            final_score = 0;
+        }
+    }
     
     struct move *m;
     struct board_flags save = board->flags;
@@ -189,7 +233,9 @@ int32_t quiescent_max(struct board_state *board, int32_t alpha, int32_t beta) {
         /* if capture */
         if (m->t_mover != NO_PIECE) {
             make(board, m);
+            elapsed += tsc_elapsed(tsc, RDTSC());
             int score = quiescent_min(board, alpha, beta);
+            tsc = RDTSC();
             unmake(board, m, &save, old_hash);
             if (score >= beta) {
                 final_score = beta;
@@ -207,6 +253,8 @@ int32_t quiescent_max(struct board_state *board, int32_t alpha, int32_t beta) {
     }
     priority_queue_destroy(&move_list);
     set_transposition_score(old_hash, final_score);
+    elapsed += tsc_elapsed(tsc, RDTSC());
+    fprintf(stderr, "%s: %lu\n", __FUNCTION__, elapsed);
     return final_score;
 }
 
@@ -219,7 +267,6 @@ int search(struct board_state *board, int depth, struct move *best_move) {
     uint64_t old_hash = board->hash;
     struct move *m;
     priority_queue_init(&move_list, 64);
-    nodes_visited = 0;
     int move_count;
     switch(board->turn) {
         case WHITE:
@@ -275,6 +322,7 @@ int id_search(struct board_state *board, int depth, struct move *best_move) {
     if (status != NORMAL_MOVE) {
         return status;
     }
+    nodes_visited = 0;
     for (int i = 1; i <= depth; i++) {
         search(board, i, best_move); 
     }

@@ -1,0 +1,21 @@
+Beginning of what will hopefully be a neural network trained to statically
+evaluate chess positions
+
+Input is a 64-valued vector of 13 possible values: empty, or any one of the
+6 pieces for white or black
+
+0   empty
+1   white king
+2   white queen
+3   white bishop
+4   white knight
+5   white rook
+6   white pawn
+7   black king
+8   black queen
+9   black bishop
+10  black knight
+11  black rook
+12  black pawn
+
+

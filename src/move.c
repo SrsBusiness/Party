@@ -242,6 +242,11 @@ int generate_pawn_single_pushes_white(struct board_state *board,
         move_mask = pawn | w_single_push_targets(pawn,
                 ~all_pieces(board));
         struct move *m = calloc(1, sizeof(struct move));
+        if (m == NULL) {
+            fprintf(stderr, "Out of memory in %s:%s:%d",
+                    __FILE__, __FUNCTION__, __LINE__);
+            exit(-1);
+        }
         m->p_mover = PAWN;
         m->s_mover = NO_PIECE;
         m->t_mover = NO_PIECE;
@@ -288,6 +293,11 @@ int generate_pawn_push_promotions_white(struct board_state *board,
         /* Iterate through all promotions pieces */
         for (int promote = QUEEN; promote <= ROOK; promote++) {
             struct move *m = calloc(1, sizeof(struct move));
+            if (m == NULL) {
+                fprintf(stderr, "Out of memory in %s:%s:%d",
+                        __FILE__, __FUNCTION__, __LINE__);
+                exit(-1);
+            }
             m->p_mover = PAWN;
             m->s_mover = promote;
             m->t_mover = NO_PIECE;
@@ -334,6 +344,11 @@ int generate_pawn_double_pushes_white(struct board_state *board,
         move_mask = pawn | w_double_push_targets(pawn,
                 ~all_pieces(board));
         struct move *m = calloc(1, sizeof(struct move));
+        if (m == NULL) {
+            fprintf(stderr, "Out of memory in %s:%s:%d",
+                    __FILE__, __FUNCTION__, __LINE__);
+            exit(-1);
+        }
         m->p_mover = PAWN;
         m->s_mover = NO_PIECE;
         m->t_mover = NO_PIECE;
@@ -379,6 +394,11 @@ int generate_pawn_east_captures_white(struct board_state *board,
         capture_square = w_pawn_east_attacks(pawn);
         primary_mask = pawn | capture_square;
         struct move *m = calloc(1, sizeof(struct move));
+        if (m == NULL) {
+            fprintf(stderr, "Out of memory in %s:%s:%d",
+                    __FILE__, __FUNCTION__, __LINE__);
+            exit(-1);
+        }
         m->p_mover = PAWN;
         m->s_mover = NO_PIECE;
         m->t_mover = piece_on_square(board, BLACK, capture_square);
@@ -424,6 +444,11 @@ int generate_pawn_west_captures_white(struct board_state *board,
         capture_square = w_pawn_west_attacks(pawn);
         primary_mask = pawn | capture_square;
         struct move *m = calloc(1, sizeof(struct move));
+        if (m == NULL) {
+            fprintf(stderr, "Out of memory in %s:%s:%d",
+                    __FILE__, __FUNCTION__, __LINE__);
+            exit(-1);
+        }
         m->p_mover = PAWN;
         m->s_mover = NO_PIECE;
         m->t_mover = piece_on_square(board, BLACK, capture_square);
@@ -472,6 +497,11 @@ generate_pawn_east_captures_promotions_white(struct board_state *board,
         int captive = piece_on_square(board, BLACK, capture_square);
         for (int promote = QUEEN; promote <= ROOK; promote++) {
             struct move *m = calloc(1, sizeof(struct move));
+            if (m == NULL) {
+                fprintf(stderr, "Out of memory in %s:%s:%d",
+                        __FILE__, __FUNCTION__, __LINE__);
+                exit(-1);
+            }
             m->p_mover = PAWN;
             m->s_mover = promote;
             m->t_mover = captive;
@@ -523,6 +553,11 @@ generate_pawn_west_captures_promotions_white(struct board_state *board,
         int captive = piece_on_square(board, BLACK, capture_square);
         for (int promote = QUEEN; promote <= ROOK; promote++) {
             struct move *m = calloc(1, sizeof(struct move));
+            if (m == NULL) {
+                fprintf(stderr, "Out of memory in %s:%s:%d",
+                        __FILE__, __FUNCTION__, __LINE__);
+                exit(-1);
+            }
             m->p_mover = PAWN;
             m->s_mover = promote;
             m->t_mover = captive;
@@ -575,6 +610,11 @@ int generate_pawn_en_passant_white(struct board_state *board,
     while (pawns) {
         pawn = pawns & -pawns;
         struct move *m = calloc(1, sizeof(struct move));
+        if (m == NULL) {
+            fprintf(stderr, "Out of memory in %s:%s:%d",
+                    __FILE__, __FUNCTION__, __LINE__);
+            exit(-1);
+        }
         m->p_mover = PAWN;
         m->s_mover = NO_PIECE;
         m->t_mover = PAWN;
@@ -633,6 +673,11 @@ int generate_pawn_single_pushes_black(struct board_state *board,
         move_mask = pawn | b_single_push_targets(pawn,
                 ~all_pieces(board));
         struct move *m = calloc(1, sizeof(struct move));
+        if (m == NULL) {
+            fprintf(stderr, "Out of memory in %s:%s:%d",
+                    __FILE__, __FUNCTION__, __LINE__);
+            exit(-1);
+        }
         m->p_mover = PAWN;
         m->s_mover = NO_PIECE;
         m->t_mover = NO_PIECE;
@@ -679,6 +724,11 @@ int generate_pawn_push_promotions_black(struct board_state *board,
         /* Iterate through all promotions pieces */
         for (int promote = QUEEN; promote <= ROOK; promote++) {
             struct move *m = calloc(1, sizeof(struct move));
+            if (m == NULL) {
+                fprintf(stderr, "Out of memory in %s:%s:%d",
+                        __FILE__, __FUNCTION__, __LINE__);
+                exit(-1);
+            }
             m->p_mover = PAWN;
             m->s_mover = promote;
             m->t_mover = NO_PIECE;
@@ -725,6 +775,11 @@ int generate_pawn_double_pushes_black(struct board_state *board,
         move_mask = pawn | b_double_push_targets(pawn,
                 ~all_pieces(board));
         struct move *m = calloc(1, sizeof(struct move));
+        if (m == NULL) {
+            fprintf(stderr, "Out of memory in %s:%s:%d",
+                    __FILE__, __FUNCTION__, __LINE__);
+            exit(-1);
+        }
         m->p_mover = PAWN;
         m->s_mover = NO_PIECE;
         m->t_mover = NO_PIECE;
@@ -770,6 +825,11 @@ int generate_pawn_east_captures_black(struct board_state *board,
         capture_square = b_pawn_east_attacks(pawn);
         primary_mask = pawn | capture_square;
         struct move *m = calloc(1, sizeof(struct move));
+        if (m == NULL) {
+            fprintf(stderr, "Out of memory in %s:%s:%d",
+                    __FILE__, __FUNCTION__, __LINE__);
+            exit(-1);
+        }
         m->p_mover = PAWN;
         m->s_mover = NO_PIECE;
         m->t_mover = piece_on_square(board, WHITE, capture_square);
@@ -815,6 +875,11 @@ int generate_pawn_west_captures_black(struct board_state *board,
         capture_square = b_pawn_west_attacks(pawn);
         primary_mask = pawn | capture_square;
         struct move *m = calloc(1, sizeof(struct move));
+        if (m == NULL) {
+            fprintf(stderr, "Out of memory in %s:%s:%d",
+                    __FILE__, __FUNCTION__, __LINE__);
+            exit(-1);
+        }
         m->p_mover = PAWN;
         m->s_mover = NO_PIECE;
         m->t_mover = piece_on_square(board, WHITE, capture_square);
@@ -863,6 +928,11 @@ generate_pawn_east_captures_promotions_black(struct board_state *board,
         int captive = piece_on_square(board, WHITE, capture_square);
         for (int promote = QUEEN; promote <= ROOK; promote++) {
             struct move *m = calloc(1, sizeof(struct move));
+            if (m == NULL) {
+                fprintf(stderr, "Out of memory in %s:%s:%d",
+                        __FILE__, __FUNCTION__, __LINE__);
+                exit(-1);
+            }
             m->p_mover = PAWN;
             m->s_mover = promote;
             m->t_mover = captive;
@@ -914,6 +984,11 @@ generate_pawn_west_captures_promotions_black(struct board_state *board,
         int captive = piece_on_square(board, WHITE, capture_square);
         for (int promote = QUEEN; promote <= ROOK; promote++) {
             struct move *m = calloc(1, sizeof(struct move));
+            if (m == NULL) {
+                fprintf(stderr, "Out of memory in %s:%s:%d",
+                        __FILE__, __FUNCTION__, __LINE__);
+                exit(-1);
+            }
             m->p_mover = PAWN;
             m->s_mover = promote;
             m->t_mover = captive;
@@ -966,6 +1041,11 @@ int generate_pawn_en_passant_black(struct board_state *board,
     while (pawns) {
         pawn = pawns & -pawns;
         struct move *m = calloc(1, sizeof(struct move));
+        if (m == NULL) {
+            fprintf(stderr, "Out of memory in %s:%s:%d",
+                    __FILE__, __FUNCTION__, __LINE__);
+            exit(-1);
+        }
         m->p_mover = PAWN;
         m->s_mover = NO_PIECE;
         m->t_mover = PAWN;
@@ -1023,6 +1103,11 @@ int generate_bishop_moves_white(struct board_state *board,
         while (attacks) {
             uint64_t attack = attacks & -attacks;
             struct move *m = calloc(1, sizeof(struct move));
+            if (m == NULL) {
+                fprintf(stderr, "Out of memory in %s:%s:%d",
+                        __FILE__, __FUNCTION__, __LINE__);
+                exit(-1);
+            }
             m->p_mover = BISHOP;
             m->s_mover = NO_PIECE;
             int captured_piece = piece_on_square(board, BLACK, attack);
@@ -1069,6 +1154,11 @@ int generate_bishop_moves_black(struct board_state *board,
         while (attacks) {
             uint64_t attack = attacks & -attacks;
             struct move *m = calloc(1, sizeof(struct move));
+            if (m == NULL) {
+                fprintf(stderr, "Out of memory in %s:%s:%d",
+                        __FILE__, __FUNCTION__, __LINE__);
+                exit(-1);
+            }
             m->p_mover = BISHOP;
             m->s_mover = NO_PIECE;
             int captured_piece = piece_on_square(board, WHITE, attack);
@@ -1115,6 +1205,11 @@ int generate_rook_moves_white(struct board_state *board,
         while (attacks) {
             uint64_t attack = attacks & -attacks;
             struct move *m = calloc(1, sizeof(struct move));
+            if (m == NULL) {
+                fprintf(stderr, "Out of memory in %s:%s:%d",
+                        __FILE__, __FUNCTION__, __LINE__);
+                exit(-1);
+            }
             m->p_mover = ROOK;
             m->s_mover = NO_PIECE;
             int captured_piece = piece_on_square(board, BLACK, attack);
@@ -1161,6 +1256,11 @@ int generate_rook_moves_black(struct board_state *board,
         while (attacks) {
             uint64_t attack = attacks & -attacks;
             struct move *m = calloc(1, sizeof(struct move));
+            if (m == NULL) {
+                fprintf(stderr, "Out of memory in %s:%s:%d",
+                        __FILE__, __FUNCTION__, __LINE__);
+                exit(-1);
+            }
             m->p_mover = ROOK;
             m->s_mover = NO_PIECE;
             int captured_piece = piece_on_square(board, WHITE, attack);
@@ -1208,6 +1308,11 @@ int generate_queen_moves_white(struct board_state *board,
         while (attacks) {
             uint64_t attack = attacks & -attacks;
             struct move *m = calloc(1, sizeof(struct move));
+            if (m == NULL) {
+                fprintf(stderr, "Out of memory in %s:%s:%d",
+                        __FILE__, __FUNCTION__, __LINE__);
+                exit(-1);
+            }
             m->p_mover = QUEEN;
             m->s_mover = NO_PIECE;
             int captured_piece = piece_on_square(board, BLACK, attack);
@@ -1255,6 +1360,11 @@ int generate_queen_moves_black(struct board_state *board,
         while (attacks) {
             uint64_t attack = attacks & -attacks;
             struct move *m = calloc(1, sizeof(struct move));
+            if (m == NULL) {
+                fprintf(stderr, "Out of memory in %s:%s:%d",
+                        __FILE__, __FUNCTION__, __LINE__);
+                exit(-1);
+            }
             m->p_mover = QUEEN;
             m->s_mover = NO_PIECE;
             int captured_piece = piece_on_square(board, WHITE, attack);
@@ -1299,6 +1409,11 @@ int generate_knight_moves_white(struct board_state *board,
         while (attacks) {
             uint64_t attack = attacks & -attacks;
             struct move *m = calloc(1, sizeof(struct move));
+            if (m == NULL) {
+                fprintf(stderr, "Out of memory in %s:%s:%d",
+                        __FILE__, __FUNCTION__, __LINE__);
+                exit(-1);
+            }
             m->p_mover = KNIGHT;
             m->s_mover = NO_PIECE;
             int captured_piece = piece_on_square(board, BLACK, attack);
@@ -1343,6 +1458,11 @@ int generate_knight_moves_black(struct board_state *board,
         while (attacks) {
             uint64_t attack = attacks & -attacks;
             struct move *m = calloc(1, sizeof(struct move));
+            if (m == NULL) {
+                fprintf(stderr, "Out of memory in %s:%s:%d",
+                        __FILE__, __FUNCTION__, __LINE__);
+                exit(-1);
+            }
             m->p_mover = KNIGHT;
             m->s_mover = NO_PIECE;
             int captured_piece = piece_on_square(board, WHITE, attack);
@@ -1385,6 +1505,11 @@ int generate_king_moves_white(struct board_state *board,
     while (attacks) {
         uint64_t attack = attacks & -attacks;
         struct move *m = calloc(1, sizeof(struct move));
+        if (m == NULL) {
+            fprintf(stderr, "Out of memory in %s:%s:%d",
+                    __FILE__, __FUNCTION__, __LINE__);
+            exit(-1);
+        }
         m->p_mover = KING;
         m->s_mover = NO_PIECE;
         int captured_piece = piece_on_square(board, BLACK, attack);
@@ -1424,6 +1549,11 @@ int generate_king_moves_black(struct board_state *board,
     while (attacks) {
         uint64_t attack = attacks & -attacks;
         struct move *m = calloc(1, sizeof(struct move));
+        if (m == NULL) {
+            fprintf(stderr, "Out of memory in %s:%s:%d",
+                    __FILE__, __FUNCTION__, __LINE__);
+            exit(-1);
+        }
         m->p_mover = KING;
         m->s_mover = NO_PIECE;
         int captured_piece = piece_on_square(board, WHITE, attack);
@@ -1466,6 +1596,11 @@ int generate_castle_white(struct board_state *board,
             !((BITBOARD_E1 | BITBOARD_D1 | BITBOARD_C1) & enemy_attacks) &
             !((BITBOARD_D1 | BITBOARD_C1 | BITBOARD_B1) & (board->bb[WHITE][ALL] | board->bb[BLACK][ALL]))) {
         struct move *m = calloc(1, sizeof(struct move));
+        if (m == NULL) {
+            fprintf(stderr, "Out of memory in %s:%s:%d",
+                    __FILE__, __FUNCTION__, __LINE__);
+            exit(-1);
+        }
         m->p_mover = KING;
         m->s_mover = ROOK;
         m->t_mover = NO_PIECE;
@@ -1492,6 +1627,11 @@ int generate_castle_white(struct board_state *board,
             !((BITBOARD_E1 | BITBOARD_F1 | BITBOARD_G1) & enemy_attacks) &
             !((BITBOARD_F1 | BITBOARD_G1) & (board->bb[WHITE][ALL] | board->bb[BLACK][ALL]))) {
         struct move *m = calloc(1, sizeof(struct move));
+        if (m == NULL) {
+            fprintf(stderr, "Out of memory in %s:%s:%d",
+                    __FILE__, __FUNCTION__, __LINE__);
+            exit(-1);
+        }
         m->p_mover = KING;
         m->s_mover = ROOK;
         m->t_mover = NO_PIECE;
@@ -1525,6 +1665,11 @@ int generate_castle_black(struct board_state *board,
             !((BITBOARD_E8 | BITBOARD_D8 | BITBOARD_C8) & enemy_attacks) &
             !((BITBOARD_D8 | BITBOARD_C8 | BITBOARD_B8) & (board->bb[WHITE][ALL] | board->bb[BLACK][ALL]))) {
         struct move *m = calloc(1, sizeof(struct move));
+        if (m == NULL) {
+            fprintf(stderr, "Out of memory in %s:%s:%d",
+                    __FILE__, __FUNCTION__, __LINE__);
+            exit(-1);
+        }
         m->p_mover = KING;
         m->s_mover = ROOK;
         m->t_mover = NO_PIECE;
@@ -1551,6 +1696,11 @@ int generate_castle_black(struct board_state *board,
             !((BITBOARD_E8 | BITBOARD_F8 | BITBOARD_G8) & enemy_attacks) &
             !((BITBOARD_F8 | BITBOARD_G8) & (board->bb[WHITE][ALL] | board->bb[BLACK][ALL]))) {
         struct move *m = calloc(1, sizeof(struct move));
+        if (m == NULL) {
+            fprintf(stderr, "Out of memory in %s:%s:%d",
+                    __FILE__, __FUNCTION__, __LINE__);
+            exit(-1);
+        }
         m->p_mover = KING;
         m->s_mover = ROOK;
         m->t_mover = NO_PIECE;
