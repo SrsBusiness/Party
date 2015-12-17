@@ -13,14 +13,16 @@ struct vector {
 struct nnet {
    int num_layers;
    struct vector **weights;
+   struct vector **new_weights;
    struct vector *outputs;
+   struct vector *errors;
 };
 
-double loss2(struct vector *a, struct vector *b);
-double dot(struct vector *a, struct vector *b);
-double activation(struct vector *w, struct vector *x);
+double loss2(const struct vector *a, const struct vector *b);
+double dot(const struct vector *a, const struct vector *b);
+double activation(const struct vector *w, const struct vector *x);
 void forward_propogate(struct nnet *n);
-void back_propogate();
+void backward_propogate(struct nnet *n, const double *key, int length);
 struct nnet *nnet_init(struct nnet *n, int num_layers,
         int *num_neurons);
 void nnet_free(struct nnet *n);
