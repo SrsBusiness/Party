@@ -119,8 +119,8 @@ void backward_propogate_test(void **state) {
     double inputs[] = {0.76, 1.4};
     double key[] = {0.1, 0.1};
     nnet_set_inputs(&n, inputs);
-    forward_propogate(&n);
-    backward_propogate(&n, key, 2);
+    forward_propagate(&n);
+    backward_propagate(&n, key, 2);
     assert_true(n.weights[1][1].vec[0] > 0.198378 && n.weights[1][1].vec[0] < 0.198380); 
     assert_true(n.weights[1][1].vec[1] > 0.198767 && n.weights[1][1].vec[1] < 0.198769); 
     assert_true(n.weights[1][1].vec[2] > 0.497729 && n.weights[1][1].vec[2] < 0.497731);

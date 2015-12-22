@@ -5,7 +5,8 @@
 #include <string.h>
 #include "neurons.h"
 
-#define ALPHA  0.1 
+#define ALPHA   0.2
+#define M_E     2.718281828459045 
 
 
 /* Computes the sum of squares loss (difference) of the two vectors */
@@ -54,9 +55,9 @@ double activation(const struct vector *w, const struct vector *x) {
     return 1.0 / (1.0 + pow(M_E, -dot(w, x)));
 }
 
-/* random double between 0 and 1 */
+/* random double between -1 and 1 */
 static double rand_double() {
-    return (double)rand() / (double)RAND_MAX;
+    return (double)(rand() - RAND_MAX / 2) / (double)(RAND_MAX / 2);
 }
 
 /* Initializes network 
@@ -130,7 +131,7 @@ void nnet_set_inputs(struct nnet *n, double *inputs) {
 }
 
 /* forward-propogation */
-void forward_propogate(struct nnet *n) {
+void forward_propagate(struct nnet *n) {
     /* layer 0 by convention are the inputs to the network */
     /* last layer contains the outputs of the network */
     for (int i = 1; i < n->num_layers; i++) {
@@ -147,11 +148,10 @@ void forward_propogate(struct nnet *n) {
 
 /* adjusts the weights according to the error, called after forward_propogate */
 /* Takes in the net and the 'answer key' */
-void backward_propogate(struct nnet *n, const double *key, int length) {
+void backward_propagate(struct nnet *n, const double *key, int length) {
     int last_layer = n->num_layers - 1;
     assert(n->outputs[last_layer].length == length + 1);
     struct vector key_v = {length, (double *)key};
-
     /* Output layer handled specially */ 
     for (int i = 1; i < n->outputs[last_layer].length; i++) {
         /* For all nodes in the last layer */
@@ -168,24 +168,19 @@ void backward_propogate(struct nnet *n, const double *key, int length) {
                 ALPHA * n->errors[last_layer].vec[i] * x;
         }
     }
-    
     /* Inner layers: from second-to-last to the 1st layer
      * 0th layer is ignored for backprop */
     for (int i = n->num_layers - 2; i > 0; i--) {
         /* for each layer : ith layer */
         for (int j = 1; j < n->outputs[i].length; j++) {
             /* for each neuron : jth neuron */
-
             double h = n->outputs[i].vec[j];
-            
             /* accumulate the error from all the neurons in the subsequent
              * layer*/
             double sum = 0.0;
-
             for (int k = 1; k < n->errors[i + 1].length; k++) {
                 sum += n->weights[i + 1][k].vec[j] * n->errors[i + 1].vec[k];
             }
-
             n->errors[i].vec[j] = h * (1 - h) * sum;
             for (int k = 0; k < n->new_weights[i][j].length; k++) {
                 /* for each weight : kth weight/input */
@@ -194,12 +189,22 @@ void backward_propogate(struct nnet *n, const double *key, int length) {
             }
         }
     }
-
     /* Copy over the new weights */
     for (int i = 1; i < n->num_layers; i++) {
         for (int j = 1; j < n->outputs[i].length; j++) {
             memcpy(n->weights[i][j].vec, n->new_weights[i][j].vec,
                     n->outputs[i - 1].length * sizeof(double));
+        }
+    }
+}
+
+/* Deterministic version of stochastic gradient descent */
+void nnet_train(struct nnet *n, struct example *examples, int num_examples, int iterations) {
+    for (int i = 0; i < iterations; i++) {
+        for (int j = 0; j < num_examples; j++) {
+            nnet_set_inputs(n, examples[j].inputs);
+            forward_propagate(n);
+            backward_propagate(n, examples[j].outputs, examples[j].num_outputs);
         }
     }
 }
