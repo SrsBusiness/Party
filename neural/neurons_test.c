@@ -9,7 +9,7 @@ void loss2_test(void **state);
 void dot_test(void **state);
 void activation_test(void **state);
 void propagate_test(void **state);
-void backward_propogate_test(void **state);
+void backward_propagate_test(void **state);
 
 int main() {
     const struct CMUnitTest tests[] = {
@@ -17,7 +17,7 @@ int main() {
         cmocka_unit_test(dot_test),
         cmocka_unit_test(activation_test),
         cmocka_unit_test(propagate_test),
-        cmocka_unit_test(backward_propogate_test),
+        cmocka_unit_test(backward_propagate_test),
     };
     return cmocka_run_group_tests(tests, NULL, NULL);
 }
@@ -85,7 +85,7 @@ void propagate_test(void **state) {
     ///* set the inputs */
     double inputs[] = {0.76, 1.4, 0.85};
     nnet_set_inputs(&n, inputs);
-    forward_propogate(&n); 
+    forward_propagate(&n); 
     assert_true(n.outputs[2].vec[1] > 0.969883 && n.outputs[2].vec[1] < 0.969885);
     assert_true(n.outputs[2].vec[2] > 0.622628 && n.outputs[2].vec[2] < 0.62263);
     assert_true(n.outputs[2].vec[3] > 0.800552 && n.outputs[2].vec[3] < 0.800554);
@@ -93,7 +93,7 @@ void propagate_test(void **state) {
     nnet_free(&n);
 }
 
-void backward_propogate_test(void **state) {
+void backward_propagate_test(void **state) {
     struct nnet n;
     int num_neurons[] = {2, 2, 2};
     nnet_init(&n, 3, num_neurons); 
@@ -135,10 +135,10 @@ void backward_propogate_test(void **state) {
     assert_true(n.weights[2][2].vec[2] > 0.090891 && n.weights[2][2].vec[2] < 0.090893); 
 
     for (int i = 0; i < 10000; i++) {
-        forward_propogate(&n); 
+        forward_propagate(&n); 
         printf("%f %f \n", n.outputs[2].vec[1], n.outputs[2].vec[2]);
-        backward_propogate(&n, key, 2);
+        backward_propagate(&n, key, 2);
     }
-    forward_propogate(&n); 
+    forward_propagate(&n); 
     nnet_free(&n);
 }
