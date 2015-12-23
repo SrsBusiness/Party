@@ -5,8 +5,8 @@
 #include <string.h>
 #include "neurons.h"
 
-#define ALPHA   0.2
-#define M_E     2.718281828459045 
+#define ALPHA   0.1
+#define M_E 2.7182818284590452354
 
 
 /* Computes the sum of squares loss (difference) of the two vectors */
