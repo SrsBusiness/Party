@@ -6,7 +6,10 @@
 #include "neurons.h"
 
 #define ALPHA   0.1
+
+#ifndef M_E
 #define M_E 2.7182818284590452354
+#endif
 
 
 /* Computes the sum of squares loss (difference) of the two vectors */
@@ -67,8 +70,9 @@ static double rand_double() {
  **/
 
 struct nnet *nnet_init(struct nnet *n, int num_layers,
-        int *num_neurons) {
+        int *num_neurons, double alpha) {
     n->num_layers = num_layers;
+    n->alpha = alpha;
     n->weights = malloc(num_layers * sizeof(struct vector *));
     n->new_weights = malloc(num_layers * sizeof(struct vector *));
     n->outputs = malloc(num_layers * sizeof(struct vector));
@@ -165,7 +169,7 @@ void backward_propagate(struct nnet *n, const double *key, int length) {
             /* update the jth component of the weight vector */
             n->new_weights[last_layer][i].vec[j] =
                 n->weights[last_layer][i].vec[j] +
-                ALPHA * n->errors[last_layer].vec[i] * x;
+                n->alpha * n->errors[last_layer].vec[i] * x;
         }
     }
     /* Inner layers: from second-to-last to the 1st layer
@@ -185,7 +189,7 @@ void backward_propagate(struct nnet *n, const double *key, int length) {
             for (int k = 0; k < n->new_weights[i][j].length; k++) {
                 /* for each weight : kth weight/input */
                 n->new_weights[i][j].vec[k] = n->weights[i][j].vec[k] +
-                    ALPHA * n->outputs[i - 1].vec[k] * n->errors[i].vec[j];
+                    n->alpha * n->outputs[i - 1].vec[k] * n->errors[i].vec[j];
             }
         }
     }
@@ -207,4 +211,64 @@ void nnet_train(struct nnet *n, struct example *examples, int num_examples, int 
             backward_propagate(n, examples[j].outputs, examples[j].num_outputs);
         }
     }
+}
+
+void nnet_save(struct nnet *n, const char *filename) {
+    FILE *f = fopen(filename, "w");
+    fwrite(&n->num_layers, sizeof(n->num_layers), 1, f);
+    fwrite(&n->alpha, sizeof(n->alpha), 1, f);
+    /* Write # of neurons in each layer */
+    for (int i = 0; i < n->num_layers; i++) {
+        fwrite(&n->outputs[i].length,
+                sizeof(n->outputs[i].length), 1, f);
+    }
+    
+    /* Write the weights */
+    for (int i = 1; i < n->num_layers; i++) {
+        for (int j = 1; j < n->outputs[i].length; j++) {
+            fwrite(n->weights[i][j].vec, sizeof(double),
+                    n->weights[i][j].length, f);
+        }
+    }
+    fclose(f);
+}
+
+struct nnet *nnet_load(struct nnet *n, const char *filename) {
+    FILE *f = fopen(filename, "r");
+    if (f == NULL) {
+        return NULL;
+    }
+    fread(&n->num_layers, sizeof(n->num_layers), 1, f);
+    fread(&n->alpha, sizeof(n->alpha), 1, f);
+    n->weights = malloc(n->num_layers * sizeof(struct vector *));
+    n->new_weights = malloc(n->num_layers * sizeof(struct vector *));
+    n->outputs = malloc(n->num_layers * sizeof(struct vector));
+    n->errors = malloc(n->num_layers * sizeof(struct vector));
+
+    int *num_neurons = malloc(n->num_layers * sizeof(int));
+    fread(num_neurons, sizeof(int), n->num_layers, f);
+    
+    n->outputs[0].length = num_neurons[0];
+    n->outputs[0].vec = malloc(n->outputs[0].length * sizeof(double));
+    n->outputs[0].vec[0] = 1.0;
+
+    for (int i = 1; i < n->num_layers; i++) {
+        n->outputs[i].length = n->errors[i].length = num_neurons[i];
+        n->outputs[i].vec = malloc(n->outputs[i].length * sizeof(double));
+        n->outputs[i].vec[0] = 1.0;
+        n->errors[i].vec = malloc(n->errors[i].length * sizeof(double));
+        n->weights[i] = malloc(n->outputs[i].length * sizeof(struct vector));
+        n->new_weights[i] = malloc(n->outputs[i].length * sizeof(struct vector));
+        for (int j = 1; j < n->outputs[i].length; j++) {
+            n->weights[i][j].length = n->new_weights[i][j].length = n->outputs[i - 1].length;
+            n->weights[i][j].vec =
+                malloc(n->outputs[i - 1].length * sizeof(double));
+            n->new_weights[i][j].vec = 
+                malloc(n->outputs[i - 1].length * sizeof(double));
+            for (int k = 0; k < n->outputs[i - 1].length; k++) {
+                fread(&n->weights[i][j].vec[k], sizeof(double), 1, f);
+            }
+        }
+    }
+    return n;
 }

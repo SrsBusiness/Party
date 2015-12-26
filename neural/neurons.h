@@ -12,6 +12,7 @@ struct vector {
  **/
 struct nnet {
     int num_layers;
+    double alpha;
     struct vector **weights;
     struct vector **new_weights;
     struct vector *outputs;
@@ -30,9 +31,10 @@ double activation(const struct vector *w, const struct vector *x);
 void forward_propagate(struct nnet *n);
 void backward_propagate(struct nnet *n, const double *key, int length);
 struct nnet *nnet_init(struct nnet *n, int num_layers,
-        int *num_neurons);
+        int *num_neurons, double alpha);
 void nnet_free(struct nnet *n);
 void nnet_set_inputs(struct nnet *n, double *inputs);
 void nnet_train(struct nnet *, struct example *, int, int);
-
+void nnet_save(struct nnet *n, const char *filename); 
+struct nnet *nnet_load(struct nnet *n, const char *filename);
 #endif

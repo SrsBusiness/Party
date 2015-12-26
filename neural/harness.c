@@ -84,6 +84,7 @@ void init_engine() {
         fflush(out);
         do { 
             char *status = fgets(input, sizeof(input), in);
+            printf("%s\n", input);
             if (status == NULL) {
                 fprintf(stderr, "Unexpected EOF\n");
                 exit(-1);

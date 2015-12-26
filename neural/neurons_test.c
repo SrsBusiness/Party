@@ -49,7 +49,7 @@ void activation_test(void **state) {
 void propagate_test(void **state) {
     struct nnet n;
     int num_neurons[] = {3, 3, 3};
-    nnet_init(&n, 3, num_neurons); 
+    nnet_init(&n, 3, num_neurons, 0.1);
 
     /* hard code weights */
     n.weights[1][1].vec[0] = 0.2;
@@ -96,7 +96,7 @@ void propagate_test(void **state) {
 void backward_propagate_test(void **state) {
     struct nnet n;
     int num_neurons[] = {2, 2, 2};
-    nnet_init(&n, 3, num_neurons); 
+    nnet_init(&n, 3, num_neurons, 0.1);
 
     /* hard code weights */
     n.weights[1][1].vec[0] = 0.2;
@@ -140,5 +140,14 @@ void backward_propagate_test(void **state) {
         backward_propagate(&n, key, 2);
     }
     forward_propagate(&n); 
+    nnet_save(&n, "foo");
     nnet_free(&n);
+    struct nnet load;
+    nnet_load(&load, "foo");
+    
+    printf("FOO\n");
+    nnet_set_inputs(&load, inputs);
+    forward_propagate(&load); 
+    printf("%f %f \n", load.outputs[2].vec[1], load.outputs[2].vec[2]);
+
 }
