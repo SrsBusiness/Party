@@ -1,22 +1,46 @@
+#include <assert.h>
+#include <math.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+#include "neurons.h"
 
 int FEN_to_arr(const char *, double *);
 
 int main() {
-    //char *fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
-    char *fen = "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1";
-    double input[64];
-    if (FEN_to_arr(fen, input)) {
-        printf("Success\n");
-    } else {
-        printf("Failure\n");
+    srand(time(NULL));
+    FILE *f = fopen("scored_examples_final", "r");
+    char line[512];
+    /* Divide scores by 1000 */
+    int num_positions = 0;
+    while (fgets(line, sizeof(line), f)) {
+        num_positions++;
     }
+    printf("num_positions: %d\n", num_positions);
+    struct example *examples = malloc(num_positions * sizeof(struct example));
+    fseek(f, 0, SEEK_SET);
 
-    for (int i = 7; i >= 0; i--) { /* rank */
-        for (int j = 0; j < 8; j++) { /* file */
-            printf("%f ", input[i * 8 + j]);
-        }
-        printf("\n");
+    /* Initialize examples set */
+    for (int i = 0; i < num_positions; i++) {
+        fgets(line, sizeof(line), f);
+        int score;
+        char fen[512];
+        sscanf(line, "%d %s", &score, fen);
+        double score_d = (double)score;
+        examples[i].num_inputs = 64;
+        examples[i].num_outputs = 1;
+        examples[i].inputs = malloc(64 * sizeof(double));
+        assert(FEN_to_arr(fen, examples[i].inputs));
+        examples[i].outputs = malloc(1 * sizeof(double));
+        examples[i].outputs[0] = score_d;
+    }
+    struct nnet n; 
+    int num_neurons[] = {64, 256, 1};
+    nnet_init(&n, 3, num_neurons, .3);
+    for (int i = 0; i < 1000; i++) {
+        nnet_train(&n, examples, 2, 1000);
+        nnet_save(&n, "chess_eval");
+        printf("Error: %f\n", rms_error(&n, examples, 1));
     }
 }
 

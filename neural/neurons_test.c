@@ -13,39 +13,39 @@ void backward_propagate_test(void **state);
 
 int main() {
     const struct CMUnitTest tests[] = {
-        cmocka_unit_test(loss2_test),
-        cmocka_unit_test(dot_test),
-        cmocka_unit_test(activation_test),
+        //cmocka_unit_test(loss2_test),
+        //cmocka_unit_test(dot_test),
+        //cmocka_unit_test(activation_test),
         cmocka_unit_test(propagate_test),
         cmocka_unit_test(backward_propagate_test),
     };
     return cmocka_run_group_tests(tests, NULL, NULL);
 }
 
-void loss2_test(void **state) {
-    double a[3] = {9.0, 6.0, 3.0};
-    double b[3] = {4.0, 8.0, 12.0};
-    struct vector vec_a = {3, a}, vec_b = {3, b};
-    int loss = (int)loss2(&vec_a, &vec_b);
-    assert_int_equal(110, loss);
-}
-
-void dot_test(void **state) {
-    double a[3] = {9.0, 6.0, 3.0};
-    double b[3] = {4.0, 8.0, 12.0};
-    struct vector vec_a = {3, a}, vec_b = {3, b};
-    int dot_p = (int)dot(&vec_a, &vec_b);
-    assert_int_equal(120, dot_p);
-}
-
-void activation_test(void **state) {
-    double a[3] = {.2, .4, .3};
-    double b[3] = {4.0, 8.0, 12.0};
-    struct vector vec_a = {3, a}, vec_b = {3, b};
-    double output = activation(&vec_a, &vec_b);
-    assert_true(0.99949979889292051016269624597043730318546295166015625 == output);
-}
-
+//void loss2_test(void **state) {
+//    double a[3] = {9.0, 6.0, 3.0};
+//    double b[3] = {4.0, 8.0, 12.0};
+//    struct vector vec_a = {3, a}, vec_b = {3, b};
+//    int loss = (int)loss2(&vec_a, &vec_b);
+//    assert_int_equal(110, loss);
+//}
+//
+//void dot_test(void **state) {
+//    double a[3] = {9.0, 6.0, 3.0};
+//    double b[3] = {4.0, 8.0, 12.0};
+//    struct vector vec_a = {3, a}, vec_b = {3, b};
+//    int dot_p = (int)dot(&vec_a, &vec_b);
+//    assert_int_equal(120, dot_p);
+//}
+//
+//void activation_test(void **state) {
+//    double a[3] = {.2, .4, .3};
+//    double b[3] = {4.0, 8.0, 12.0};
+//    struct vector vec_a = {3, a}, vec_b = {3, b};
+//    double output = activation(&vec_a, &vec_b);
+//    assert_true(0.99949979889292051016269624597043730318546295166015625 == output);
+//}
+//
 void propagate_test(void **state) {
     struct nnet n;
     int num_neurons[] = {3, 3, 3};

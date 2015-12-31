@@ -1,3 +1,4 @@
+#include <dirent.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -15,30 +16,44 @@ int engine_score(char *fen);
 
 int main(int argc, char **argv) {
     if (argc < 2) {
-        fprintf(stderr, "usage: %s <training set>\n", argv[0]);
+        fprintf(stderr, "usage: %s <training dir>\n", argv[0]);
         exit(-1);
     }
 
-    FILE *tset = fopen(argv[1], "r");
-    if (tset == NULL) {
-        fprintf(stderr, "File %s does not exist\n", argv[1]);
+    DIR *d = opendir(argv[1]);
+    
+
+    if (d == NULL) {
+        fprintf(stderr, "Directory %s does not exist\n", argv[1]);
         exit(-1);
     }
-    char *out_name = malloc(strlen(argv[1]) + strlen("_score") + 1);
-    strcpy(out_name, argv[1]);
-    strncat(out_name, "_score", strlen("_score") + 1);
-    FILE *tset_scores = fopen(out_name, "w+");
+    struct dirent *dir;
+    FILE *tset_scores = fopen("scored_examples", "w+");
     init_engine();
     
     char fen[512] = {0};
-    while (fgets(fen, sizeof(fen), tset) != NULL) {
-        /* fen has stray newline */
-        fen[strlen(fen) - 1] = '\0';
-        printf("FEN: %s\n", fen);
-        int score = engine_score(fen);
-        fprintf(tset_scores, "%d %s\n", score, fen);  
+    char filename[256] = {0};
+    while ((dir = readdir(d)) != NULL) {
+        if (dir->d_type == DT_DIR) {
+            continue;
+        }
+        printf("%s\n", dir->d_name);
+        strncpy(filename, argv[1], sizeof(filename));
+        strncat(filename, "/", sizeof(filename));
+        strncat(filename, dir->d_name, sizeof(filename));
+        FILE *tset = fopen(filename, "r");
+        while (fgets(fen, sizeof(fen), tset) != NULL) {
+            /* If first char is '#', ignore */
+            if (fen[0] != '#') {
+                /* fen has stray newline */
+                fen[strlen(fen) - 1] = '\0';
+                //printf("FEN: %s\n", fen);
+                int score = engine_score(fen);
+                fprintf(tset_scores, "%d %s\n", score, fen);  
+            }
+        }
+        fclose(tset);
     }
-    fclose(tset);
     fclose(tset_scores);
     return 0;
 }
@@ -84,7 +99,6 @@ void init_engine() {
         fflush(out);
         do { 
             char *status = fgets(input, sizeof(input), in);
-            printf("%s\n", input);
             if (status == NULL) {
                 fprintf(stderr, "Unexpected EOF\n");
                 exit(-1);
@@ -98,7 +112,7 @@ int engine_score(char *fen) {
     int score = 0;
     fprintf(out, "ucinewgame\n");
     fprintf(out, "position fen %s\n", fen);
-    fprintf(out, "go movetime 10000\n");
+    fprintf(out, "go depth 0\n");
     fflush(out);
     char input[512] = {0};
     char tmp[512] = {0};

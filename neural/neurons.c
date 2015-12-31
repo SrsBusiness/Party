@@ -22,45 +22,51 @@ double loss2(const struct vector *a, const struct vector *b) {
     return loss;
 }
 
-double dot(const struct vector *a, const struct vector *b) {
-    assert(a->length == b->length);
+double dot(const double *a, const double *b, int length) {
     double product = 0;
-    for (int i = 0; i < a->length; i++) {
-        product += a->vec[i] * b->vec[i];
+    for (int i = 0; i < length; i++) {
+        product += a[i] * b[i];
     }
     return product;
 }
 
-void vadd(const struct vector *a, const struct vector *b, struct vector *c) {
-    assert(a->length == b->length && a->length == c->length);
-    for (int i = 0; i < a->length; i++) {
-        c->vec[i] = a->vec[i] + b->vec[i];
+void vadd(const double *a, const double *b, double *c, int length) {
+    for (int i = 0; i < length; i++) {
+        c[i] = a[i] + b[i];
     }
 }
 
-void vsub(const struct vector *a, const struct vector *b, struct vector *c) {
-    assert(a->length == b->length && a->length == c->length);
-    for (int i = 0; i < a->length; i++) {
-        c->vec[i] = a->vec[i] - b->vec[i];
+void vsub(const double *a, const double *b, double *c, int length) {
+    for (int i = 0; i < length; i++) {
+        c[i] = a[i] - b[i];
     }
 }
 
-double vsum(const struct vector *a) {
-    double sum = 0;
-    for (int i = 0; i < a->length; i++) {
-        sum += a->vec[i]; 
+double vsum(const double *a, int length) {
+    double sum = 0.0;
+    for (int i = 0; i < length; i++) {
+        sum += a[i]; 
     }
     return sum;
 }
 
+double dist_euc_2(const double *a, const double *b, int length) {
+    double dist = 0.0;
+    for (int i = 0; i < length; i++) {
+        printf("expected: %f, hypothesis: %f\n", a[i], b[i]);
+        dist += pow(a[i] - b[i], 2);
+    }
+    return dist;
+}
+
 /* Logistic activation function given weights w and inputs x */
 double activation(const struct vector *w, const struct vector *x) {
-    return 1.0 / (1.0 + pow(M_E, -dot(w, x)));
+    return 1.0 / (1.0 + pow(M_E, -dot(w->vec, x->vec, w->length)));
 }
 
 /* random double between -1 and 1 */
 static double rand_double() {
-    return (double)(rand() - RAND_MAX / 2) / (double)(RAND_MAX / 2);
+    return (double)(rand() - RAND_MAX / 2) / ((double)(RAND_MAX / 2)) / 100.0;
 }
 
 /* Initializes network 
@@ -77,7 +83,7 @@ struct nnet *nnet_init(struct nnet *n, int num_layers,
     n->new_weights = malloc(num_layers * sizeof(struct vector *));
     n->outputs = malloc(num_layers * sizeof(struct vector));
     n->errors = malloc(num_layers * sizeof(struct vector));
-    
+
     /* layer 0: only the outputs are important, no weights or errors */
     n->outputs[0].length = num_neurons[0] + 1;
     n->outputs[0].vec = malloc(n->outputs[0].length * sizeof(double));
@@ -128,7 +134,8 @@ void nnet_free(struct nnet *n) {
     free(n->errors);
 }
 
-void nnet_set_inputs(struct nnet *n, double *inputs) {
+void nnet_set_inputs(struct nnet *n, double *inputs, int length) {
+    assert(length + 1 == n->outputs[0].length);
     for (int i = 1; i < n->outputs[0].length; i++) {
         n->outputs[0].vec[i] = inputs[i - 1];
     }
@@ -138,16 +145,26 @@ void nnet_set_inputs(struct nnet *n, double *inputs) {
 void forward_propagate(struct nnet *n) {
     /* layer 0 by convention are the inputs to the network */
     /* last layer contains the outputs of the network */
-    for (int i = 1; i < n->num_layers; i++) {
+    for (int i = 1; i < n->num_layers - 1; i++) {
         /* For each layer */
         /* propogate the activation signals for this layer */
         for (int j = 1; j < n->outputs[i].length; j++) { /* */
             /* For each neuron */
             n->outputs[i].vec[j] = 
                 activation(&n->weights[i][j],
-                    &n->outputs[i - 1]); 
+                        &n->outputs[i - 1]); 
+            assert(n->outputs[i].vec[j] <= 1.0);
         }
     }
+
+    /* last layer is linear activation */
+    int last_layer = n->num_layers - 1;
+    for (int i = 1; i < n->outputs[last_layer].length; i++) {
+        n->outputs[last_layer].vec[i] =
+            dot(n->weights[last_layer][i].vec, n->outputs[last_layer - 1].vec, 
+                    n->weights[last_layer][i].length);
+    }
+    //exit(0);
 }
 
 /* adjusts the weights according to the error, called after forward_propogate */
@@ -160,7 +177,8 @@ void backward_propagate(struct nnet *n, const double *key, int length) {
     for (int i = 1; i < n->outputs[last_layer].length; i++) {
         /* For all nodes in the last layer */
         double h = n->outputs[last_layer].vec[i];
-        n->errors[last_layer].vec[i] =  h * (1 - h) * (key[i - 1] - h);
+        //n->errors[last_layer].vec[i] =  h * (1 - h) * (key[i - 1] - h);
+        n->errors[last_layer].vec[i] = (key[i - 1] - h);
         for (int j = 0; j < n->new_weights[last_layer][i].length; j++) {
             /* For all weights in the node */
             /* ith component of the output vector */
@@ -202,15 +220,32 @@ void backward_propagate(struct nnet *n, const double *key, int length) {
     }
 }
 
-/* Deterministic version of stochastic gradient descent */
+/* stochastic gradient descent */
 void nnet_train(struct nnet *n, struct example *examples, int num_examples, int iterations) {
     for (int i = 0; i < iterations; i++) {
-        for (int j = 0; j < num_examples; j++) {
-            nnet_set_inputs(n, examples[j].inputs);
-            forward_propagate(n);
-            backward_propagate(n, examples[j].outputs, examples[j].num_outputs);
-        }
+        int index = rand() % num_examples;
+        nnet_set_inputs(n, examples[index].inputs, examples[index].num_inputs);
+        //printf("INPUTS\n");
+        //for (int j = 0; j < n->outputs[0].length; j++) {
+        //    printf("%f ", n->outputs[0].vec[j]); 
+        //}
+        //printf("\n");
+        forward_propagate(n);
+        backward_propagate(n, examples[index].outputs, examples[index].num_outputs);
     }
+}
+
+/* compute root mean square of the error */
+double rms_error(struct nnet *n, struct example *examples, int num_examples) {
+    double total_error = 0.0;
+    int last_layer = n->num_layers - 1;
+    for (int i = 0; i < num_examples; i++) {
+        nnet_set_inputs(n, examples[i].inputs, examples[i].num_inputs);
+        forward_propagate(n);
+        total_error += dist_euc_2(examples[i].outputs, &n->outputs[last_layer].vec[1],
+                examples[i].num_outputs);
+    }
+    return sqrt(total_error / num_examples);
 }
 
 void nnet_save(struct nnet *n, const char *filename) {
@@ -222,7 +257,7 @@ void nnet_save(struct nnet *n, const char *filename) {
         fwrite(&n->outputs[i].length,
                 sizeof(n->outputs[i].length), 1, f);
     }
-    
+
     /* Write the weights */
     for (int i = 1; i < n->num_layers; i++) {
         for (int j = 1; j < n->outputs[i].length; j++) {
@@ -247,7 +282,7 @@ struct nnet *nnet_load(struct nnet *n, const char *filename) {
 
     int *num_neurons = malloc(n->num_layers * sizeof(int));
     fread(num_neurons, sizeof(int), n->num_layers, f);
-    
+
     n->outputs[0].length = num_neurons[0];
     n->outputs[0].vec = malloc(n->outputs[0].length * sizeof(double));
     n->outputs[0].vec[0] = 1.0;
