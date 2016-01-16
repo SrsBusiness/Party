@@ -17,9 +17,11 @@ int main() {
         num_positions++;
     }
     printf("num_positions: %d\n", num_positions);
-    struct example *examples = malloc(num_positions * sizeof(struct example));
+    double board[64];
+    //struct example *examples = malloc(num_positions * sizeof(struct example));
     fseek(f, 0, SEEK_SET);
-
+    FILE *out = fopen("fann_examples", "w");
+    fprintf(out, "%d %d %d\n", num_positions, 64, 1);
     /* Initialize examples set */
     for (int i = 0; i < num_positions; i++) {
         fgets(line, sizeof(line), f);
@@ -27,21 +29,46 @@ int main() {
         char fen[512];
         sscanf(line, "%d %s", &score, fen);
         double score_d = (double)score;
-        examples[i].num_inputs = 64;
-        examples[i].num_outputs = 1;
-        examples[i].inputs = malloc(64 * sizeof(double));
-        assert(FEN_to_arr(fen, examples[i].inputs));
-        examples[i].outputs = malloc(1 * sizeof(double));
-        examples[i].outputs[0] = score_d;
+        assert(FEN_to_arr(fen, board));
+        /* Input */
+        for (int j = 0; j < 64; j++) {
+            fprintf(out, "%f ", board[j]);
+        }
+        fprintf(out, "\n");
+        /* Outputs */
+        fprintf(out, "%f\n", score_d);
+        //examples[i].num_inputs = 64;
+        //examples[i].num_outputs = 1;
+        //examples[i].inputs = malloc(64 * sizeof(double));
+        //assert(FEN_to_arr(fen, examples[i].inputs));
+        //examples[i].outputs = malloc(1 * sizeof(double));
+        //examples[i].outputs[0] = score_d;
     }
-    struct nnet n; 
-    int num_neurons[] = {64, 256, 1};
-    nnet_init(&n, 3, num_neurons, .3);
-    for (int i = 0; i < 1000; i++) {
-        nnet_train(&n, examples, 2, 1000);
-        nnet_save(&n, "chess_eval");
-        printf("Error: %f\n", rms_error(&n, examples, 1));
-    }
+
+//    /* partition examples into training and validation set */
+//    struct example *validation = malloc(num_positions / 10 * sizeof(struct example));
+//    partition_examples(examples, validation, num_positions, num_positions / 10);
+//    int training_size = num_positions - num_positions / 10;
+//    int validation_size = num_positions / 10;
+//    struct nnet n; 
+//    int num_neurons[] = {64, 1024, 1};
+//    nnet_init(&n, 3, num_neurons, .3);
+//    //nnet_load(&n, "chess_eval");
+//    printf("Layers: %d\n", n.num_layers);
+//    printf("Neurons per layer: ");
+//    for (int i = 0; i < n.num_layers; i++) {
+//        printf("%d ", n.outputs[i].length - 1); 
+//    }
+//    printf("\n");
+//    for (int i = 0; i < 1000; i++) {
+//        double training_error;
+//        printf("Training\n");
+//        nnet_train(&n, examples, 2, 100000, &training_error);
+//        nnet_save(&n, "chess_eval");
+//        printf("Computing Error\n");
+//        printf("Training Error: %f\n", training_error);
+//        printf("Validation Error: %f\n", rms_error(&n, examples, 10));
+//    }
 }
 
 int FEN_to_arr(const char *fen, double *input) {

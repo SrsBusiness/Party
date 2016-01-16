@@ -84,7 +84,7 @@ void propagate_test(void **state) {
 
     ///* set the inputs */
     double inputs[] = {0.76, 1.4, 0.85};
-    nnet_set_inputs(&n, inputs);
+    nnet_set_inputs(&n, inputs, 3);
     forward_propagate(&n); 
     assert_true(n.outputs[2].vec[1] > 0.969883 && n.outputs[2].vec[1] < 0.969885);
     assert_true(n.outputs[2].vec[2] > 0.622628 && n.outputs[2].vec[2] < 0.62263);
@@ -118,7 +118,7 @@ void backward_propagate_test(void **state) {
     ///* set the inputs */
     double inputs[] = {0.76, 1.4};
     double key[] = {0.1, 0.1};
-    nnet_set_inputs(&n, inputs);
+    nnet_set_inputs(&n, inputs, 2);
     forward_propagate(&n);
     backward_propagate(&n, key, 2);
     assert_true(n.weights[1][1].vec[0] > 0.198378 && n.weights[1][1].vec[0] < 0.198380); 
@@ -146,7 +146,7 @@ void backward_propagate_test(void **state) {
     nnet_load(&load, "foo");
     
     printf("FOO\n");
-    nnet_set_inputs(&load, inputs);
+    nnet_set_inputs(&load, inputs, 2);
     forward_propagate(&load); 
     printf("%f %f \n", load.outputs[2].vec[1], load.outputs[2].vec[2]);
 

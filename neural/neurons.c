@@ -53,7 +53,8 @@ double vsum(const double *a, int length) {
 double dist_euc_2(const double *a, const double *b, int length) {
     double dist = 0.0;
     for (int i = 0; i < length; i++) {
-        printf("expected: %f, hypothesis: %f\n", a[i], b[i]);
+        //printf("expected: %f, hypothesis: %f\n", a[i], b[i]);
+        //getchar();
         dist += pow(a[i] - b[i], 2);
     }
     return dist;
@@ -145,7 +146,7 @@ void nnet_set_inputs(struct nnet *n, double *inputs, int length) {
 void forward_propagate(struct nnet *n) {
     /* layer 0 by convention are the inputs to the network */
     /* last layer contains the outputs of the network */
-    for (int i = 1; i < n->num_layers - 1; i++) {
+    for (int i = 1; i < n->num_layers; i++) {
         /* For each layer */
         /* propogate the activation signals for this layer */
         for (int j = 1; j < n->outputs[i].length; j++) { /* */
@@ -158,12 +159,12 @@ void forward_propagate(struct nnet *n) {
     }
 
     /* last layer is linear activation */
-    int last_layer = n->num_layers - 1;
-    for (int i = 1; i < n->outputs[last_layer].length; i++) {
-        n->outputs[last_layer].vec[i] =
-            dot(n->weights[last_layer][i].vec, n->outputs[last_layer - 1].vec, 
-                    n->weights[last_layer][i].length);
-    }
+    //int last_layer = n->num_layers - 1;
+    //for (int i = 1; i < n->outputs[last_layer].length; i++) {
+    //    n->outputs[last_layer].vec[i] =
+    //        dot(n->weights[last_layer][i].vec, n->outputs[last_layer - 1].vec, 
+    //                n->weights[last_layer][i].length);
+    //}
     //exit(0);
 }
 
@@ -177,8 +178,8 @@ void backward_propagate(struct nnet *n, const double *key, int length) {
     for (int i = 1; i < n->outputs[last_layer].length; i++) {
         /* For all nodes in the last layer */
         double h = n->outputs[last_layer].vec[i];
-        //n->errors[last_layer].vec[i] =  h * (1 - h) * (key[i - 1] - h);
-        n->errors[last_layer].vec[i] = (key[i - 1] - h);
+        n->errors[last_layer].vec[i] =  h * (1 - h) * (key[i - 1] - h);
+        //n->errors[last_layer].vec[i] = (key[i - 1] - h);
         for (int j = 0; j < n->new_weights[last_layer][i].length; j++) {
             /* For all weights in the node */
             /* ith component of the output vector */
@@ -220,8 +221,27 @@ void backward_propagate(struct nnet *n, const double *key, int length) {
     }
 }
 
+/* Selects size_a random examples from examples and moves them to a 
+ * modifies both examples and a
+ **/
+void partition_examples(struct example *examples, struct example *a, int num_examples, int size_a) {
+    int len_orig = num_examples, len_a = 0; 
+    for (int i = 0; i < size_a; i++) {
+        /* swap a random example with the last one in examples */
+        int rand_index = rand() % len_orig;
+        struct example tmp = examples[rand_index];
+        examples[rand_index] = examples[len_orig - 1];
+        examples[len_orig - 1] = tmp;
+        /* Move the last example into a */
+        a[len_a++] = tmp;
+        len_orig--;
+    }
+}
+
 /* stochastic gradient descent */
-void nnet_train(struct nnet *n, struct example *examples, int num_examples, int iterations) {
+void nnet_train(struct nnet *n, struct example *examples, int num_examples, int iterations, double *error) {
+    double total_error = 0.0;
+    int last_layer = n->num_layers - 1;
     for (int i = 0; i < iterations; i++) {
         int index = rand() % num_examples;
         nnet_set_inputs(n, examples[index].inputs, examples[index].num_inputs);
@@ -231,8 +251,25 @@ void nnet_train(struct nnet *n, struct example *examples, int num_examples, int 
         //}
         //printf("\n");
         forward_propagate(n);
+        total_error += dist_euc_2(examples[index].outputs, &n->outputs[last_layer].vec[1],
+                examples[index].num_outputs);
         backward_propagate(n, examples[index].outputs, examples[index].num_outputs);
     }
+    *error = sqrt(total_error / iterations);
+}
+
+/* compute root mean square of the error */
+double rms_error_rand(struct nnet *n, struct example *examples, int num_examples, int samples) {
+    double total_error = 0.0;
+    int last_layer = n->num_layers - 1;
+    for (int i = 0; i < samples; i++) {
+        int index = rand() % num_examples;
+        nnet_set_inputs(n, examples[index].inputs, examples[index].num_inputs);
+        forward_propagate(n);
+        total_error += dist_euc_2(examples[index].outputs, &n->outputs[last_layer].vec[1],
+                examples[index].num_outputs);
+    }
+    return sqrt(total_error / num_examples);
 }
 
 /* compute root mean square of the error */

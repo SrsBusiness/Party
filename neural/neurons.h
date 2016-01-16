@@ -33,7 +33,9 @@ struct nnet *nnet_init(struct nnet *n, int num_layers,
         int *num_neurons, double alpha);
 void nnet_free(struct nnet *n);
 void nnet_set_inputs(struct nnet *n, double *inputs, int length);
-void nnet_train(struct nnet *, struct example *, int, int);
+void nnet_train(struct nnet *, struct example *, int, int, double *);
+void partition_examples(struct example *examples, struct example *a, int num_examples, int size_a);
+double rms_error_rand(struct nnet *n, struct example *examples, int num_examples, int samples);
 double rms_error(struct nnet *n, struct example *examples, int num_examples);
 void nnet_save(struct nnet *n, const char *filename); 
 struct nnet *nnet_load(struct nnet *n, const char *filename);
