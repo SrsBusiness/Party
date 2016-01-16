@@ -31,8 +31,8 @@ uint64_t nodes_visited = 0;
 int32_t min(struct board_state *board, int32_t alpha, int32_t beta, int depth_left) {
     nodes_visited++;
     if (depth_left == 0) {
-        //return quiescent_min(board, alpha, beta);
-        return compute_material(board);
+        return quiescent_min(board, alpha, beta);
+        //return compute_material(board);
     }
     int32_t final_score = beta;
     struct priority_queue move_list;
@@ -83,8 +83,8 @@ int32_t min(struct board_state *board, int32_t alpha, int32_t beta, int depth_le
 int32_t max(struct board_state *board, int32_t alpha, int32_t beta, int depth_left) {
     nodes_visited++;
     if (depth_left == 0) {
-        //return quiescent_max(board, alpha, beta);
-        return compute_material(board);
+        return quiescent_max(board, alpha, beta);
+        //return compute_material(board);
     }
     int32_t final_score = alpha;
     struct priority_queue move_list;
