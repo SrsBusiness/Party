@@ -128,6 +128,7 @@ int main(int argc, char **argv) {
     char move_str[6] = {0};
     clear_all();
     int turn_count = 1;
+    fprintf(stderr, "elapsed, depth (left), possible moves, branching factor\n");
     while (1) {
         print_board(&pos, 1, 1);
         move_cursor(12, 1);
