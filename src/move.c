@@ -229,6 +229,36 @@ int no_legal_moves(struct board_state *board, int color) {
     return move_count == 0;
 }
 
+static inline void fill_move(
+        struct move *m,
+        int p_mover,
+        int s_mover,
+        int t_mover,
+        uint64_t primary,
+        uint64_t secondary,
+        uint64_t tertiary,
+        uint64_t primary_src,
+        int q0,
+        int q1,
+        int k0,
+        int k1,
+        uint8_t ep0,
+        uint8_t ep1) {
+    m->p_mover = p_mover;
+    m->s_mover = s_mover;
+    m->t_mover = t_mover;
+    m->primary = primary;
+    m->secondary = secondary;
+    m->tertiary = tertiary;
+    m->primary_src = primary_src;
+    m->flags.castle_q[0] = q0;
+    m->flags.castle_q[1] = q1;
+    m->flags.castle_k[0] = k0;
+    m->flags.castle_k[1] = k1;
+    m->flags.en_passant[0] = ep0;
+    m->flags.en_passant[1] = ep1;
+}
+
 /* move generation */
 /* Generate all single pawn pushes excluding promotions */
 int generate_pawn_single_pushes_white(struct board_state *board,
@@ -259,6 +289,22 @@ int generate_pawn_single_pushes_white(struct board_state *board,
         m->flags.castle_k[1] = board->flags.castle_k[1];
         /* Clear the en passant flag */
         m->flags.en_passant[0] = m->flags.en_passant[1] = 0;
+        
+        fill_move(m,
+                PAWN,
+                NO_PIECE,
+                NO_PIECE,
+                move_mask,
+                0,
+                0,
+                pawn,
+                board->flags.castle_q[0],
+                board->flags.castle_q[1],
+                board->flags.castle_k[0],
+                board->flags.castle_k[1],
+                0,
+                0);
+
         /* Check legality */
         struct board_state tmp = *board;
         make(&tmp, m);
@@ -312,6 +358,23 @@ int generate_pawn_push_promotions_white(struct board_state *board,
             /* Clear the en passant flag */
             m->flags.en_passant[0] = m->flags.en_passant[1] = 0;
             /* Check legality */
+
+            fill_move(m,
+                    PAWN,
+                    promote,
+                    NO_PIECE,
+                    pawn,
+                    promote_mask,
+                    0,
+                    pawn,
+                    board->flags.castle_q[0],
+                    board->flags.castle_q[1],
+                    board->flags.castle_k[0],
+                    board->flags.castle_k[1],
+                    0,
+                    0
+                    );
+
             struct board_state tmp = *board;
             make(&tmp, m);
             if (!in_check(&tmp, WHITE)) {
@@ -363,6 +426,22 @@ int generate_pawn_double_pushes_white(struct board_state *board,
         m->flags.en_passant[0] = bboard_to_fset(pawn);
         m->flags.en_passant[1] = 0;
         /* Check legality */
+
+        fill_move(m,
+                PAWN,
+                NO_PIECE,
+                NO_PIECE,
+                move_mask,
+                0,
+                0,
+                pawn,
+                board->flags.castle_q[0],
+                board->flags.castle_q[1],
+                board->flags.castle_k[0],
+                board->flags.castle_k[1],
+                bboard_to_fset(pawn),
+                0);
+
         struct board_state tmp = *board;
         make(&tmp, m);
         if (!in_check(&tmp, WHITE)) {
@@ -412,6 +491,22 @@ int generate_pawn_east_captures_white(struct board_state *board,
         m->flags.castle_k[1] = board->flags.castle_k[1];
         /* Clear en-passant flags */
         m->flags.en_passant[0] = m->flags.en_passant[1] = 0;
+
+        fill_move(m,
+                PAWN,
+                NO_PIECE,
+                piece_on_square(board, BLACK, capture_square),
+                primary_mask,
+                0,
+                capture_square,
+                pawn,
+                board->flags.castle_q[0],
+                board->flags.castle_q[1],
+                board->flags.castle_k[0],
+                board->flags.castle_k[1],
+                0,
+                0);
+
         /* Check legality */
         struct board_state tmp = *board;
         make(&tmp, m);
@@ -463,6 +558,22 @@ int generate_pawn_west_captures_white(struct board_state *board,
         /* Clear en-passant flags */
         m->flags.en_passant[0] = m->flags.en_passant[1] = 0;
         /* Check legality */
+
+        fill_move(m,
+                PAWN,
+                NO_PIECE,
+                piece_on_square(board, BLACK, capture_square),
+                primary_mask,
+                0,
+                capture_square,
+                pawn,
+                board->flags.castle_q[0],
+                board->flags.castle_q[1],
+                board->flags.castle_k[0],
+                board->flags.castle_k[1],
+                0,
+                0);
+
         struct board_state tmp = *board;
         make(&tmp, m);
         if (!in_check(&tmp, WHITE)) {
@@ -511,8 +622,8 @@ generate_pawn_east_captures_promotions_white(struct board_state *board,
             m->primary_src = pawn;
             /* Should we 0 the other masks? */
             m->flags.castle_q[0] = board->flags.castle_q[0];
-            m->flags.castle_k[0] = board->flags.castle_k[0];
             m->flags.castle_q[1] = board->flags.castle_q[1];
+            m->flags.castle_k[0] = board->flags.castle_k[0];
             /* In case the h8 rook was captured */
             m->flags.castle_k[1] = capture_square == BITBOARD_H8 ? 0 : board->flags.castle_k[1];
             /* Clear en-passant flags */
@@ -567,9 +678,9 @@ generate_pawn_west_captures_promotions_white(struct board_state *board,
             m->primary_src = pawn;
             /* Should we 0 the other masks? */
             m->flags.castle_q[0] = board->flags.castle_q[0];
+            m->flags.castle_q[1] = capture_square == BITBOARD_A8 ? 0 : board->flags.castle_q[1];
             m->flags.castle_k[0] = board->flags.castle_k[0];
             /* In case the a8 rook was captured */
-            m->flags.castle_q[1] = capture_square == BITBOARD_A8 ? 0 : board->flags.castle_q[1];
             m->flags.castle_k[1] = board->flags.castle_k[1];
             /* Clear en-passant flags */
             m->flags.en_passant[0] = m->flags.en_passant[1] = 0;
@@ -941,11 +1052,11 @@ generate_pawn_east_captures_promotions_black(struct board_state *board,
             m->tertiary = capture_square;
             m->primary_src = pawn;
             /* Should we 0 the other masks? */
-            m->flags.castle_q[1] = board->flags.castle_q[1];
-            m->flags.castle_k[1] = board->flags.castle_k[1];
             m->flags.castle_q[0] = board->flags.castle_q[0];
+            m->flags.castle_q[1] = board->flags.castle_q[1];
             /* In case the h8 rook was captured */
             m->flags.castle_k[0] = capture_square == BITBOARD_H1 ? 0 : board->flags.castle_k[0];
+            m->flags.castle_k[1] = board->flags.castle_k[1];
             /* Clear en-passant flags */
             m->flags.en_passant[0] = m->flags.en_passant[1] = 0;
             /* Check legality */
@@ -997,11 +1108,11 @@ generate_pawn_west_captures_promotions_black(struct board_state *board,
             m->tertiary = capture_square;
             m->primary_src = pawn;
             /* Should we 0 the other masks? */
-            m->flags.castle_q[1] = board->flags.castle_q[1];
-            m->flags.castle_k[1] = board->flags.castle_k[1];
-            /* In case the a1 rook was captured */
             m->flags.castle_q[0] = capture_square == BITBOARD_A1 ? 0 : board->flags.castle_q[0];
+            m->flags.castle_q[1] = board->flags.castle_q[1];
+            /* In case the a1 rook was captured */
             m->flags.castle_k[0] = board->flags.castle_k[0];
+            m->flags.castle_k[1] = board->flags.castle_k[1];
             /* Clear en-passant flags */
             m->flags.en_passant[0] = m->flags.en_passant[1] = 0;
             /* Check legality */
