@@ -163,6 +163,7 @@ int32_t quiescent_min(struct board_state *board, int32_t alpha, int32_t beta) {
             unmake(board, m, &save, old_hash);
             if (score <= alpha) {
                 final_score = alpha;
+                free(m);
                 break;
             }
             if (score < beta) {
@@ -216,6 +217,7 @@ int32_t quiescent_max(struct board_state *board, int32_t alpha, int32_t beta) {
             unmake(board, m, &save, old_hash);
             if (score >= beta) {
                 final_score = beta;
+                free(m);
                 break;
             }
             if (score > alpha) {
