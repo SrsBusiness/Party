@@ -3,5 +3,5 @@ compiler: clang
 addons:
     apt:
         packages:
-            cmocka
+            libcmocka-dev
 script: make test
