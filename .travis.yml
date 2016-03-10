@@ -5,4 +5,5 @@ compiler: clang
 before_script:
     - wget http://ftp.us.debian.org/debian/pool/main/c/cmocka/libcmocka0_1.0.1-2_amd64.deb
     - sudo dpkg -x libcmocka0_1.0.1-2_amd64.deb /usr
+    - sudo dpkg -L libcmocka0
 script: make test
