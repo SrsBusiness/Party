@@ -15,5 +15,5 @@ before_script:
     - sudo cmake -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=Debug ..
     - sudo make
     - sudo make install
-    - cd ../..
+      #- cd ../..
 script: make test
