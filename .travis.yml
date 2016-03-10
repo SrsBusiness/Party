@@ -1,3 +1,5 @@
 language: c
 compiler: clang
+before_install:
+    - sudo apt-get cmocka
 script: make test
