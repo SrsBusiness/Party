@@ -229,6 +229,36 @@ int no_legal_moves(struct board_state *board, int color) {
     return move_count == 0;
 }
 
+static inline void fill_move(
+        struct move *m,
+        int p_mover,
+        int s_mover,
+        int t_mover,
+        uint64_t primary,
+        uint64_t secondary,
+        uint64_t tertiary,
+        uint64_t primary_src,
+        int q0,
+        int q1,
+        int k0,
+        int k1,
+        uint8_t ep0,
+        uint8_t ep1) {
+    m->p_mover = p_mover;
+    m->s_mover = s_mover;
+    m->t_mover = t_mover;
+    m->primary = primary;
+    m->secondary = secondary;
+    m->tertiary = tertiary;
+    m->primary_src = primary_src;
+    m->flags.castle_q[0] = q0;
+    m->flags.castle_q[1] = q1;
+    m->flags.castle_k[0] = k0;
+    m->flags.castle_k[1] = k1;
+    m->flags.en_passant[0] = ep0;
+    m->flags.en_passant[1] = ep1;
+}
+
 /* move generation */
 /* Generate all single pawn pushes excluding promotions */
 int generate_pawn_single_pushes_white(struct board_state *board,
@@ -247,18 +277,22 @@ int generate_pawn_single_pushes_white(struct board_state *board,
                     __FILE__, __FUNCTION__, __LINE__);
             exit(-1);
         }
-        m->p_mover = PAWN;
-        m->s_mover = NO_PIECE;
-        m->t_mover = NO_PIECE;
-        m->primary = move_mask;
-        m->primary_src = pawn;
-        /* Should we 0 the other masks? */
-        m->flags.castle_q[0] = board->flags.castle_q[0];
-        m->flags.castle_q[1] = board->flags.castle_q[1];
-        m->flags.castle_k[0] = board->flags.castle_k[0];
-        m->flags.castle_k[1] = board->flags.castle_k[1];
-        /* Clear the en passant flag */
-        m->flags.en_passant[0] = m->flags.en_passant[1] = 0;
+        
+        fill_move(m,
+                PAWN,
+                NO_PIECE,
+                NO_PIECE,
+                move_mask,
+                0,
+                0,
+                pawn,
+                board->flags.castle_q[0],
+                board->flags.castle_q[1],
+                board->flags.castle_k[0],
+                board->flags.castle_k[1],
+                0,
+                0);
+
         /* Check legality */
         struct board_state tmp = *board;
         make(&tmp, m);
@@ -298,20 +332,23 @@ int generate_pawn_push_promotions_white(struct board_state *board,
                         __FILE__, __FUNCTION__, __LINE__);
                 exit(-1);
             }
-            m->p_mover = PAWN;
-            m->s_mover = promote;
-            m->t_mover = NO_PIECE;
-            m->primary = pawn;
-            m->secondary = promote_mask;
-            m->primary_src = pawn;
-            /* Should we 0 the other masks? */
-            m->flags.castle_q[0] = board->flags.castle_q[0];
-            m->flags.castle_q[1] = board->flags.castle_q[1];
-            m->flags.castle_k[0] = board->flags.castle_k[0];
-            m->flags.castle_k[1] = board->flags.castle_k[1];
-            /* Clear the en passant flag */
-            m->flags.en_passant[0] = m->flags.en_passant[1] = 0;
-            /* Check legality */
+
+            fill_move(m,
+                    PAWN,
+                    promote,
+                    NO_PIECE,
+                    pawn,
+                    promote_mask,
+                    0,
+                    pawn,
+                    board->flags.castle_q[0],
+                    board->flags.castle_q[1],
+                    board->flags.castle_k[0],
+                    board->flags.castle_k[1],
+                    0,
+                    0
+                    );
+
             struct board_state tmp = *board;
             make(&tmp, m);
             if (!in_check(&tmp, WHITE)) {
@@ -349,20 +386,22 @@ int generate_pawn_double_pushes_white(struct board_state *board,
                     __FILE__, __FUNCTION__, __LINE__);
             exit(-1);
         }
-        m->p_mover = PAWN;
-        m->s_mover = NO_PIECE;
-        m->t_mover = NO_PIECE;
-        m->primary = move_mask;
-        m->primary_src = pawn;
-        /* Should we 0 the other masks? */
-        m->flags.castle_q[0] = board->flags.castle_q[0];
-        m->flags.castle_q[1] = board->flags.castle_q[1];
-        m->flags.castle_k[0] = board->flags.castle_k[0];
-        m->flags.castle_k[1] = board->flags.castle_k[1];
-        /* Set white en passant flag, clear black en passant flag */
-        m->flags.en_passant[0] = bboard_to_fset(pawn);
-        m->flags.en_passant[1] = 0;
-        /* Check legality */
+
+        fill_move(m,
+                PAWN,
+                NO_PIECE,
+                NO_PIECE,
+                move_mask,
+                0,
+                0,
+                pawn,
+                board->flags.castle_q[0],
+                board->flags.castle_q[1],
+                board->flags.castle_k[0],
+                board->flags.castle_k[1],
+                bboard_to_fset(pawn),
+                0);
+
         struct board_state tmp = *board;
         make(&tmp, m);
         if (!in_check(&tmp, WHITE)) {
@@ -399,19 +438,22 @@ int generate_pawn_east_captures_white(struct board_state *board,
                     __FILE__, __FUNCTION__, __LINE__);
             exit(-1);
         }
-        m->p_mover = PAWN;
-        m->s_mover = NO_PIECE;
-        m->t_mover = piece_on_square(board, BLACK, capture_square);
-        m->primary = primary_mask;
-        m->tertiary = capture_square;
-        m->primary_src = pawn;
-        /* Should we 0 the other masks? */
-        m->flags.castle_q[0] = board->flags.castle_q[0];
-        m->flags.castle_q[1] = board->flags.castle_q[1];
-        m->flags.castle_k[0] = board->flags.castle_k[0];
-        m->flags.castle_k[1] = board->flags.castle_k[1];
-        /* Clear en-passant flags */
-        m->flags.en_passant[0] = m->flags.en_passant[1] = 0;
+
+        fill_move(m,
+                PAWN,
+                NO_PIECE,
+                piece_on_square(board, BLACK, capture_square),
+                primary_mask,
+                0,
+                capture_square,
+                pawn,
+                board->flags.castle_q[0],
+                board->flags.castle_q[1],
+                board->flags.castle_k[0],
+                board->flags.castle_k[1],
+                0,
+                0);
+
         /* Check legality */
         struct board_state tmp = *board;
         make(&tmp, m);
@@ -449,20 +491,22 @@ int generate_pawn_west_captures_white(struct board_state *board,
                     __FILE__, __FUNCTION__, __LINE__);
             exit(-1);
         }
-        m->p_mover = PAWN;
-        m->s_mover = NO_PIECE;
-        m->t_mover = piece_on_square(board, BLACK, capture_square);
-        m->primary = primary_mask;
-        m->tertiary = capture_square;
-        m->primary_src = pawn;
-        /* Should we 0 the other masks? */
-        m->flags.castle_q[0] = board->flags.castle_q[0];
-        m->flags.castle_q[1] = board->flags.castle_q[1];
-        m->flags.castle_k[0] = board->flags.castle_k[0];
-        m->flags.castle_k[1] = board->flags.castle_k[1];
-        /* Clear en-passant flags */
-        m->flags.en_passant[0] = m->flags.en_passant[1] = 0;
-        /* Check legality */
+
+        fill_move(m,
+                PAWN,
+                NO_PIECE,
+                piece_on_square(board, BLACK, capture_square),
+                primary_mask,
+                0,
+                capture_square,
+                pawn,
+                board->flags.castle_q[0],
+                board->flags.castle_q[1],
+                board->flags.castle_k[0],
+                board->flags.castle_k[1],
+                0,
+                0);
+
         struct board_state tmp = *board;
         make(&tmp, m);
         if (!in_check(&tmp, WHITE)) {
@@ -502,21 +546,23 @@ generate_pawn_east_captures_promotions_white(struct board_state *board,
                         __FILE__, __FUNCTION__, __LINE__);
                 exit(-1);
             }
-            m->p_mover = PAWN;
-            m->s_mover = promote;
-            m->t_mover = captive;
-            m->primary = primary_mask;
-            m->secondary = capture_square;
-            m->tertiary = capture_square;
-            m->primary_src = pawn;
-            /* Should we 0 the other masks? */
-            m->flags.castle_q[0] = board->flags.castle_q[0];
-            m->flags.castle_k[0] = board->flags.castle_k[0];
-            m->flags.castle_q[1] = board->flags.castle_q[1];
-            /* In case the h8 rook was captured */
-            m->flags.castle_k[1] = capture_square == BITBOARD_H8 ? 0 : board->flags.castle_k[1];
-            /* Clear en-passant flags */
-            m->flags.en_passant[0] = m->flags.en_passant[1] = 0;
+            
+            fill_move(m,
+                    PAWN,
+                    promote,
+                    captive,
+                    primary_mask,
+                    capture_square,
+                    capture_square,
+                    pawn,
+                    board->flags.castle_q[0],
+                    board->flags.castle_q[1],
+                    board->flags.castle_k[0],
+                    capture_square == BITBOARD_H8 ? 0 : board->flags.castle_k[1],
+                    0,
+                    0
+                    );
+
             /* Check legality */
             struct board_state tmp = *board;
             make(&tmp, m);
@@ -558,22 +604,23 @@ generate_pawn_west_captures_promotions_white(struct board_state *board,
                         __FILE__, __FUNCTION__, __LINE__);
                 exit(-1);
             }
-            m->p_mover = PAWN;
-            m->s_mover = promote;
-            m->t_mover = captive;
-            m->primary = primary_mask;
-            m->secondary = capture_square;
-            m->tertiary = capture_square;
-            m->primary_src = pawn;
-            /* Should we 0 the other masks? */
-            m->flags.castle_q[0] = board->flags.castle_q[0];
-            m->flags.castle_k[0] = board->flags.castle_k[0];
-            /* In case the a8 rook was captured */
-            m->flags.castle_q[1] = capture_square == BITBOARD_A8 ? 0 : board->flags.castle_q[1];
-            m->flags.castle_k[1] = board->flags.castle_k[1];
-            /* Clear en-passant flags */
-            m->flags.en_passant[0] = m->flags.en_passant[1] = 0;
-            /* Check legality */
+
+            fill_move(m,
+                    PAWN,
+                    promote,
+                    captive,
+                    primary_mask,
+                    capture_square,
+                    capture_square,
+                    pawn,
+                    board->flags.castle_q[0],
+                    capture_square == BITBOARD_A8 ? 0 : board->flags.castle_q[1],
+                    board->flags.castle_k[0],
+                    board->flags.castle_k[1],
+                    0,
+                    0
+                    );
+
             struct board_state tmp = *board;
             make(&tmp, m);
             if (!in_check(&tmp, WHITE)) {
@@ -615,18 +662,23 @@ int generate_pawn_en_passant_white(struct board_state *board,
                     __FILE__, __FUNCTION__, __LINE__);
             exit(-1);
         }
-        m->p_mover = PAWN;
-        m->s_mover = NO_PIECE;
-        m->t_mover = PAWN;
-        m->primary = pawn | en_passant_capture_square;
-        m->tertiary = en_passant_square;
-        m->primary_src = pawn;
-        m->flags.castle_q[0] = board->flags.castle_q[0];
-        m->flags.castle_q[1] = board->flags.castle_q[1];
-        m->flags.castle_k[0] = board->flags.castle_k[0];
-        m->flags.castle_k[1] = board->flags.castle_k[1];
-        /* Clear en-passant flags */
-        m->flags.en_passant[0] = m->flags.en_passant[1] = 0;
+
+        fill_move(m,
+                PAWN,
+                NO_PIECE,
+                PAWN,
+                pawn | en_passant_capture_square,
+                0,
+                en_passant_square,
+                pawn,
+                board->flags.castle_q[0],
+                board->flags.castle_q[1],
+                board->flags.castle_k[0],
+                board->flags.castle_k[1],
+                0,
+                0
+                );
+
         /* Check legality */
         struct board_state tmp = *board;
         make(&tmp, m);
@@ -678,18 +730,22 @@ int generate_pawn_single_pushes_black(struct board_state *board,
                     __FILE__, __FUNCTION__, __LINE__);
             exit(-1);
         }
-        m->p_mover = PAWN;
-        m->s_mover = NO_PIECE;
-        m->t_mover = NO_PIECE;
-        m->primary = move_mask;
-        m->primary_src = pawn;
-        /* Should we 0 the other masks? */
-        m->flags.castle_q[0] = board->flags.castle_q[0];
-        m->flags.castle_q[1] = board->flags.castle_q[1];
-        m->flags.castle_k[0] = board->flags.castle_k[0];
-        m->flags.castle_k[1] = board->flags.castle_k[1];
-        /* Clear the en passant flag */
-        m->flags.en_passant[0] = m->flags.en_passant[1] = 0;
+
+        fill_move(m,
+                PAWN,
+                NO_PIECE,
+                NO_PIECE,
+                move_mask,
+                0,
+                0,
+                pawn,
+                board->flags.castle_q[0],
+                board->flags.castle_q[1],
+                board->flags.castle_k[0],
+                board->flags.castle_k[1],
+                0,
+                0);
+
         /* Check legality */
         struct board_state tmp = *board;
         make(&tmp, m);
@@ -729,19 +785,22 @@ int generate_pawn_push_promotions_black(struct board_state *board,
                         __FILE__, __FUNCTION__, __LINE__);
                 exit(-1);
             }
-            m->p_mover = PAWN;
-            m->s_mover = promote;
-            m->t_mover = NO_PIECE;
-            m->primary = pawn;
-            m->secondary = promote_mask;
-            m->primary_src = pawn;
-            /* Should we 0 the other masks? */
-            m->flags.castle_q[0] = board->flags.castle_q[0];
-            m->flags.castle_q[1] = board->flags.castle_q[1];
-            m->flags.castle_k[0] = board->flags.castle_k[0];
-            m->flags.castle_k[1] = board->flags.castle_k[1];
-            /* Clear the en passant flag */
-            m->flags.en_passant[0] = m->flags.en_passant[1] = 0;
+
+            fill_move(m,
+                    PAWN,
+                    promote,
+                    NO_PIECE,
+                    pawn,
+                    promote_mask,
+                    0,
+                    pawn,
+                    board->flags.castle_q[0],
+                    board->flags.castle_q[1],
+                    board->flags.castle_k[0],
+                    board->flags.castle_k[1],
+                    0,
+                    0);
+
             /* Check legality */
             struct board_state tmp = *board;
             make(&tmp, m);
@@ -780,19 +839,22 @@ int generate_pawn_double_pushes_black(struct board_state *board,
                     __FILE__, __FUNCTION__, __LINE__);
             exit(-1);
         }
-        m->p_mover = PAWN;
-        m->s_mover = NO_PIECE;
-        m->t_mover = NO_PIECE;
-        m->primary = move_mask;
-        m->primary_src = pawn;
-        /* Should we 0 the other masks? */
-        m->flags.castle_q[0] = board->flags.castle_q[0];
-        m->flags.castle_q[1] = board->flags.castle_q[1];
-        m->flags.castle_k[0] = board->flags.castle_k[0];
-        m->flags.castle_k[1] = board->flags.castle_k[1];
-        /* Set black en passant flag, clear black en passant flag */
-        m->flags.en_passant[0] = 0;
-        m->flags.en_passant[1] = bboard_to_fset(pawn);
+
+        fill_move(m,
+                PAWN,
+                NO_PIECE,
+                NO_PIECE,
+                move_mask,
+                0,
+                0,
+                pawn,
+                board->flags.castle_q[0],
+                board->flags.castle_q[1],
+                board->flags.castle_k[0],
+                board->flags.castle_k[1],
+                0,
+                bboard_to_fset(pawn));
+
         /* Check legality */
         struct board_state tmp = *board;
         make(&tmp, m);
@@ -830,19 +892,22 @@ int generate_pawn_east_captures_black(struct board_state *board,
                     __FILE__, __FUNCTION__, __LINE__);
             exit(-1);
         }
-        m->p_mover = PAWN;
-        m->s_mover = NO_PIECE;
-        m->t_mover = piece_on_square(board, WHITE, capture_square);
-        m->primary = primary_mask;
-        m->tertiary = capture_square;
-        m->primary_src = pawn;
-        /* Should we 0 the other masks? */
-        m->flags.castle_q[0] = board->flags.castle_q[0];
-        m->flags.castle_q[1] = board->flags.castle_q[1];
-        m->flags.castle_k[0] = board->flags.castle_k[0];
-        m->flags.castle_k[1] = board->flags.castle_k[1];
-        /* Clear en-passant flags */
-        m->flags.en_passant[0] = m->flags.en_passant[1] = 0;
+
+        fill_move(m,
+                PAWN,
+                NO_PIECE,
+                piece_on_square(board, WHITE, capture_square),
+                primary_mask,
+                0,
+                capture_square,
+                pawn,
+                board->flags.castle_q[0],
+                board->flags.castle_q[1],
+                board->flags.castle_k[0],
+                board->flags.castle_k[1],
+                0,
+                0);
+
         /* Check legality */
         struct board_state tmp = *board;
         make(&tmp, m);
@@ -880,19 +945,22 @@ int generate_pawn_west_captures_black(struct board_state *board,
                     __FILE__, __FUNCTION__, __LINE__);
             exit(-1);
         }
-        m->p_mover = PAWN;
-        m->s_mover = NO_PIECE;
-        m->t_mover = piece_on_square(board, WHITE, capture_square);
-        m->primary = primary_mask;
-        m->tertiary = capture_square;
-        m->primary_src = pawn;
-        /* Should we 0 the other masks? */
-        m->flags.castle_q[0] = board->flags.castle_q[0];
-        m->flags.castle_q[1] = board->flags.castle_q[1];
-        m->flags.castle_k[0] = board->flags.castle_k[0];
-        m->flags.castle_k[1] = board->flags.castle_k[1];
-        /* Clear en-passant flags */
-        m->flags.en_passant[0] = m->flags.en_passant[1] = 0;
+
+        fill_move(m,
+                PAWN,
+                NO_PIECE,
+                piece_on_square(board, WHITE, capture_square),
+                primary_mask,
+                0,
+                capture_square,
+                pawn,
+                board->flags.castle_q[0],
+                board->flags.castle_q[1],
+                board->flags.castle_k[0],
+                board->flags.castle_k[1],
+                0,
+                0);
+
         /* Check legality */
         struct board_state tmp = *board;
         make(&tmp, m);
@@ -933,21 +1001,22 @@ generate_pawn_east_captures_promotions_black(struct board_state *board,
                         __FILE__, __FUNCTION__, __LINE__);
                 exit(-1);
             }
-            m->p_mover = PAWN;
-            m->s_mover = promote;
-            m->t_mover = captive;
-            m->primary = primary_mask;
-            m->secondary = capture_square;
-            m->tertiary = capture_square;
-            m->primary_src = pawn;
-            /* Should we 0 the other masks? */
-            m->flags.castle_q[1] = board->flags.castle_q[1];
-            m->flags.castle_k[1] = board->flags.castle_k[1];
-            m->flags.castle_q[0] = board->flags.castle_q[0];
-            /* In case the h8 rook was captured */
-            m->flags.castle_k[0] = capture_square == BITBOARD_H1 ? 0 : board->flags.castle_k[0];
-            /* Clear en-passant flags */
-            m->flags.en_passant[0] = m->flags.en_passant[1] = 0;
+
+            fill_move(m,
+                    PAWN,
+                    promote,
+                    captive,
+                    primary_mask,
+                    capture_square,
+                    capture_square,
+                    pawn,
+                    board->flags.castle_q[0],
+                    board->flags.castle_q[1],
+                    capture_square == BITBOARD_H1 ? 0 : board->flags.castle_k[0],
+                    board->flags.castle_k[1],
+                    0,
+                    0);
+
             /* Check legality */
             struct board_state tmp = *board;
             make(&tmp, m);
@@ -989,21 +1058,22 @@ generate_pawn_west_captures_promotions_black(struct board_state *board,
                         __FILE__, __FUNCTION__, __LINE__);
                 exit(-1);
             }
-            m->p_mover = PAWN;
-            m->s_mover = promote;
-            m->t_mover = captive;
-            m->primary = primary_mask;
-            m->secondary = capture_square;
-            m->tertiary = capture_square;
-            m->primary_src = pawn;
-            /* Should we 0 the other masks? */
-            m->flags.castle_q[1] = board->flags.castle_q[1];
-            m->flags.castle_k[1] = board->flags.castle_k[1];
-            /* In case the a1 rook was captured */
-            m->flags.castle_q[0] = capture_square == BITBOARD_A1 ? 0 : board->flags.castle_q[0];
-            m->flags.castle_k[0] = board->flags.castle_k[0];
-            /* Clear en-passant flags */
-            m->flags.en_passant[0] = m->flags.en_passant[1] = 0;
+
+            fill_move(m,
+                    PAWN,
+                    promote,
+                    captive,
+                    primary_mask,
+                    capture_square,
+                    capture_square,
+                    pawn,
+                    capture_square == BITBOARD_A1 ? 0 : board->flags.castle_q[0],
+                    board->flags.castle_q[1],
+                    board->flags.castle_k[0],
+                    board->flags.castle_k[1],
+                    0,
+                    0);
+
             /* Check legality */
             struct board_state tmp = *board;
             make(&tmp, m);
@@ -1046,18 +1116,22 @@ int generate_pawn_en_passant_black(struct board_state *board,
                     __FILE__, __FUNCTION__, __LINE__);
             exit(-1);
         }
-        m->p_mover = PAWN;
-        m->s_mover = NO_PIECE;
-        m->t_mover = PAWN;
-        m->primary = pawn | en_passant_capture_square;
-        m->tertiary = en_passant_square;
-        m->primary_src = pawn;
-        m->flags.castle_q[0] = board->flags.castle_q[0];
-        m->flags.castle_q[1] = board->flags.castle_q[1];
-        m->flags.castle_k[0] = board->flags.castle_k[0];
-        m->flags.castle_k[1] = board->flags.castle_k[1];
-        /* Clear en-passant flags */
-        m->flags.en_passant[0] = m->flags.en_passant[1] = 0;
+
+        fill_move(m,
+                PAWN,
+                NO_PIECE,
+                PAWN,
+                pawn | en_passant_capture_square,
+                0,
+                en_passant_square,
+                pawn,
+                board->flags.castle_q[0],
+                board->flags.castle_q[1],
+                board->flags.castle_k[0],
+                board->flags.castle_k[1],
+                0,
+                0);
+
         /* Check legality */
         struct board_state tmp = *board;
         make(&tmp, m);
@@ -1108,18 +1182,24 @@ int generate_bishop_moves_white(struct board_state *board,
                         __FILE__, __FUNCTION__, __LINE__);
                 exit(-1);
             }
-            m->p_mover = BISHOP;
-            m->s_mover = NO_PIECE;
+
             int captured_piece = piece_on_square(board, BLACK, attack);
-            m->t_mover = captured_piece;
-            m->primary = bishop | attack;
-            m->tertiary = captured_piece == NO_PIECE ? 0 : attack;
-            m->primary_src = bishop;
-            m->flags.castle_q[0] = board->flags.castle_q[0];
-            m->flags.castle_q[1] = attack == BITBOARD_A8 ? 0 : board->flags.castle_q[1];
-            m->flags.castle_k[0] = board->flags.castle_k[0];
-            m->flags.castle_k[1] = attack == BITBOARD_H8 ? 0 : board->flags.castle_k[1];
-            m->flags.en_passant[0] = m->flags.en_passant[1] = 0;
+
+            fill_move(m,
+                    BISHOP,
+                    NO_PIECE,
+                    captured_piece,
+                    bishop | attack,
+                    0,
+                    captured_piece == NO_PIECE ? 0: attack,
+                    bishop,
+                    board->flags.castle_q[0],
+                    attack == BITBOARD_A8 ? 0 : board->flags.castle_q[1],
+                    board->flags.castle_k[0],
+                    attack == BITBOARD_H8 ? 0 : board->flags.castle_k[1],
+                    0,
+                    0);
+
             /* Check legality */
             struct board_state tmp = *board;
             make(&tmp, m);
@@ -1159,18 +1239,24 @@ int generate_bishop_moves_black(struct board_state *board,
                         __FILE__, __FUNCTION__, __LINE__);
                 exit(-1);
             }
-            m->p_mover = BISHOP;
-            m->s_mover = NO_PIECE;
+
             int captured_piece = piece_on_square(board, WHITE, attack);
-            m->t_mover = captured_piece;
-            m->primary = bishop | attack;
-            m->tertiary = captured_piece == NO_PIECE ? 0 : attack;
-            m->primary_src = bishop;
-            m->flags.castle_q[0] = attack == BITBOARD_A1 ? 0 : board->flags.castle_q[0];
-            m->flags.castle_q[1] = board->flags.castle_q[1];
-            m->flags.castle_k[0] = attack == BITBOARD_H1 ? 0 : board->flags.castle_k[0];
-            m->flags.castle_k[1] = board->flags.castle_k[1];
-            m->flags.en_passant[0] = m->flags.en_passant[1] = 0;
+
+            fill_move(m,
+                    BISHOP,
+                    NO_PIECE,
+                    captured_piece,
+                    bishop | attack,
+                    0,
+                    captured_piece == NO_PIECE ? 0 : attack,
+                    bishop,
+                    attack == BITBOARD_A1 ? 0 : board->flags.castle_q[0],
+                    board->flags.castle_q[1],
+                    attack == BITBOARD_H1 ? 0 : board->flags.castle_k[0],
+                    board->flags.castle_k[1],
+                    0,
+                    0);
+
             /* Check legality */
             struct board_state tmp = *board;
             make(&tmp, m);
@@ -1210,18 +1296,24 @@ int generate_rook_moves_white(struct board_state *board,
                         __FILE__, __FUNCTION__, __LINE__);
                 exit(-1);
             }
-            m->p_mover = ROOK;
-            m->s_mover = NO_PIECE;
+
             int captured_piece = piece_on_square(board, BLACK, attack);
-            m->t_mover = captured_piece;
-            m->primary = rook | attack;
-            m->tertiary = captured_piece == NO_PIECE ? 0 : attack;
-            m->primary_src = rook;
-            m->flags.castle_q[0] = rook == BITBOARD_A1 ? 0 : board->flags.castle_q[0];
-            m->flags.castle_q[1] = attack == BITBOARD_A8 ? 0 : board->flags.castle_q[1];
-            m->flags.castle_k[0] = rook == BITBOARD_H1 ? 0 : board->flags.castle_k[0];
-            m->flags.castle_k[1] = attack == BITBOARD_H8 ? 0 : board->flags.castle_k[1];
-            m->flags.en_passant[0] = m->flags.en_passant[1] = 0;
+
+            fill_move(m,
+                    ROOK,
+                    NO_PIECE,
+                    captured_piece,
+                    rook | attack,
+                    0,
+                    captured_piece == NO_PIECE ? 0 : attack,
+                    rook,
+                    rook == BITBOARD_A1 ? 0 : board->flags.castle_q[0],
+                    attack == BITBOARD_A8 ? 0 : board->flags.castle_q[1],
+                    rook == BITBOARD_H1 ? 0 : board->flags.castle_k[0],
+                    attack == BITBOARD_H8 ? 0 : board->flags.castle_k[1],
+                    0,
+                    0);
+
             /* Check legality */
             struct board_state tmp = *board;
             make(&tmp, m);
@@ -1261,18 +1353,24 @@ int generate_rook_moves_black(struct board_state *board,
                         __FILE__, __FUNCTION__, __LINE__);
                 exit(-1);
             }
-            m->p_mover = ROOK;
-            m->s_mover = NO_PIECE;
+
             int captured_piece = piece_on_square(board, WHITE, attack);
-            m->t_mover = captured_piece;
-            m->primary = rook | attack;
-            m->tertiary = captured_piece == NO_PIECE ? 0 : attack;
-            m->primary_src = rook;
-            m->flags.castle_q[0] = attack == BITBOARD_A1 ? 0 : board->flags.castle_q[0];
-            m->flags.castle_q[1] = rook == BITBOARD_A8 ? 0 : board->flags.castle_q[1];
-            m->flags.castle_k[0] = attack == BITBOARD_H1 ? 0 : board->flags.castle_k[0];
-            m->flags.castle_k[1] = rook == BITBOARD_H8 ? 0 : board->flags.castle_k[1];
-            m->flags.en_passant[0] = m->flags.en_passant[1] = 0;
+
+            fill_move(m,
+                    ROOK,
+                    NO_PIECE,
+                    captured_piece,
+                    rook | attack,
+                    0,
+                    captured_piece == NO_PIECE ? 0 : attack,
+                    rook,
+                    attack == BITBOARD_A1 ? 0 : board->flags.castle_q[0],
+                    rook == BITBOARD_A8 ? 0 : board->flags.castle_q[1],
+                    attack == BITBOARD_H1 ? 0 : board->flags.castle_k[0],
+                    rook == BITBOARD_H8 ? 0 : board->flags.castle_k[1],
+                    0,
+                    0);
+
             /* Check legality */
             struct board_state tmp = *board;
             make(&tmp, m);
@@ -1313,18 +1411,24 @@ int generate_queen_moves_white(struct board_state *board,
                         __FILE__, __FUNCTION__, __LINE__);
                 exit(-1);
             }
-            m->p_mover = QUEEN;
-            m->s_mover = NO_PIECE;
+
             int captured_piece = piece_on_square(board, BLACK, attack);
-            m->t_mover = captured_piece;
-            m->primary = queen | attack;
-            m->tertiary = captured_piece == NO_PIECE ? 0 : attack;
-            m->primary_src = queen;
-            m->flags.castle_q[0] = board->flags.castle_q[0];
-            m->flags.castle_q[1] = attack == BITBOARD_A8 ? 0 : board->flags.castle_q[1];
-            m->flags.castle_k[0] = board->flags.castle_k[0];
-            m->flags.castle_k[1] = attack == BITBOARD_H8 ? 0 : board->flags.castle_k[1];
-            m->flags.en_passant[0] = m->flags.en_passant[1] = 0;
+
+            fill_move(m,
+                    QUEEN,
+                    NO_PIECE,
+                    captured_piece,
+                    queen | attack,
+                    0,
+                    captured_piece == NO_PIECE ? 0 : attack,
+                    queen,
+                    m->flags.castle_q[0] = board->flags.castle_q[0],
+                    m->flags.castle_q[1] = attack == BITBOARD_A8 ? 0 : board->flags.castle_q[1],
+                    m->flags.castle_k[0] = board->flags.castle_k[0],
+                    m->flags.castle_k[1] = attack == BITBOARD_H8 ? 0 : board->flags.castle_k[1],
+                    0,
+                    0);
+
             /* Check legality */
             struct board_state tmp = *board;
             make(&tmp, m);
@@ -1365,18 +1469,24 @@ int generate_queen_moves_black(struct board_state *board,
                         __FILE__, __FUNCTION__, __LINE__);
                 exit(-1);
             }
-            m->p_mover = QUEEN;
-            m->s_mover = NO_PIECE;
+
             int captured_piece = piece_on_square(board, WHITE, attack);
-            m->t_mover = captured_piece;
-            m->primary = queen | attack;
-            m->tertiary = captured_piece == NO_PIECE ? 0 : attack;
-            m->primary_src = queen;
-            m->flags.castle_q[0] = attack == BITBOARD_A1 ? 0 : board->flags.castle_q[0];
-            m->flags.castle_q[1] = board->flags.castle_q[1];
-            m->flags.castle_k[0] = attack == BITBOARD_H1 ? 0 : board->flags.castle_k[0];
-            m->flags.castle_k[1] = board->flags.castle_k[1];
-            m->flags.en_passant[0] = m->flags.en_passant[1] = 0;
+
+            fill_move(m,
+                    QUEEN,
+                    NO_PIECE,
+                    captured_piece,
+                    queen | attack,
+                    0,
+                    captured_piece == NO_PIECE ? 0 : attack,
+                    queen,
+                    attack == BITBOARD_A1 ? 0 : board->flags.castle_q[0],
+                    board->flags.castle_q[1],
+                    attack == BITBOARD_H1 ? 0 : board->flags.castle_k[0],
+                    board->flags.castle_k[1],
+                    0,
+                    0);
+
             /* Check legality */
             struct board_state tmp = *board;
             make(&tmp, m);
@@ -1414,18 +1524,24 @@ int generate_knight_moves_white(struct board_state *board,
                         __FILE__, __FUNCTION__, __LINE__);
                 exit(-1);
             }
-            m->p_mover = KNIGHT;
-            m->s_mover = NO_PIECE;
+
             int captured_piece = piece_on_square(board, BLACK, attack);
-            m->t_mover = captured_piece;
-            m->primary = knight | attack;
-            m->tertiary = captured_piece == NO_PIECE ? 0 : attack;
-            m->primary_src = knight;
-            m->flags.castle_q[0] = board->flags.castle_q[0];
-            m->flags.castle_q[1] = attack == BITBOARD_A8 ? 0 : board->flags.castle_q[1];
-            m->flags.castle_k[0] = board->flags.castle_k[0];
-            m->flags.castle_k[1] = attack == BITBOARD_H8 ? 0 : board->flags.castle_k[1];
-            m->flags.en_passant[0] = m->flags.en_passant[1] = 0;
+
+            fill_move(m,
+                    KNIGHT,
+                    NO_PIECE,
+                    captured_piece,
+                    knight | attack,
+                    0,
+                    captured_piece == NO_PIECE ? 0 : attack,
+                    knight,
+                    board->flags.castle_q[0],
+                    attack == BITBOARD_A8 ? 0 : board->flags.castle_q[1],
+                    board->flags.castle_k[0],
+                    attack == BITBOARD_H8 ? 0 : board->flags.castle_k[1],
+                    0,
+                    0);
+
             /* Check legality */
             struct board_state tmp = *board;
             make(&tmp, m);
@@ -1463,18 +1579,24 @@ int generate_knight_moves_black(struct board_state *board,
                         __FILE__, __FUNCTION__, __LINE__);
                 exit(-1);
             }
-            m->p_mover = KNIGHT;
-            m->s_mover = NO_PIECE;
+
             int captured_piece = piece_on_square(board, WHITE, attack);
-            m->t_mover = captured_piece;
-            m->primary = knight | attack;
-            m->tertiary = captured_piece == NO_PIECE ? 0 : attack;
-            m->primary_src = knight;
-            m->flags.castle_q[0] = attack == BITBOARD_A1 ? 0 : board->flags.castle_q[0];
-            m->flags.castle_q[1] = board->flags.castle_q[1];
-            m->flags.castle_k[0] = attack == BITBOARD_H1 ? 0 : board->flags.castle_k[0];
-            m->flags.castle_k[1] = board->flags.castle_k[1];
-            m->flags.en_passant[0] = m->flags.en_passant[1] = 0;
+
+            fill_move(m,
+                    KNIGHT,
+                    NO_PIECE,
+                    captured_piece,
+                    knight | attack,
+                    0,
+                    captured_piece == NO_PIECE ? 0 : attack,
+                    knight,
+                    attack == BITBOARD_A1 ? 0 : board->flags.castle_q[0],
+                    board->flags.castle_q[1],
+                    attack == BITBOARD_H1 ? 0 : board->flags.castle_k[0],
+                    board->flags.castle_k[1],
+                    0,
+                    0);
+
             /* Check legality */
             struct board_state tmp = *board;
             make(&tmp, m);
@@ -1510,18 +1632,24 @@ int generate_king_moves_white(struct board_state *board,
                     __FILE__, __FUNCTION__, __LINE__);
             exit(-1);
         }
-        m->p_mover = KING;
-        m->s_mover = NO_PIECE;
+
         int captured_piece = piece_on_square(board, BLACK, attack);
-        m->t_mover = captured_piece;
-        m->primary = king | attack;
-        m->tertiary = captured_piece == NO_PIECE ? 0 : attack;
-        m->primary_src = king;
-        m->flags.castle_q[0] = king == BITBOARD_E1 ? 0 : board->flags.castle_q[0];
-        m->flags.castle_q[1] = attack == BITBOARD_A8 ? 0 : board->flags.castle_q[1];
-        m->flags.castle_k[0] = king == BITBOARD_E1 ? 0 : board->flags.castle_k[0];
-        m->flags.castle_k[1] = attack == BITBOARD_H8 ? 0 : board->flags.castle_k[1];
-        m->flags.en_passant[0] = m->flags.en_passant[1] = 0;
+
+        fill_move(m,
+                KING,
+                NO_PIECE,
+                captured_piece,
+                king | attack,
+                0,
+                captured_piece == NO_PIECE ? 0 : attack,
+                king,
+                king == BITBOARD_E1 ? 0 : board->flags.castle_q[0],
+                attack == BITBOARD_A8 ? 0 : board->flags.castle_q[1],
+                king == BITBOARD_E1 ? 0 : board->flags.castle_k[0],
+                attack == BITBOARD_H8 ? 0 : board->flags.castle_k[1],
+                0,
+                0);
+
         struct board_state tmp = *board;
         make(&tmp, m);
         if (!in_check(&tmp, WHITE)) {
@@ -1554,18 +1682,24 @@ int generate_king_moves_black(struct board_state *board,
                     __FILE__, __FUNCTION__, __LINE__);
             exit(-1);
         }
-        m->p_mover = KING;
-        m->s_mover = NO_PIECE;
+
         int captured_piece = piece_on_square(board, WHITE, attack);
-        m->t_mover = captured_piece;
-        m->primary = king | attack;
-        m->tertiary = captured_piece == NO_PIECE ? 0 : attack;
-        m->primary_src = king;
-        m->flags.castle_q[0] = attack == BITBOARD_A1 ? 0 : board->flags.castle_q[0];
-        m->flags.castle_q[1] = king == BITBOARD_E8 ? 0 : board->flags.castle_q[1];
-        m->flags.castle_k[0] = attack == BITBOARD_H1 ? 0 : board->flags.castle_k[0];
-        m->flags.castle_k[1] = king == BITBOARD_E8 ? 0 : board->flags.castle_k[1];
-        m->flags.en_passant[0] = m->flags.en_passant[1] = 0;
+
+        fill_move(m,
+                KING,
+                NO_PIECE,
+                captured_piece,
+                king | attack,
+                0,
+                captured_piece == NO_PIECE ? 0 : attack,
+                king,
+                attack == BITBOARD_A1 ? 0 : board->flags.castle_q[0],
+                king == BITBOARD_E8 ? 0 : board->flags.castle_q[1],
+                attack == BITBOARD_H1 ? 0 : board->flags.castle_k[0],
+                king == BITBOARD_E8 ? 0 : board->flags.castle_k[1],
+                0,
+                0);
+
         struct board_state tmp = *board;
         make(&tmp, m);
         if (!in_check(&tmp, BLACK)) {
@@ -1601,17 +1735,22 @@ int generate_castle_white(struct board_state *board,
                     __FILE__, __FUNCTION__, __LINE__);
             exit(-1);
         }
-        m->p_mover = KING;
-        m->s_mover = ROOK;
-        m->t_mover = NO_PIECE;
-        m->primary = BITBOARD_E1 | BITBOARD_C1;
-        m->secondary = BITBOARD_A1 | BITBOARD_D1;
-        m->primary_src = BITBOARD_E1;
-        m->flags.castle_q[0] = 0;
-        m->flags.castle_q[1] = board->flags.castle_q[1];
-        m->flags.castle_k[0] = 0;
-        m->flags.castle_k[1] = board->flags.castle_k[1];
-        m->flags.en_passant[0] = m->flags.en_passant[1] = 0;
+
+        fill_move(m,
+                KING,
+                ROOK,
+                NO_PIECE,
+                BITBOARD_E1 | BITBOARD_C1,
+                BITBOARD_A1 | BITBOARD_D1,
+                0,
+                BITBOARD_E1,
+                0,
+                board->flags.castle_q[1],
+                0,
+                board->flags.castle_k[1],
+                0,
+                0);
+
         move_count++;
         if (moves) {
             struct board_state tmp = *board;
@@ -1632,17 +1771,22 @@ int generate_castle_white(struct board_state *board,
                     __FILE__, __FUNCTION__, __LINE__);
             exit(-1);
         }
-        m->p_mover = KING;
-        m->s_mover = ROOK;
-        m->t_mover = NO_PIECE;
-        m->primary = BITBOARD_E1 | BITBOARD_G1;
-        m->secondary = BITBOARD_H1 | BITBOARD_F1;
-        m->primary_src = BITBOARD_E1;
-        m->flags.castle_q[0] = 0;
-        m->flags.castle_q[1] = board->flags.castle_q[1];
-        m->flags.castle_k[0] = 0;
-        m->flags.castle_k[1] = board->flags.castle_k[1];
-        m->flags.en_passant[0] = m->flags.en_passant[1] = 0;
+
+        fill_move(m,
+                KING,
+                ROOK,
+                NO_PIECE,
+                BITBOARD_E1 | BITBOARD_G1,
+                BITBOARD_H1 | BITBOARD_F1,
+                0,
+                BITBOARD_E1,
+                0,
+                board->flags.castle_q[1],
+                0,
+                board->flags.castle_k[1],
+                0,
+                0);
+
         move_count++;
         if (moves) {
             struct board_state tmp = *board;
@@ -1670,17 +1814,22 @@ int generate_castle_black(struct board_state *board,
                     __FILE__, __FUNCTION__, __LINE__);
             exit(-1);
         }
-        m->p_mover = KING;
-        m->s_mover = ROOK;
-        m->t_mover = NO_PIECE;
-        m->primary = BITBOARD_E8 | BITBOARD_C8;
-        m->secondary = BITBOARD_A8 | BITBOARD_D8;
-        m->primary_src = BITBOARD_E8;
-        m->flags.castle_q[0] = board->flags.castle_q[0];
-        m->flags.castle_q[1] = 0;
-        m->flags.castle_k[0] = board->flags.castle_k[0];
-        m->flags.castle_k[1] = 0;
-        m->flags.en_passant[0] = m->flags.en_passant[1] = 0;
+
+        fill_move(m,
+                KING,
+                ROOK,
+                NO_PIECE,
+                BITBOARD_E8 | BITBOARD_C8,
+                BITBOARD_A8 | BITBOARD_D8,
+                0,
+                BITBOARD_E8,
+                board->flags.castle_q[0],
+                0,
+                board->flags.castle_k[0],
+                0,
+                0,
+                0);
+
         move_count++;
         if (moves) {
             struct board_state tmp = *board;
@@ -1701,17 +1850,22 @@ int generate_castle_black(struct board_state *board,
                     __FILE__, __FUNCTION__, __LINE__);
             exit(-1);
         }
-        m->p_mover = KING;
-        m->s_mover = ROOK;
-        m->t_mover = NO_PIECE;
-        m->primary = BITBOARD_E8 | BITBOARD_G8;
-        m->secondary = BITBOARD_H8 | BITBOARD_F8;
-        m->primary_src = BITBOARD_E8;
-        m->flags.castle_q[0] = board->flags.castle_q[0];
-        m->flags.castle_q[1] = 0;
-        m->flags.castle_k[0] = board->flags.castle_k[0];
-        m->flags.castle_k[1] = 0;
-        m->flags.en_passant[0] = m->flags.en_passant[1] = 0;
+
+        fill_move(m,
+                KING,
+                ROOK,
+                NO_PIECE,
+                BITBOARD_E8 | BITBOARD_G8,
+                BITBOARD_H8 | BITBOARD_F8,
+                0,
+                BITBOARD_E8,
+                board->flags.castle_q[0],
+                0,
+                board->flags.castle_k[0],
+                0,
+                0,
+                0);
+
         move_count++;
         if (moves) {
             struct board_state tmp = *board;
