@@ -2,5 +2,5 @@ language: c
 compiler: clang
 before_install:
     - sudo apt-get -qq update
-    - sudo apt-get install libcmocka-dev -y
+    - sudo apt-get install cmocka -y
 script: make test
