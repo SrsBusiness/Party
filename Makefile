@@ -1,6 +1,6 @@
 CC		=	clang
-OBJFLAGS	=	-c -g -Wall -Iinclude --std=c11
-BINFLAGS	=	-g -Wall -Iinclude --std=c11
+OBJFLAGS	=	-c -g -pg -Wall -Iinclude --std=c11
+BINFLAGS	=	-g -pg -Wall -Iinclude --std=c11
 
 SRC		=	src
 LIB		=	lib

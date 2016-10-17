@@ -236,58 +236,64 @@ int32_t quiescent_max(struct board_state *board, int32_t alpha, int32_t beta) {
 }
 
 
-int search(struct board_state *board, int depth, struct move *best_move) {
+int search_w(struct board_state *board, int depth, struct move *best_move) {
     int status = NORMAL_MOVE;
-    int32_t min_max;
     struct priority_queue move_list;
     struct board_flags save = board->flags;
     uint64_t old_hash = board->hash;
     struct move *m;
     priority_queue_init(&move_list, 64);
     int move_count;
-    switch(board->turn) {
-        case WHITE:
-            min_max = -INT32_MAX;
-            move_count = generate_moves_white(board, &move_list);
-            if (move_count == 0) {
-                if (in_check(board, WHITE)) {
-                    status = CHECKMATE;
-                } else {
-                    status = STALEMATE;
-                }
-            }
-            while ((m = priority_queue_pop(&move_list)) != NULL) {
-                make(board, m);
-                int32_t score = min(board, SCORE_MIN, SCORE_MAX, depth - 1);
-                if (score > min_max) {
-                    min_max = score;
-                    *best_move = *m;
-                }
-                unmake(board, m, &save, old_hash);
-                free(m);
-            }
-            break;
-        case BLACK:
-            min_max = INT32_MAX; /* for symmetry */
-            move_count = generate_moves_black(board, &move_list);
-            if (move_count == 0) {
-                if (in_check(board, BLACK)) {
-                    status = CHECKMATE;
-                } else {
-                    status = STALEMATE;
-                }
-            }
-            while ((m = priority_queue_pop(&move_list)) != NULL) {
-                make(board, m);
-                int32_t score = max(board, SCORE_MIN, SCORE_MAX, depth - 1);
-                if (score < min_max) {
-                    min_max = score;
-                    *best_move = *m;
-                }
-                unmake(board, m, &save, old_hash);
-                free(m);
-            }
-            break;
+    int32_t alpha = SCORE_MIN, beta = SCORE_MAX;
+    move_count = generate_moves_white(board, &move_list);
+    if (move_count == 0) {
+        if (in_check(board, WHITE)) {
+            status = CHECKMATE;
+        } else {
+            status = STALEMATE;
+        }
+    }
+    while ((m = priority_queue_pop(&move_list)) != NULL) {
+        make(board, m);
+        /* Should remember alpha/beta values across min()/max() calls */
+        int32_t score = min(board, alpha, beta, depth - 1);
+        if (score > alpha) {
+            alpha = score;
+            *best_move = *m;
+        }
+        unmake(board, m, &save, old_hash);
+        free(m);
+    }
+    priority_queue_destroy(&move_list);
+    return status;
+}
+
+int search_b(struct board_state *board, int depth, struct move *best_move) {
+    int status = NORMAL_MOVE;
+    struct priority_queue move_list;
+    struct board_flags save = board->flags;
+    uint64_t old_hash = board->hash;
+    struct move *m;
+    priority_queue_init(&move_list, 64);
+    int move_count;
+    int alpha = SCORE_MIN, beta = SCORE_MAX;
+    move_count = generate_moves_black(board, &move_list);
+    if (move_count == 0) {
+        if (in_check(board, BLACK)) {
+            status = CHECKMATE;
+        } else {
+            status = STALEMATE;
+        }
+    }
+    while ((m = priority_queue_pop(&move_list)) != NULL) {
+        make(board, m);
+        int32_t score = max(board, alpha, beta, depth - 1);
+        if (score < beta) {
+            beta = score;
+            *best_move = *m;
+        }
+        unmake(board, m, &save, old_hash);
+        free(m);
     }
     priority_queue_destroy(&move_list);
     return status;
@@ -300,8 +306,16 @@ int id_search(struct board_state *board, int depth, struct move *best_move) {
         return status;
     }
     nodes_visited = 0;
-    for (int i = 1; i <= depth; i++) {
-        search(board, i, best_move); 
+    switch(board->turn) {
+        case WHITE:
+            for (int i = 1; i <= depth; i++) {
+                search_w(board, i, best_move); 
+            }
+            break;
+        case BLACK:
+            for (int i = 1; i <= depth; i++) {
+                search_b(board, i, best_move);
+            }
     }
     return status;
 }
